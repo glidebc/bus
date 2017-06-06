@@ -136,7 +136,7 @@
         /*background: #89c4f4;*/
     }
     .selected {
-    	background: whitesmoke;
+    	background: lightgray;
         /*border-color: black;*/
     }
 

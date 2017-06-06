@@ -744,7 +744,7 @@ function clearSelectedCellAndData() {
 }
 
 function beforeGetBookingData() {
-    aryCells.splice(0, aryShiftCell.length); //清除 每個site的cell array
+    aryCells.splice(0, aryCells.length); //清除 每個site的cell array
     $(tbody).empty(); //清除 table body
     lastSelectedCell = undefined;
     lastSelectedRow = undefined;

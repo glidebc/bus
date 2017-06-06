@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\DataQuery;
 use App\Entrust;
-use App\Glide;
 use App\Publishposition;
 use App\Publishsite;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +24,7 @@ class PublishbookController extends Controller {
     {
     	$arraySite = [];
     	$arrayPositions = [];
-    	$publishSites = Publishsite::select('name','id')->where('deleted_at', null)->orderBy('id')->pluck('name','id');
+    	$publishSites = Publishsite::select('name','id')->orderBy('id')->pluck('name','id');
     	foreach ($publishSites as $key => $value) {
     		$site = new stdClass();
     		$site->id = $key;
@@ -52,7 +52,7 @@ class PublishbookController extends Controller {
     	}
 
 		$userid = Auth::user()->id;
-		$entrust = Glide::arraySelectEntrust($userid);
+		$entrust = DataQuery::arraySelectEntrust($userid);
         // $entrust = Entrust::where('owner_user', $userid)->orderBy('created_at')->pluck('name', 'id');
 
         $myEntrustId = Input::get('eid');

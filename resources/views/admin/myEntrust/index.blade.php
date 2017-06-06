@@ -60,7 +60,7 @@
                                 {!! Form::close() !!}
                                 <!-- {!! link_to_route('admin.myentrust.back', '退回提案', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
                                 @elseif($row->status == 3)
-                                {!! link_to_route(config('quickadmin.route').'.publishbook.index', '委刊預約', array('eid='.$row->id), array('class' => 'btn btn-xs btn-publish')) !!}
+                                {!! link_to_route(config('quickadmin.route').'.publishbook.index', '委刊預約', array('eid='.$row->id), array('class' => 'btn btn-xs btn-default')) !!}
                                 @endif
                             </td>
                             <td>
@@ -117,16 +117,4 @@
             });
         });
     </script>
-
-    <style>
-    .btn-publish {
-        color: black;
-        background-color: #C5C5C5;
-        border: 1px solid black;
-    }
-    .btn-publish:hover {
-        color: white;
-        background-color: #909090;
-    }
-    </style>
 @stop

@@ -51,10 +51,10 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as'   => 'admin.entrustverify.reject',
 	    'uses' => 'Admin\PublishverifyController@publishReject'
 	]);
-	// Route::post('entrustverify/back/{id}', [
-	//     'as'   => 'admin.entrustverify.back',
-	//     'uses' => 'Admin\PublishverifyController@publishBack'
-	// ]);
+	Route::post('entrustverify/back/{id}', [
+	    'as'   => 'admin.entrustverify.back',
+	    'uses' => 'Admin\PublishverifyController@publishBack'
+	]);
 });
 
 Route::group(['prefix' => 'publish'], function () {

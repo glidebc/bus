@@ -137,7 +137,9 @@ class DataQuery {
 
     static function arraySelectEntrust($userId)
     {
-        $entrust = Entrust::where('owner_user', $userId)->orderBy('created_at', 'desc')->pluck('name', 'id')->prepend('請選擇', 0);
+        $entrust = Entrust::where('owner_user', $userId)
+                            ->whereIn('status', array(2, 3))
+                            ->orderBy('created_at', 'desc')->pluck('name', 'id')->prepend('請選擇', 0);
         return $entrust;
     }
     

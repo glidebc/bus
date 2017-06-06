@@ -22,7 +22,7 @@
 <th>狀態</th>
 
                         <th>審核</th>
-                        <!-- <th>狀態回復</th> -->
+                        <th>狀態回復</th>
                     </tr>
                 </thead>
 
@@ -55,15 +55,15 @@
                                 {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!} -->
                             </td>
-                            <!-- <td>
+                            <td>
                                 @if($row->status == 3)
-                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退回審核中？');", 'route' => array('publish.init', $row->id))) !!}
-                                {!! Form::submit('退回審核中', array('class' => 'btn btn-xs btn-warning')) !!}
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要回復成審核中？');", 'route' => array(config('quickadmin.route').'.entrustverify.back', $row->id))) !!}
+                                {!! Form::submit('回復審核中', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
 
-                                {!! link_to_route('publish.init', '退回審核中', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!}
+                                <!-- {!! link_to_route('publish.init', '退回審核中', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
                                 @endif
-                            </td> -->
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

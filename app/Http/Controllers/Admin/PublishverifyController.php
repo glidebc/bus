@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\DataQuery;
 use App\Entrust;
+use App\Publish;
 use App\Publishuser;
 use App\User;
 use Illuminate\Http\Request;
@@ -50,14 +51,17 @@ class PublishverifyController extends Controller {
 	}
 	public function publishReject($id)
 	{
+		//退件時把委刊單預約的資料刪除
+		Publish::where('entrust_id', $id)->delete();
+		//
 		$this->verify($id, 4);
 		return redirect()->route('admin.publishverify.index');
 	}
-	// public function publishBack($id)
-	// {
-	// 	$this->verify($id, 2);
-	// 	return redirect()->route('admin.publishverify.index');
-	// }
+	public function publishBack($id)
+	{
+		$this->verify($id, 2);
+		return redirect()->route('admin.publishverify.index');
+	}
 
 	/**
 	 * 審核

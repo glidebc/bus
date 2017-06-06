@@ -30,7 +30,8 @@
         {!! Form::text('name', old('name'), array('class'=>'form-control')) !!}
         
     </div>
-</div><div class="form-group">
+</div>
+<!-- <div class="form-group">
     {!! Form::label('publish_kind', '委刊類別', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         <select class="form-control" id="publish_kind" name="publish_kind">
@@ -44,8 +45,8 @@
         </select>
         
     </div>
-</div>
-<div class="form-group">
+</div> -->
+<!-- <div class="form-group">
     {!! Form::label('publish_item', '委刊項', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         <select class="form-control" id="publish_item" name="publish_item">
@@ -57,7 +58,7 @@
         </select>
         <input class="form-control" name="publish_item_cost" type="text" id="publish_item_cost" />
     </div>
-</div>
+</div> -->
 
 <!-- <div class="form-group">
     {!! Form::label('owner_user', '委刊者*', array('class'=>'col-sm-2 control-label')) !!}

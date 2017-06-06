@@ -33,6 +33,8 @@
                                 <input type="email"
                                        class="form-control"
                                        name="email"
+                                       autofocus="autofocus"
+                                       placeholder="Email"
                                        value="{{ old('email') }}">
                             </div>
                         </div>
@@ -51,7 +53,7 @@
                             <div class="col-md-6 col-md-offset-4">
                                 <label>
                                     <input type="checkbox"
-                                           name="remember">{{ trans('quickadmin::auth.login-remember_me') }}
+                                           name="remember"> {{ trans('quickadmin::auth.login-remember_me') }}
                                 </label>
                             </div>
                         </div>

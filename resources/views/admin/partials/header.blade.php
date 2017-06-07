@@ -3,14 +3,17 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ trans('quickadmin::admin.partials-header-title') }} - 
+    <title>
       <?php
+        $fncTitle = '';
         foreach($menus as $menu)
             foreach($menu['children'] as $child)
                 if($child->name == str_replace('Controller','',explode("@",class_basename(app('request')->route()->getAction()['controller']))[0])) {
-                    echo $child->title; break;
+                    $fncTitle .= $child->title; break;
                 }
-      ?>
+        if(strlen($fncTitle) > 0)
+          echo $fncTitle.' - ';
+      ?>{{ trans('quickadmin::admin.partials-header-title') }}
     </title>
 
     <meta http-equiv="X-UA-Compatible"

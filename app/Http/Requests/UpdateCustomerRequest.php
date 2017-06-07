@@ -25,11 +25,17 @@ class UpdateCustomerRequest extends FormRequest {
 	 */
 	public function rules()
 	{
+		$exceptId = $this->customer;
+		if($exceptId == null)
+			$exceptId = $this->mycustomer;
+		if($exceptId == null)
+			$exceptId = $this->myagent;
+
 		return [
-            'name' => 'required|unique:customer,name,'.$this->customer,
+            'name' => 'required|unique:customer,name,'.$exceptId,
             'tax_title' => 'required',
-            'agent_id' => 'required',
-            'tax_num' => 'required|numeric|check_min_length|check_valid_tax_num|unique:customer,tax_num,'.$this->customer,
+            // 'agent_id' => 'required',
+            'tax_num' => 'required|numeric|check_min_length|check_valid_tax_num|unique:customer,tax_num,'.$exceptId,
             'address' => 'required',
             'com_tel' => 'required',
             

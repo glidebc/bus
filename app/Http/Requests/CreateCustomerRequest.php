@@ -28,7 +28,7 @@ class CreateCustomerRequest extends FormRequest {
 		return [
             'name' => 'required|unique:customer,name,'.$this->customer,
             'tax_title' => 'required',
-            'agent_id' => 'required',
+            // 'agent_id' => 'required',
             'tax_num' => 'required|numeric|check_min_length|check_valid_tax_num|unique:customer,tax_num,'.$this->customer,
             'address' => 'required',
             'com_tel' => 'required',

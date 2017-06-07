@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
-use App\Agent;
 use App\Customer;
 use App\CustomerAgent;
 use App\DataQuery;
@@ -48,7 +47,8 @@ class MyCustomerController extends Controller {
 	 */
 	public function create()
 	{
-	    $agent = DataQuery::arraySelectAgent();
+		$userId = Auth::user()->id;
+	    $agent = DataQuery::arraySelectAgent($userId);
 	    return view(config('quickadmin.route').'.myCustomer.create', compact('agent'));
 	}
 
@@ -60,15 +60,9 @@ class MyCustomerController extends Controller {
 	public function store(CreateCustomerRequest $request)
 	{
 		$id = Customer::create($request->all())->id;
-		//
+		//更新客戶與代理商關聯
 		$agentid = $request->input('agent_id');
-		if($agentid > 0) {
-			$customerAgent = new CustomerAgent();
-			$customerAgent->customer_id = $id;
-			$customerAgent->agent_id = $agentid;
-			$customerAgent->save();
-		}
-
+		$this->checkCustomerAgent($id, $agentid);
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 
@@ -80,9 +74,17 @@ class MyCustomerController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$agent = DataQuery::arraySelectAgent();
+		$userId = Auth::user()->id;
+		$agent = DataQuery::arraySelectAgent($userId);
 		$customer = Customer::withTrashed()->find($id);
-		$agentid = $customer->agent_id;
+		//
+		$agentid = null;
+		$customerAgent = CustomerAgent::where([
+				['customer_id', $id],
+				['status', 1]
+			]);
+		if($customerAgent->count() > 0)
+			$agentid = $customerAgent->first()->agent_id;
 		return view(config('quickadmin.route').'.myCustomer.edit', compact(array('agent','customer','agentid')));
 	}
 
@@ -96,17 +98,9 @@ class MyCustomerController extends Controller {
 	{
 		$customer = Customer::withTrashed()->findOrFail($id);
 		$customer->update($request->all());
-		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
-	}
-
-	/**
-	 * agent 的 deleted_at 改成 null.
-	 *
-	 * @param  int  $id
-	 */
-	public function resetDelete($id)
-	{
-		Customer::withTrashed()->find($id)->restore();
+		//更新客戶與代理商關聯
+		$agentid = $request->input('agent_id');
+		$this->checkCustomerAgent($id, $agentid);
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 
@@ -139,4 +133,63 @@ class MyCustomerController extends Controller {
         return redirect()->route(config('quickadmin.route').'.mycustomer.index');
     }
 
+    //列表中的啟用按鈕
+	public function resetDelete($id) {
+		Customer::withTrashed()->find($id)->restore();
+		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+	}
+	//加入或取消 客戶與代理商關聯
+	public function checkCustomerAgent($customerId, $agentId) {
+		$status = 1;
+		$ca = CustomerAgent::where('customer_id', $customerId);
+		//新增客戶時，若沒有代理商。客戶與代理商關聯表不用新增資料
+		if($ca->count() == 0 && $agentId == 0)
+			return;
+
+		//選擇「無代理商」時，取出原本關聯的代理商id
+		if($agentId == 0) {
+			$agentId = $ca->first()->agent_id;
+			$status = 0;
+		}
+		// $customerAgent = CustomerAgent::where([
+		// 		['customer_id', $customerId],
+		// 		['agent_id', $agentId]
+		// 	]);
+		
+		if($ca->count() == 0) {
+			$ca = new CustomerAgent();
+			$ca->customer_id = $customerId;
+		} else {
+			$ca = $ca->first();
+		}
+		$ca->agent_id = $agentId;
+		$ca->status = $status;
+		$ca->save();
+		
+
+		
+
+
+		// if($agentId == 0) {
+		// 	$agentId = CustomerAgent::where('customer_id', $customerId)->first()->agent_id;
+		// 	$customerAgent = CustomerAgent::where([
+		// 			['customer_id', $customerId],
+		// 			['agent_id', $agentId]
+		// 		])->first();
+		// 	$customerAgent->status = 0;
+		// 	$customerAgent->save();
+		// } else {
+		// 	$customerAgent = CustomerAgent::where([
+		// 			['customer_id', $customerId],
+		// 			['agent_id', $agentId]
+		// 		]);
+		// 	if($customerAgent->count() > 0) {
+
+		// 	}
+		// 	$customerAgent = new CustomerAgent();
+		// 	$customerAgent->customer_id = $customerId;
+		// 	$customerAgent->agent_id = $agentId;
+		// 	$customerAgent->save();
+		// }
+	}
 }

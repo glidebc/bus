@@ -14,13 +14,23 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/logout', function () {
+	Auth::logout(); //will clear the user from the session automatically
+    return view('welcome');
+});
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('myentrust', 'Admin\MyEntrustController');
     Route::resource('mycustomer', 'Admin\MyCustomerController');
+    Route::resource('myagent', 'Admin\MyAgentController');
+
     Route::post('/mycustomer/resetDelete/{id}',[
 	    'as' => 'admin.mycustomer.resetDelete',
 	    'uses' => 'Admin\MyCustomerController@resetDelete'
+	]);
+	Route::post('/myagent/resetDelete/{id}',[
+	    'as' => 'admin.myagent.resetDelete',
+	    'uses' => 'Admin\MyAgentController@resetDelete'
 	]);
 });
 

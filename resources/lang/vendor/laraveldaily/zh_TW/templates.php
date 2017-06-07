@@ -38,7 +38,7 @@ return [
   'templates-view_index-delete' => '刪除',
   'templates-view_index-delete_checked' => '將打勾的都刪除',
   'templates-view_index-confirm_deletion2' => 'Confirm deletion?',  
-  'templates-view_index-no_entries_found' => 'No entries found.',
+  'templates-view_index-no_entries_found' => '沒有資料',
   'templates-view_index-are_you_sure' => 'Are you sure?',
 
 ];

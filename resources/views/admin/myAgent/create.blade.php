@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-sm-10 col-sm-offset-2">
-        <h1>新增客戶</h1>
+        <h1>新增代理商</h1>
 
         @if ($errors->any())
         	<div class="alert alert-danger">
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-{!! Form::open(array('route' => config('quickadmin.route').'.mycustomer.store', 'id' => 'form-with-validation', 'class' => 'form-horizontal')) !!}
+{!! Form::open(array('route' => config('quickadmin.route').'.myagent.store', 'id' => 'form-with-validation', 'class' => 'form-horizontal')) !!}
 
 <div class="form-group">
     {!! Form::label('name', '公司簡稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
@@ -28,12 +28,6 @@
     {!! Form::label('tax_title', '公司全名', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::text('tax_title', old('tax_title'), array('class'=>'form-control', 'placeholder' => '發票抬頭，公司完整名稱')) !!}
-        
-    </div>
-</div><div class="form-group">
-    {!! Form::label('agent_id', '代理商', array('class'=>'col-sm-2 control-label')) !!}
-    <div class="col-sm-10">
-        {!! Form::select('agent_id', $agent, null, array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">
@@ -87,7 +81,8 @@
     </div>
 </div>
 
-{{ Form::hidden('owner_user', Auth::user()->id, array('id' => 'invisible_id')) }}
+{{ Form::hidden('is_agent', true, array('id' => 'invisible_agent')) }}
+{{ Form::hidden('owner_user', Auth::user()->id, array('id' => 'invisible_user')) }}
 
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">

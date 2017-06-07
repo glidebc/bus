@@ -36,24 +36,30 @@ class DataQuery {
     //                         ->selectRaw('agent.name AS agent_name,customer.*');
     //     return $customer;
     // }
+
+    static function arrayAgent($userId)
+    {
+        return self::arrayAgentOrCustomer($userId, true);
+    }
     
     static function arrayCustomer($userId)
     {
-        $customers = Customer::withTrashed()
-                            ->where([
-                                ['is_agent', false],
-                                ['owner_user', $userId]
-                            ])
-                            ->selectRaw('*, "" AS agent_name')
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-        foreach ($customers as $customer) {
-            $ca = CustomerAgent::where('customer_id', $customer->id);
-            if($ca->count() > 0) {
-                // $a_tax_num = $ca->first()->a_tax_num;
-                $customer->agent_name = Customer::find($ca->first()->agent_id)->name;
-            }
-        }
+        // $customers = Customer::withTrashed()
+        //                     ->where([
+        //                         ['is_agent', false],
+        //                         ['owner_user', $userId]
+        //                     ])
+        //                     ->selectRaw('*, "" AS agent_name')
+        //                     ->orderBy('created_at', 'desc')
+        //                     ->get();
+        // foreach ($customers as $customer) {
+        //     $ca = CustomerAgent::where('customer_id', $customer->id);
+        //     if($ca->count() > 0) {
+        //         // $a_tax_num = $ca->first()->a_tax_num;
+        //         $customer->agent_name = Customer::find($ca->first()->agent_id)->name;
+        //     }
+        // }
+
         // $customer = Customer::withTrashed()
         //                     ->leftJoin('agent', function ($join) {
         //                         $join->on('agent.id', '=', 'customer.agent_id');
@@ -62,6 +68,29 @@ class DataQuery {
         //                     ->orderBy('customer.created_at', 'desc')
         //                     ->get();
         // $customer = self::collectionOfCustomerWithAgent()->get();
+        return self::arrayAgentOrCustomer($userId, false);
+    }
+
+    static function arrayAgentOrCustomer($userId, $isAgent)
+    {
+        $customerCondition = array();
+        array_push($customerCondition, array('is_agent', $isAgent));
+        if(!is_null($userId))
+            array_push($customerCondition, array('owner_user', $userId));
+
+        $customers = Customer::withTrashed()
+                            ->where($customerCondition)
+                            ->selectRaw('*, "" AS agent_name')
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+        foreach ($customers as $customer) {
+            $customerAgent = CustomerAgent::where([
+                    ['customer_id', $customer->id],
+                    ['status', 1]
+                ]);
+            if($customerAgent->count() > 0)
+                $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
+        }
         return $customers;
     }
     
@@ -82,13 +111,14 @@ class DataQuery {
         return $customer;
     }
     
-    static function arraySelectAgent()
+    static function arraySelectAgent($userId)
     {
-        $agent = Customer::where('is_agent', true)->select('name','id')->orderBy('name')->pluck('name','id')->prepend('無代理商', 0);
-        // $arr = array('無代理商' => null);
-        // foreach($agent as $key => $value) {
-        //     $arr[$key] = $value;
-        // }
+        $agent = Customer::where([
+                                ['customer.is_agent', true],
+                                ['customer.owner_user', $userId]
+                            ])
+                            ->select('name','id')
+                            ->orderBy('name')->pluck('name','id')->prepend('無代理商', 0);
         return $agent;
     }
 
@@ -155,11 +185,9 @@ class DataQuery {
     {
         $entrust = Entrust::join('customer', function ($join) use ($entrustId) {
                                 $join->on('entrust.customer_id', '=', 'customer.id')
-                                     ->whereRaw('entrust.id='.$entrustId.' AND entrust.deleted_at IS NULL');
-                            })->leftJoin('agent', function ($join) {
-                                $join->on('customer.agent_id', '=', 'agent.id');
+                                     ->where('entrust.id', $entrustId);
                             })
-                            ->selectRaw('CASE WHEN agent.id IS NULL THEN customer.name ELSE CONCAT(agent.name,"-",customer.name) END AS agent_customer,entrust.name,entrust.owner_user');
+                            ->selectRaw('customer.name AS agent_customer,entrust.name,entrust.owner_user');
                             // ->orderBy('entrust.created_at', 'desc');
         return $entrust;
     }
@@ -167,8 +195,8 @@ class DataQuery {
     static function arrayPublishpositionWithSite()
     {
         $publishposition = Publishposition::leftJoin('publish_site', function ($join) {
-                                $join->on('publish_site.id', '=', 'publish_position.site_id')
-                                     ->whereRaw('publish_position.deleted_at IS NULL');
+                                $join->on('publish_site.id', '=', 'publish_position.site_id');
+                                     // ->whereRaw('publish_position.deleted_at IS NULL');
                             })
                             ->selectRaw('publish_site.name AS site_name,publish_position.*')
                             ->get();

@@ -80,9 +80,9 @@ class ServiceController extends Controller {
 
 					if($d != '' && $canSave) {
 						//將此委刊單的 status 改成 2 (審核中)
-						$entrust = Entrust::find($json['eid']);
-						$entrust->status = 2;
-						$entrust->save();
+						// $entrust = Entrust::find($json['eid']);
+						// $entrust->status = 2;
+						// $entrust->save();
 						//save to Publish
 						$publish = new Publish();
 						$publish->entrust_id = $json['eid'];
@@ -141,7 +141,7 @@ class ServiceController extends Controller {
 		$data = new stdClass();
 		//有預約的日期與版位的table cell list
 		$listDatePosition = Publish::select('publish_position_id', 'turn', 'date')
-								->whereRaw('deleted_at IS NULL')
+								// ->whereRaw('deleted_at IS NULL')
 								->where([
 									['date', '>=', str_replace('-', '', $json['sDate'])],
 									['date', '<=', str_replace('-', '', $json['eDate'])]
@@ -159,8 +159,8 @@ class ServiceController extends Controller {
 			//委刊單的status 2 or 3 才顯示
 			$entrustStatus = Entrust::find($publish->entrust_id)->status;
 			if ($entrustStatus == 2 || $entrustStatus == 3) {
-				$entrust = Glide::collectionOfEntrustByID($publish->entrust_id)->first();
-				$publishuser = Glide::collectionPublishUser($entrust->owner_user)->first();
+				$entrust = DataQuery::collectionOfEntrustByID($publish->entrust_id)->first();
+				$publishuser = DataQuery::collectionPublishUser($entrust->owner_user)->first();
 				$cell = new stdClass();
 				$cell->customer = $entrust->agent_customer;
 				$cell->project = $entrust->name;

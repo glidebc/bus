@@ -37,7 +37,7 @@
     <link rel="stylesheet"
           href="{{ url('quickadmin/css') }}/quickadmin-theme-default.css"/>
     <link rel="stylesheet"
-          href="https://code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">
+          href="https://code.jquery.com/ui/1.11.3/themes/hot-sneaks/jquery-ui.css">
     <link rel="stylesheet"
           href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css"/>
     <link rel="stylesheet"

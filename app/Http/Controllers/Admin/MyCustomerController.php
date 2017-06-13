@@ -139,7 +139,7 @@ class MyCustomerController extends Controller {
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 	//加入或取消 客戶與代理商關聯
-	public function checkCustomerAgent($customerId, $agentId) {
+	function checkCustomerAgent($customerId, $agentId) {
 		$status = 1;
 		$ca = CustomerAgent::where('customer_id', $customerId);
 		//新增客戶時，若沒有代理商。客戶與代理商關聯表不用新增資料

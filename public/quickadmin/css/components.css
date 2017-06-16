@@ -39,7 +39,7 @@ General reset
 /* Set default body */
 body {
   color: #333333;
-  font-family: "Open Sans", \5FAE\8EDF\6B63\9ED1\9AD4, sans-serif;
+  font-family: "Open Sans", "cwTeXHei", sans-serif;
   padding: 0px !important;
   margin: 0px !important;
   font-size: 13px;

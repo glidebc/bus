@@ -12,12 +12,20 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+	return Redirect::to('/login');
+    // return view('welcome');
 });
-Route::get('/logout', function () {
-	Auth::logout(); //will clear the user from the session automatically
-    return view('welcome');
+Route::get('/home', function () {
+	return Redirect::to('/admin');
+    // return view('welcome');
 });
+// Route::post('/logout', 'Auth\LoginController@logout');
+// Route::post('/logout', function () {
+// 	Session::flush();
+//     return view('auth.login');
+// 	// Auth::logout(); //will clear the user from the session automatically
+//  //    return view('welcome');
+// });
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('myentrust', 'Admin\MyEntrustController');

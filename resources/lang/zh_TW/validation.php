@@ -115,7 +115,7 @@ return [
     */
 
     'attributes' => [
-        'email' => 'Email',
+        'email' => '帳號',
         'password' => '密碼',
     ],
 

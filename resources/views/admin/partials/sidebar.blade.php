@@ -69,6 +69,7 @@
             @endforeach
             <li>
                 {!! Form::open(['url' => 'logout']) !!}
+                {{ csrf_field() }}
                 <button type="submit" class="logout">
                     <i class="fa fa-sign-out fa-fw"></i>
                     <span class="title">{{ trans('quickadmin::admin.partials-sidebar-logout') }}</span>

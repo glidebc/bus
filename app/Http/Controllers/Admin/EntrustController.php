@@ -5,15 +5,87 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
-use App\Customer;
+use App\DataQuery;
 use App\Entrust;
+use App\EntrustItem;
 use App\Glide;
 use App\Http\Requests\CreateEntrustRequest;
 use App\Http\Requests\UpdateEntrustRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use stdClass;
 
 class EntrustController extends Controller {
+
+	/**
+	 * 查看委刊單資料
+	 */
+	public function entrustVerify($id)
+	{
+		$entrust = $this->getEntrust($id);
+		$kind = 'verify';
+		return view(config('quickadmin.route').'.entrust.read', compact(array('entrust', 'kind')));
+	}
+	public function entrustRead($id)
+	{
+		$entrust = $this->getEntrust($id);
+		$kind = 'read';
+		return view(config('quickadmin.route').'.entrust.read', compact(array('entrust', 'kind')));
+	}
+	function getEntrust($id) {
+		$entrust = new stdClass();
+		$entrust->id = $id;
+		$e = Entrust::find($id);
+
+		// $userId = Auth::user()->id;
+		$aryCustomer = DataQuery::arrayCustomer(null)->pluck('name','id');
+		$entrust->customer_name = $aryCustomer[$e->customer_id];
+
+		$entrust->name = $e->name;
+
+		$sd = ''; $ed = ''; $dayCount = 0;
+		if($e->start_date != null && $e->end_date != null) {
+			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
+			$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
+			$dayCount = $this->countDays($sd, $ed);
+		}
+		$entrust->txt_start_date = $sd;
+		$entrust->txt_end_date = $ed;
+		$entrust->day_count = $dayCount;
+		
+		$publishKindSelected = explode(',', $e->publish_kind);
+		$aryPublishKind = [];
+		foreach ($publishKindSelected as $kindId) {
+			$aryPublishKind[] = config('admin.entrust.items')[$kindId];
+		}
+		$entrust->publish_kind = $aryPublishKind;
+
+		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
+		$entrust->item_count = $entrustItems->count();//委刊項數量
+		$aryItem = []; $aryItemCost = []; $count = 0;
+		foreach ($entrustItems as $item) {
+			$aryItem[] = $item->name;
+			$aryItemCost[] = number_format($item->cost);
+			$count += $item->cost;
+		}
+		$entrust->item = $aryItem;
+		$entrust->itemCost = $aryItemCost;
+		$entrust->count = number_format($count);
+
+		$entrust->pay = config('admin.entrust.pay')[$e->pay];
+		$entrust->pay_status = config('admin.entrust.pay_status')[$e->pay_status];
+		$entrust->note = $e->note;
+
+		return $entrust;
+	}
+
+	//計算天數
+    function countDays($strSD, $strED) {
+		$sd = date_create($strSD);
+		$ed = date_create($strED);
+		$interval = date_diff($sd, $ed);
+		return $interval->days + 1;
+    }
 
 	// private $customer;
 

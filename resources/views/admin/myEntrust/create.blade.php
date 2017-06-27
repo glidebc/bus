@@ -37,13 +37,16 @@
         {{ Form::hidden('start_date', null, array('id' => 'hidStartDate')) }}
         <span class="fa fa-arrow-right"></span>
         {!! Form::text('txt_end_date', old('txt_end_date'), array('class'=>'form-control duration', 'id'=>'txtEndDate', 'maxlength' => 10)) !!}
-        {{ Form::hidden('end_date', null, array('id' => 'hidEndDate')) }}
+        {{ Form::hidden('end_date', null, array('id' => 'hidEndDate')) }}&nbsp;
+        共
+        {!! Form::text('day_count', old('day_count',0), array('class'=>'form-control item-count', 'id'=>'day-count', 'readonly'=>'true')) !!}
+        天
         
     </div>
 </div><div class="form-group">
     {!! Form::label('publish_kind', '委刊類別', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::select('publish_kind', $publishKind, null, array('class'=>'form-control')) !!}
+        {!! Form::select('publish_kind[]', $publishKind, null, array('class'=>'form-control', 'multiple'=>true)) !!}
         
     </div>
 </div><div class="form-group">
@@ -51,7 +54,7 @@
     <div class="col-sm-10">
         目前有
         {!! Form::text('item_count', old('item_count',0), array('class'=>'form-control item-count', 'id'=>'item-count', 'readonly'=>'true')) !!}
-        個委刊項。&nbsp;
+        個委刊項 , 小計 $<span id="count">0</span> 元整&nbsp;&nbsp;&nbsp;&nbsp;
         <input class="btn btn-item" type="button" value="編輯委刊項" onclick="showOrHideItemList(this);">
         <div id="item-list" style="display: none;">
             @for ($no=1; $no <= 10 ; $no++)
@@ -104,9 +107,11 @@
         beforeShow: durationDatePick,
         dateFormat: "yy-m-d",
         onSelect: function(dateText, inst) {
-            var d = new Date($(this).val());
-            var hidID = this.id.replace('txt', 'hid');
+            var d = new Date(dateText);
+            var hidID = inst.id.replace('txt', 'hid');
             $('#' + hidID).val(dateString(d, 'date'));
+            //
+            countDays();
         }
     });
     function durationDatePick(input) {
@@ -120,7 +125,6 @@
         }
         return {}
     }
-
     //將日期轉成字串
     function dateString(date, type) {
         var year = date.getFullYear();
@@ -135,6 +139,15 @@
                 return year + (month < 10 ? '0' + month : month) + (day < 10 ? '0' + day : day);
         }
     }
+    //計算天數
+    function countDays() {
+        var sd = new Date($('#txtStartDate').val());
+        var ed = new Date($('#txtEndDate').val());
+        if(!isNaN(sd.getTime()) && !isNaN(ed.getTime())){
+            var days = Math.round((ed - sd) / (1000 * 60 * 60 * 24)) + 1;
+            $('#day-count').val(days);
+        }
+    }
 
     function showOrHideItemList(e){
         var t = '';
@@ -145,11 +158,12 @@
 
     $('#item_name_1, #item_name_2, #item_name_3, #item_name_4, #item_name_5, #item_name_6, #item_name_7, #item_name_8, #item_name_9, #item_name_10').change(function() {
         //
-        var itemCount = 0;
+        var itemCount = 0, count = 0;
         for(var itemNo = 1; itemNo <= 10; itemNo++)
             if($('#item_name_' + itemNo).val().length > 0)
                 itemCount++;
         $('#item-count').val(itemCount);
+        setCount();//小計
     }); 
 
     function formatCurrency(num){
@@ -173,15 +187,33 @@
     };
 
     
-    $('.form-control.item-currency.text-right').keyup(function(){setCurrencyAndCostText(this);});
-    $('.form-control.item-currency.text-right').change(function(){setCurrencyAndCostText(this);});
+    $('.form-control.item-currency.text-right').keypress(function(event) {
+        if(event.which != 8 && isNaN(String.fromCharCode(event.which)))
+            event.preventDefault();
+    }).keyup(function(event) {
+        setCurrencyAndCostText(this);
+        setCount();//小計
+    });
+    $('.form-control.item-currency.text-right').change(function() {
+        setCurrencyAndCostText(this);
+        setCount();//小計
+    });
     function setCurrencyAndCostText(e) {
-        var currency = formatCurrency($(e).val());
+        var cost = $(e).val().replace(/,/g, ''); //currency去掉comma
+        $('#item_cost_' + $(e).attr('no')).val(cost);
+        var currency = formatCurrency(cost);
         $(e).val(currency);
-        var cost = currency.replace(/,/g, ''); //currency去掉comma
-        var no = $(e).attr('no');
-        $('#item_cost_' + no).val(cost);
-        return {};
+        // return {};
+    }
+    //小計
+    function setCount() {
+        var count = 0;
+        for(var itemNo = 1; itemNo <= 10; itemNo++){
+            var cost = parseInt($('#item_cost_' + itemNo).val(), 10);
+            if($('#item_name_' + itemNo).val().length > 0 && !isNaN(cost))
+                count += cost;
+        }
+        $('#count').text(formatCurrency(count));
     }
 
 </script>

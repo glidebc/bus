@@ -37,15 +37,17 @@
     <link rel="stylesheet"
           href="{{ url('quickadmin/css') }}/quickadmin-theme-default.css"/>
     <link rel="stylesheet"
-          href="https://code.jquery.com/ui/1.11.3/themes/hot-sneaks/jquery-ui.css">
+          href="{{ url('jqueryui-themes-1.12.1/css/hot-sneaks') }}/jquery-ui.css">
     <link rel="stylesheet"
-          href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css"/>
-    <link rel="stylesheet"
+          href="{{ url('datatables-1.10.15/css') }}/jquery.dataTables.min.css"/>
+<!--     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.4.5/jquery-ui-timepicker-addon.min.css"/>
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.standalone.min.css"/>
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.standalone.min.css"/> -->
     <style type="text/css">
-      @font-face {
+      @import url(http://fonts.googleapis.com/earlyaccess/notosanstc.css);
+
+      /*@font-face {
         font-family: 'cwTeXHei';
         font-style: normal;
         font-weight: 500;
@@ -54,7 +56,7 @@
              url(//fonts.gstatic.com/ea/cwtexhei/v3/cwTeXHei-zhonly.woff2) format('woff2'),
              url(//fonts.gstatic.com/ea/cwtexhei/v3/cwTeXHei-zhonly.woff) format('woff'),
              url(//fonts.gstatic.com/ea/cwtexhei/v3/cwTeXHei-zhonly.ttf) format('truetype');
-      }
+      }*/
     </style>
 </head>
 

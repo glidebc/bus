@@ -29,7 +29,7 @@ class CreateEntrustRequest extends FormRequest {
             'name' => 'required|unique:entrust,name,'.$this->myentrust,
             'start_date' => 'required|size:8', 
             'end_date' => 'required|size:8', 
-            'publish_kind' => 'check_publish_kind', 
+            'publish_kind' => 'required|array|min:1', 
             'item_count' => 'check_item_count', 
 
             'item_cost_1' => 'check_item_cost',
@@ -64,7 +64,7 @@ class CreateEntrustRequest extends FormRequest {
 
 	        'start_date.required' => '請選擇 總走期的開始日期',  
 	        'end_date.required' => '請選擇 總走期的結束日期', 
-	        'publish_kind.check_publish_kind' => '請選擇委刊類別', 
+	        'publish_kind.required' => '請選擇委刊類別', 
 
 	        'item_count.check_item_count' => '至少要有一個委刊項',
 	        'item_cost_1.check_item_cost' => '預算請輸入數字',
@@ -90,9 +90,6 @@ class CreateEntrustRequest extends FormRequest {
     public function validator(Factory $factory)
     {
 		$factory->extend('check_customer', function($attribute, $value, $parameters, $validator) {
-    		return $value > 0;
-        });
-        $factory->extend('check_publish_kind', function($attribute, $value, $parameters, $validator) {
     		return $value > 0;
         });
         $factory->extend('check_item_count', function($attribute, $value, $parameters, $validator) {

@@ -19,9 +19,11 @@
                         <th>&nbsp;</th>
                         <th>客戶</th>
 <th>委刊單名稱</th>
-<!-- <th>委刊者</th> -->
+<th>總走期</th>
+<th>付款方式</th>
+<th>付款情況</th>
 
-                        <th>狀態</th>
+                        <th>審核狀態</th>
                         <th>&nbsp;</th>
                         <th>&nbsp;</th>
                     </tr>
@@ -33,10 +35,18 @@
                             <!-- <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
                             </td> -->
-                            <td>&nbsp;</td>
+                            <td>
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.read', $row->id))) !!}
+                                {!! Form::submit('查看', array('class' => 'hide', 'id' => 'read-'.$row->id)) !!}
+                                <span class="fa fa-file-o btn-read" onclick='$("#read-{{ $row->id }}").click();'></span>
+                                {!! Form::close() !!}
+                            </td>
                             <td>{{ $row->customer_name }}</td>
 <td>{{ $row->name }}</td>
-<!-- <td>{{ $row->owner_user }}</td> -->
+<td>{{ $row->duration }}</td>
+<td>{{ $row->txt_pay }}</td>
+<td>{{ $row->txt_pay_status }}</td>
+
                             <td>
                                 @if($row->status == 1)
                                 提案
@@ -63,6 +73,9 @@
                                 <!-- {!! link_to_route('admin.myentrust.back', '退回提案', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
                                 @elseif($row->status == 3)
                                 {!! link_to_route(config('quickadmin.route').'.publishbook.index', '委刊預約', array('eid='.$row->id), array('class' => 'btn btn-xs btn-default')) !!}
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.myentrust.excel', $row->id))) !!}
+                                {!! Form::submit('產生Excel', array('class' => 'btn btn-xs btn-default btn-excel')) !!}
+                                {!! Form::close() !!}
                                 @endif
                             </td>
                             <td>
@@ -119,4 +132,29 @@
             });
         });
     </script>
+    <style>
+    .btn-read {
+        opacity: .4;
+        color: green;
+        cursor: pointer;;
+    }
+    .btn-read:hover {
+        opacity: 1;
+    }
+    .btn-excel {
+        /*opacity: .6;*/
+        border-color: LightGreen;
+        color: green;
+    }
+    .btn-excel:hover {
+        /*opacity: 1;*/
+        border-color: ForestGreen;
+        color: green;
+    }
+    .btn-excel:focus {
+        opacity: .8;
+        border-color: ForestGreen;
+        color: green;
+    }
+    </style>
 @stop

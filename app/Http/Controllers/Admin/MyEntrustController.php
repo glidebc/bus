@@ -11,8 +11,10 @@ use App\Entrust;
 use App\EntrustItem;
 use App\Http\Requests\CreateEntrustRequest;
 use App\Http\Requests\UpdateEntrustRequest;
+use Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use stdClass;
 
 class MyEntrustController extends Controller {
@@ -28,6 +30,20 @@ class MyEntrustController extends Controller {
     {
         $userId = Auth::user()->id;
         $entrust = DataQuery::collectionOfEntrustByUser($userId)->get();
+        $pay = config('admin.entrust.pay');//付款方式 array
+	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
+
+        foreach ($entrust as $entrustOne) {
+        	if(strlen($entrustOne->start_date) > 0) {
+        		$dateStart = substr($entrustOne->start_date, 0, 4).'-'.substr($entrustOne->start_date, -4, 2).'-'.substr($entrustOne->start_date, -2);
+				$dateEnd = substr($entrustOne->end_date, 0, 4).'-'.substr($entrustOne->end_date, -4, 2).'-'.substr($entrustOne->end_date, -2);
+				$entrustOne->duration = $dateStart.'～'.$dateEnd;
+        	}
+			//
+			$entrustOne->txt_pay = $pay[$entrustOne->pay];
+			$entrustOne->txt_pay_status = $payStatus[$entrustOne->pay_status];
+        }
+
 		return view(config('quickadmin.route').'.myEntrust.index', compact('entrust'));
 	}
 
@@ -41,9 +57,9 @@ class MyEntrustController extends Controller {
 		$userId = Auth::user()->id;
 	    $customer = DataQuery::arraySelectCustomer($userId);
 	    //
-	    $publishKind = $this->arrayPublishKind();
-	    $pay = $this->arrayPay();
-	    $payStatus = $this->arrayPayStatus();
+	    $publishKind = config('admin.entrust.items');//委刊類別 array
+	    $pay = config('admin.entrust.pay');//付款方式 array
+	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
 	    //
 	    return view(config('quickadmin.route').'.myEntrust.create', compact(array('customer', 'publishKind', 'pay', 'payStatus')));
 	}
@@ -55,14 +71,16 @@ class MyEntrustController extends Controller {
 	 */
 	public function store(CreateEntrustRequest $request)
 	{
-	    $entrustId = Entrust::create($request->all())->id;
+		$input = $this->getInput_publishKindToString($request);//委刊類別轉成字串
+		//
+	    $entrustId = Entrust::create($input)->id;
 	    //檢查委刊項
 	    $this->checkEntrustItem($entrustId, $request);
 		return redirect()->route(config('quickadmin.route').'.myentrust.index');
 	}
 
 	/**
-	 * 送審 與 退回提案
+	 * 送審, 退回提案, 取消, 產生Excel
 	 */
 	public function entrustGo($id)
 	{
@@ -78,6 +96,134 @@ class MyEntrustController extends Controller {
 	{
 		$this->entrustPending($id, 0);
 		return redirect()->route(config('quickadmin.route').'.myentrust.index');
+	}
+	public function entrustExcel($id)
+	{
+		$entrust = Entrust::find($id);
+		$customer = Customer::find($entrust->customer_id);
+		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
+
+		$data = Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
+				// $sheet = $reader->getExcel()->getSheet();
+				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
+					//日期
+					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
+					//客戶資料
+					$sheet->setCellValue('C3', $customer->tax_title);
+					$sheet->setCellValue('G3', $customer->tax_num);
+					$sheet->setCellValue('C4', $customer->zip_code.$customer->address);
+					$sheet->setCellValue('G4', $customer->com_fax);
+
+					$sheet->setCellValue('G5', $customer->com_tel);
+
+					$sheet->setCellValue('G6', $customer->mobile);
+
+					//合作內容
+					$sheet->setCellValue('C8', $entrust->name);
+
+					$dateStart = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
+					$dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+					$sheet->setCellValue('C9', $dateStart.' ～ '.$dateEnd);
+					$days = $this->countDays($entrust->start_date, $entrust->end_date);
+					$sheet->setCellValue('F9', '(共 '.$days.' 天) / 實際走期依排期表');
+
+					$strPublishKind = '';
+					$aryPublishKind = config('admin.entrust.items');//委刊類別 array
+					$publishKindSelected = explode(',', $entrust->publish_kind);
+					foreach ($publishKindSelected as $publishKind) {
+						if(strlen($strPublishKind) > 0)
+							$strPublishKind .= ', ';
+						$strPublishKind .= $aryPublishKind[$publishKind];
+					}
+					$sheet->setCellValue('C10', $strPublishKind);
+
+					//付款方式與金額
+					$numRow = 13; $numItem = 1; $count = 0;
+					foreach ($entrustItems as $entrustItem) {
+						$sheet->setCellValue('B'.$numRow, $numItem++);
+						$sheet->setCellValue('C'.$numRow, $entrustItem->name);
+						$sheet->setCellValue('E'.$numRow, $entrustItem->cost);
+						$count += $entrustItem->cost;
+						$numRow++;
+					}
+					$sheet->setCellValue('E18', $count);
+					$tax = round($count * .05);
+					$sheet->setCellValue('E19', $tax);
+					$sheet->setCellValue('E20', $count + $tax);
+
+					$aryPay = config('admin.entrust.pay');
+					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);
+					if($entrust->pay == 2) {
+						$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
+					}
+
+					//表格邊線補回去
+					$this->redrawBorder($sheet);
+				});
+				
+			})->export('xlsx');
+
+		// $sheetForm = null;
+		// Excel::load('inc/eForm_v1.xlsx', function($reader) use (&$sheetForm) {
+		// 	$objExcel = $reader->getExcel();
+  //           $sheetForm = $objExcel->getSheet(0);
+			
+		// 	$sheetForm->setCellValue('C3', '葛萊德');
+		// });		
+
+		// $sheet = $excelForm->getExcel()->getSheet();
+		// $sheet->setCellValue('C3', '葛萊德(股)公司');
+
+		// Excel::create('委刊單_20170619', function($excel) use ($sheetForm) {
+		// 		$excel->sheet('20170619', function($sheet) use($sheetForm) {
+		// 	    	$sheet = $sheetForm;
+		// 		});
+		// 	})->export('xlsx');
+
+	    // $html = app('excel.readers.html');
+	    // $html->load('admin/excel/show', true, $excel);
+
+		// return view(config('quickadmin.route').'.excel.show', compact('excel'));
+
+		// $excel->export('xlsx');
+
+		// $data = [];
+		// Excel::load('inc/eForm_v1.xlsx', function($reader) use (&$data) {
+		// 	$objExcel = $reader->getExcel();
+  //           $sheet = $objExcel->getSheet(0);
+		// 	$sheet->setCellValue('C3', '葛萊德');
+		// 	// $objExcel = $reader->getExcel();
+  //  //          $sheet = $objExcel->getSheet(0);
+  //  //          $highestRow = $sheet->getHighestRow();
+  //  //          $highestColumn = $sheet->getHighestColumn();
+
+  //  //          //  Loop through each row of the worksheet in turn
+  //  //          for ($row = 1; $row <= $highestRow; $row++)
+  //  //          {
+  //  //              //  Read a row of data into an array
+  //  //              $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+  //  //                  NULL, TRUE, FALSE);
+
+  //  //              $data[] = $rowData[0];
+  //  //          }
+		// })->download('委刊單_20170619.xlsx');
+		
+		// $result = Excel::create('委刊單_20170619', function($excel) use ($data) {
+		// 	$excel->sheet('委刊單', function($sheet) use ($data)
+	 //        {
+		// 		$sheet->fromArray($data);
+	 //        });
+	 //    })->export('xlsx');
+	 //    return $result;
+		
+
+		
+
+		// Excel::create('gen_excel/e1.xlsx', function($excel) use ($templateRows) {
+
+		// })->export('');
+		// $this->entrustPending($id, 2);
+		// return redirect()->route(config('quickadmin.route').'.myentrust.index');
 	}
 
 	/**
@@ -107,11 +253,13 @@ class MyEntrustController extends Controller {
 		$entrust->txt_start_date = substr($sd, 0, 4).'-'.substr($sd, -4, 2).'-'.substr($sd, -2);
 		$ed = $entrust->end_date;
 		$entrust->txt_end_date = substr($ed, 0, 4).'-'.substr($ed, -4, 2).'-'.substr($ed, -2);
-		// $customerid = $entrust->customer_id;
+		$entrust->day_count = $this->countDays($sd, $ed);
 		//
-		$publishKind = $this->arrayPublishKind();
-	    $pay = $this->arrayPay();
-	    $payStatus = $this->arrayPayStatus();
+		$publishKindSelected = explode(',', $entrust->publish_kind);
+		//
+		$publishKind = config('admin.entrust.items');//委刊類別 array
+	    $pay = config('admin.entrust.pay');//付款方式 array
+	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
 		//
 		$entrustItems = EntrustItem::where('entrust_id', $id);
 		$entrust->item_count = $entrustItems->count();//顯示目前有幾個委刊項
@@ -128,7 +276,7 @@ class MyEntrustController extends Controller {
 			
 		}
 		
-		return view(config('quickadmin.route').'.myEntrust.edit', compact(array('customer', 'entrust', 'publishKind', 'pay', 'payStatus')));
+		return view(config('quickadmin.route').'.myEntrust.edit', compact(array('customer', 'entrust', 'publishKind', 'publishKindSelected', 'pay', 'payStatus')));
 	}
 
 	/**
@@ -139,8 +287,10 @@ class MyEntrustController extends Controller {
 	 */
 	public function update($id, UpdateEntrustRequest $request)
 	{
+		$input = $this->getInput_publishKindToString($request);//委刊類別轉成字串
+		//
 		$entrust = Entrust::findOrFail($id);
-		$entrust->update($request->all());
+		$entrust->update($input);
 		//檢查委刊項
 	    $this->checkEntrustItem($id, $request);
 		return redirect()->route(config('quickadmin.route').'.myentrust.index');
@@ -175,13 +325,31 @@ class MyEntrustController extends Controller {
         return redirect()->route(config('quickadmin.route').'.myentrust.index');
     }
 
-    //委刊類別下拉選單
-    function arrayPublishKind() {
-    	$aryName = ['請選擇','必PO TV網頁版','必PO TV手機版','必PO TV APP','中天影音平台專案','中天FB社群','快點TV網頁版','快點TV手機版','快點TV APP','其他專案'];
-    	$aryPublishKind = array();
-    	for ($i=0; $i < count($aryName); $i++)
-    		$aryPublishKind[$i] = $aryName[$i];
-    	return $aryPublishKind;
+    //計算天數
+    function countDays($strSD, $strED) {
+		$sd = date_create($strSD);
+		$ed = date_create($strED);
+		$interval = date_diff($sd, $ed);
+		return $interval->days + 1;
+    }
+    //委刊類別 array
+    // function arrayPublishKind() {
+    // 	$aryName = config('admin.entrust.items');
+    // 	// $aryName = ['必PO TV網頁版','必PO TV手機版','必PO TV APP','中天影音平台專案','中天FB社群','快點TV網頁版','快點TV手機版','快點TV APP','其他專案'];
+    // 	$aryPublishKind = array();
+    // 	for ($i=0; $i < count($aryName); $i++)
+    // 		$aryPublishKind[$i+1] = $aryName[$i];
+    // 	return $aryPublishKind;
+    // }
+    //將input中的委刊類別 array 轉換成字串
+    function getInput_publishKindToString($request) {
+		$publishKind = $request->input('publish_kind');
+		$publishKind = implode(',', $publishKind);
+
+		$input = $request->except('publish_kind');
+		//Assign the "mutated" publish_kind value to $input
+		$input['publish_kind'] = $publishKind;
+		return $input;
     }
     //委刊項的input逐一檢查，insert ot update
     function checkEntrustItem($id, $request) {
@@ -204,7 +372,8 @@ class MyEntrustController extends Controller {
 		    	}
 		    	$entrustItem->name = $itemName;
 	    		$itemCost = $request->input('item_cost_'.$no);
-		    	$entrustItem->cost = $itemCost;
+	    		if($itemCost != null)
+		    		$entrustItem->cost = $itemCost;
 		    	//
 		    	$entrustItem->save();
 	    	}
@@ -216,21 +385,12 @@ class MyEntrustController extends Controller {
 					])->delete();
 	    }
     }
-    //付款方式下拉選單
-    function arrayPay() {
-    	$aryPay = array();
-    	$aryPay[0] = '請選擇';
-    	$aryPay[1] = '匯款';
-    	$aryPay[2] = '現金';
-    	return $aryPay;
-    }
-    //付款狀況下拉選單
-    function arrayPayStatus() {
-    	$aryName = ['尚未開立發票', '發票開立中', '款項付清'];
-    	$aryPayStatus = array();
-    	for ($i=0; $i < count($aryName); $i++)
-    		$aryPayStatus[$i] = $aryName[$i];
-    	return $aryPayStatus;
+    //excel border
+    function redrawBorder($sheet) {
+    	for ($row=3; $row <= 30; $row++) { 
+    		$sheet->cells('I'.$row, function($cells) {$cells->setBorder('none ', 'none', 'none', 'medium');});
+    	}
+    	$sheet->cells('A31:H31', function($cells) {$cells->setBorder('medium', 'none', 'none', 'none');});
     }
 
 }

@@ -19,13 +19,6 @@ Route::get('/home', function () {
 	return Redirect::to('/admin');
     // return view('welcome');
 });
-// Route::post('/logout', 'Auth\LoginController@logout');
-// Route::post('/logout', function () {
-// 	Session::flush();
-//     return view('auth.login');
-// 	// Auth::logout(); //will clear the user from the session automatically
-//  //    return view('welcome');
-// });
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('myentrust', 'Admin\MyEntrustController');
@@ -59,6 +52,10 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as' => 'admin.myentrust.cancel',
 	    'uses' => 'Admin\MyEntrustController@entrustCancel'
 	]);
+	Route::post('myentrust/excel/{id}', [
+	    'as'   => 'admin.myentrust.excel',
+	    'uses' => 'Admin\MyEntrustController@entrustExcel'
+	]);
 
 	//
 	Route::post('entrustverify/yes/{id}', [
@@ -73,22 +70,31 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as'   => 'admin.entrustverify.back',
 	    'uses' => 'Admin\PublishverifyController@publishBack'
 	]);
+	//單一委刊單內容
+	Route::post('entrust/verify/{id}', [
+	    'as'   => 'admin.entrust.verify',
+	    'uses' => 'Admin\EntrustController@entrustVerify'
+	]);
+	Route::post('entrust/read/{id}', [
+	    'as'   => 'admin.entrust.read',
+	    'uses' => 'Admin\EntrustController@entrustRead'
+	]);
 });
 
-Route::group(['prefix' => 'publish'], function () {
-    Route::get('yes/{id}', [
-	    'as'   => 'publish.yes',
-	    'uses' => 'Admin\PublishverifyController@publishOk'
-	]);
-    Route::get('no/{id}', [
-	    'as'   => 'publish.no',
-	    'uses' => 'Admin\PublishverifyController@publishReject'
-	]);
-	Route::get('init/{id}', [
-	    'as'   => 'publish.init',
-	    'uses' => 'Admin\PublishverifyController@publishInit'
-	]);
-});
+// Route::group(['prefix' => 'publish'], function () {
+//     Route::get('yes/{id}', [
+// 	    'as'   => 'publish.yes',
+// 	    'uses' => 'Admin\PublishverifyController@publishOk'
+// 	]);
+//     Route::get('no/{id}', [
+// 	    'as'   => 'publish.no',
+// 	    'uses' => 'Admin\PublishverifyController@publishReject'
+// 	]);
+// 	Route::get('init/{id}', [
+// 	    'as'   => 'publish.init',
+// 	    'uses' => 'Admin\PublishverifyController@publishInit'
+// 	]);
+// });
 
 //index.blade.php list row btn 使用於代理商，客戶
 Route::post('/admin/agent/resetDelete/{id}',[

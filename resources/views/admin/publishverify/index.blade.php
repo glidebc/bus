@@ -32,7 +32,12 @@
                             <!-- <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
                             </td> -->
-                            <td>&nbsp;</td>
+                            <td>
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.verify', $row->id))) !!}
+                                {!! Form::submit('查看', array('class' => 'hide', 'id' => 'verify-'.$row->id)) !!}
+                                <span class="fa fa-file-o btn-read" onclick='$("#verify-{{ $row->id }}").click();'></span>
+                                {!! Form::close() !!}
+                            </td>
                             <td>{{ $row->name }}</td>
 <td>{{ $row->customer_name }}</td>
 <td>{{ $row->user_dept }}</td>
@@ -47,9 +52,6 @@
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退件？');", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
                                 {!! Form::submit('退件', array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!}
-
-                                <!-- {!! link_to_route('publish.yes', '核可', array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
-                                {!! link_to_route('publish.no', '取消', array($row->id), array('class' => 'btn btn-xs btn-danger')) !!} -->
                                 @endif
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.publish.destroy', $row->id))) !!}
                                 {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
@@ -60,8 +62,6 @@
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要回復成審核中？');", 'route' => array(config('quickadmin.route').'.entrustverify.back', $row->id))) !!}
                                 {!! Form::submit('回復審核中', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
-
-                                <!-- {!! link_to_route('publish.init', '退回審核中', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
                                 @endif
                             </td>
                         </tr>
@@ -109,4 +109,14 @@
             });
         });
     </script>
+    <style>
+        .btn-read {
+            opacity: .4;
+            color: green;
+            cursor: pointer;;
+        }
+        .btn-read:hover {
+            opacity: 1;
+        }
+    </style>
 @stop

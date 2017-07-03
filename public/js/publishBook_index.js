@@ -263,11 +263,12 @@ function createCellAppendToRow(d, itemID, col, days, data, aryRowIdx, aryRow, ar
     } else {
         td.innerText = data.project;
         td.onmousedown = null;
-        td.style.background = data.color;
+        td.style.background = data.bgcolor;
+        td.style.color = data.color;
         if (data.status == 1 || data.status == 2) {
             td.className = 'project-pending';
         } else if (data.status == 3) {
-            td.style.color = 'white';
+            // td.style.color = 'white';
             td.style.borderColor = '#555';
         }
 

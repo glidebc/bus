@@ -49,7 +49,7 @@ class MyCustomerController extends Controller {
 	{
 		$userId = Auth::user()->id;
 	    $agent = DataQuery::arraySelectAgent($userId);
-	    return view(config('quickadmin.route').'.myCustomer.create', compact('agent'));
+	    return view(config('quickadmin.route').'.myCustomer.create', compact('userId', 'agent'));
 	}
 
 	/**

@@ -39,7 +39,7 @@
         {!! Form::text('txt_end_date', old('txt_end_date'), array('class'=>'form-control duration', 'id'=>'txtEndDate', 'maxlength' => 10)) !!}
         {{ Form::hidden('end_date', null, array('id' => 'hidEndDate')) }}&nbsp;
         共
-        {!! Form::text('day_count', old('day_count',0), array('class'=>'form-control item-count', 'id'=>'day-count', 'readonly'=>'true')) !!}
+        {!! Form::text('day_count', old('day_count',0), array('class'=>'form-control day-count', 'id'=>'day-count', 'readonly'=>'true')) !!}
         天
         
     </div>
@@ -52,9 +52,9 @@
 </div><div class="form-group">
     {!! Form::label('item', '委刊項', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        目前有
-        {!! Form::text('item_count', old('item_count',0), array('class'=>'form-control item-count', 'id'=>'item-count', 'readonly'=>'true')) !!}
-        個委刊項 , 小計 $<span id="count">0</span> 元整&nbsp;&nbsp;&nbsp;&nbsp;
+        <!-- 目前有 -->
+        {!! Form::text('item_info', old('item_info',''), array('class'=>'form-control item-info', 'id'=>'item-info', 'readonly'=>'true')) !!}
+        <!-- 個委刊項 , 小計 $<span id="count">{{ old('count',0) }}</span> 元整 -->&nbsp;&nbsp;
         <input class="btn btn-item" type="button" value="編輯委刊項" onclick="showOrHideItemList(this);">
         <div id="item-list" style="display: none;">
             @for ($no=1; $no <= 10 ; $no++)
@@ -87,7 +87,8 @@
     </div>
 </div>
 
-{{ Form::hidden('owner_user', Auth::user()->id, array('id' => 'invisible_id')) }}
+{{ Form::hidden('item_count', 0, array('id' => 'item_count')) }}
+{{ Form::hidden('owner_user', $userId, array('id' => 'invisible_id')) }}
 
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">
@@ -156,15 +157,24 @@
         $('#item-list').slideToggle();
     }
 
+    var itemCount=0, count=0;//委刊項數量, 小計金額
+    var strItemCountInfo = '目前有 item 個委刊項 , 小計 $count 元整';
+    setItemInfo();
+
     $('#item_name_1, #item_name_2, #item_name_3, #item_name_4, #item_name_5, #item_name_6, #item_name_7, #item_name_8, #item_name_9, #item_name_10').change(function() {
         //
-        var itemCount = 0, count = 0;
+        // var itemCount = 0, count = 0;
+        setItemInfo();
+    });
+
+    function setItemInfo() {
+        itemCount = 0;
         for(var itemNo = 1; itemNo <= 10; itemNo++)
             if($('#item_name_' + itemNo).val().length > 0)
                 itemCount++;
-        $('#item-count').val(itemCount);
+        // alert(strItemCountInfo.replace(/item/i, itemCount.toString()).replace(/count/i, count.toString()));
         setCount();//小計
-    }); 
+    }
 
     function formatCurrency(num){
         var str = num.toString().replace("$", ""), parts = false, output = [], i = 1, formatted = null;
@@ -207,13 +217,15 @@
     }
     //小計
     function setCount() {
-        var count = 0;
+        $('#item_count').val(itemCount);
+        count = 0;
         for(var itemNo = 1; itemNo <= 10; itemNo++){
             var cost = parseInt($('#item_cost_' + itemNo).val(), 10);
             if($('#item_name_' + itemNo).val().length > 0 && !isNaN(cost))
                 count += cost;
         }
-        $('#count').text(formatCurrency(count));
+        $('#item-info').val(strItemCountInfo.replace(/item/i, itemCount.toString()).replace(/count/i, formatCurrency(count)));
+        // $('#count').text(formatCurrency(count));
     }
 
 </script>
@@ -222,17 +234,24 @@
         display: inline-block;
         width: 16%;
     }
-    .item-count {
+    .day-count {
         display: inline-block;
         width: 3%;
         padding: 0;
         text-align: center;
         border-width: 0px;
     }
-    .item-count:-moz-read-only { /* For Firefox */
+    .item-info {
+        display: inline-block;
+        width: 36%;
+        padding: 0;
+        /*text-align: center;*/
+        border-width: 0px;
+    }
+    .item-info:-moz-read-only, .day-count:-moz-read-only { /* For Firefox */
         background-color: white;
     }
-    .item-count:read-only { 
+    .item-info:read-only, .day-count:read-only { 
         background-color: white;
     }
     .item-name {

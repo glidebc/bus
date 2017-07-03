@@ -68,7 +68,7 @@
                                 <!-- {!! link_to_route('admin.myentrust.go', '送審', array($row->id), array('class' => 'btn btn-xs btn-success')) !!} -->
                                 @elseif($row->status == 2)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退回提案？');", 'route' => array(config('quickadmin.route').'.myentrust.back', $row->id))) !!}
-                                {!! Form::submit('退回提案', array('class' => 'btn btn-xs btn-warning')) !!}
+                                {!! Form::submit('取消送審', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
                                 <!-- {!! link_to_route('admin.myentrust.back', '退回提案', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
                                 @elseif($row->status == 3)

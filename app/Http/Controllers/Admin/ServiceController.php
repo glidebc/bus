@@ -168,7 +168,11 @@ class ServiceController extends Controller {
 				$cell->user = $publishuser->user_name;
 				$cell->days = $publish->days;
 				$cell->status = $entrustStatus;
-				$cell->color = Publishuser::where('user_id', $entrust->owner_user)->first()->color_name;
+				$cell->bgcolor = $publishuser->color_name;//底色
+				$cell->color = $publishuser->color_name == 'Gray' ? 'white' : config('admin.publish.colors')[$publishuser->color_name];//字的顏色, 預設是白色字
+				// $cell->bgcolor = empty($publishuser->color_name) ? 'Gray' : $publishuser->color_name;//預設是灰色底色
+				// 
+				// $cell->color = Publishuser::where('user_id', $entrust->owner_user)->first()->color_name;
 
 				$data->{$datePosition->date.'-'.$datePosition->publish_position_id.'-'.$datePosition->turn} = $cell;
 			}

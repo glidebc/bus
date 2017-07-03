@@ -33,6 +33,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 	    'as' => 'admin.myagent.resetDelete',
 	    'uses' => 'Admin\MyAgentController@resetDelete'
 	]);
+
+	// Route::resource('myuser', 'Admin\MyUserController', ['only' => [
+	//     'index', 'update'
+	// ]]);
+
+	Route::patch('/myuser/update/{id}',[
+	    'as' => 'admin.myuser.update',
+	    'uses' => 'Admin\MyUserController@update'
+	]);
 });
 
 Route::get('/admin/api/ad/book/list', 'Admin\ServiceController@adBookedList');

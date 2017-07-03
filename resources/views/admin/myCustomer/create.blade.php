@@ -87,7 +87,7 @@
     </div>
 </div>
 
-{{ Form::hidden('owner_user', Auth::user()->id, array('id' => 'invisible_id')) }}
+{{ Form::hidden('owner_user', $userId, array('id' => 'invisible_id')) }}
 
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">

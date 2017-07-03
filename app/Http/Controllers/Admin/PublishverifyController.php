@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\DataQuery;
+use App\Dept;
 use App\Entrust;
 use App\Publish;
 use App\Publishuser;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PublishverifyController extends Controller {
 
@@ -23,23 +25,11 @@ class PublishverifyController extends Controller {
     {
     	$entrusts = DataQuery::collectionOfEntrustVerify();
     	foreach ($entrusts as $entrust) {
-            $entrust->user_dept = Publishuser::find($entrust->owner_user)->dept;
-            $entrust->user_name = User::find($entrust->owner_user)->name;
-            //
-            $statusName = '';
-            switch($entrust->status) {
-                case 1:
-                    $statusName = '提案'; break;
-                case 3:
-                    $statusName = '審核通過'; break;
-                case 4:
-                    $statusName = '退件'; break;
-                case 5:
-                    $statusName = '暫停'; break;
-                case 0:
-                    $statusName = '取消委刊'; break;
-            }
-            $entrust->status_name = $statusName;
+    		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
+    		$dept = Dept::find($publishuser->dept_id);
+            $entrust->user_dept = empty($dept) ? '' : $dept->name;
+            $entrust->user_name = User::find($publishuser->user_id)->name;
+            $entrust->status_name = config('admin.entrust.status')[$entrust->status];
         }
 		return view('admin.publishverify.index', compact('entrusts'));
 	}

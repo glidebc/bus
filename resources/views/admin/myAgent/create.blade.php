@@ -82,7 +82,7 @@
 </div>
 
 {{ Form::hidden('is_agent', true, array('id' => 'invisible_agent')) }}
-{{ Form::hidden('owner_user', Auth::user()->id, array('id' => 'invisible_user')) }}
+{{ Form::hidden('owner_user', $userId, array('id' => 'invisible_user')) }}
 
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">

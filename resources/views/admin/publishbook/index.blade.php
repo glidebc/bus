@@ -7,24 +7,41 @@
             <div class="caption">預約現況表</div>
         </div>
         <div class="portlet-body">
-        	<div class="form-group">
-			    {!! Form::label('entrust_id', '委刊單', array('class'=>'col-sm-2 control-label')) !!}
-			    <div class="col-sm-10">
-			        {!! Form::select('entrust_id', $entrust, $myEntrustId, array('class'=>'form-control')) !!}
+        	<div class="row width-98">
+        		<!-- <div class="col-md-12"> -->
+    			<div class="form-horizontal">
 
-			    </div>
+    				<!-- <div class="form-group  width-98">
+    					<label class="col-sm-2 control-label">預約者顏色</label>
+    					<div class="col-sm-10">
+							<input type="text" class="form-control color-box" readonly="true" value="使用者1" style="background-color: Red;">
+							<input type="text" class="form-control color-box" readonly="true" value="大名" style="background-color: blue;">
+						</div>
+					</div> -->
+		        	<div class="form-group">
+					    {!! Form::label('entrust_id', '委刊單', array('class'=>'col-sm-2 control-label')) !!}
+					    <div class="col-sm-10">
+					        {!! Form::select('entrust_id', $entrust, $myEntrustId, array('class'=>'form-control width-auto')) !!}
+
+					    </div>
+					</div>
+		        	<div class="form-group">
+					    <label class="col-sm-2 control-label">顯示月份區間</label>
+					    <div class="col-sm-10">
+					        <select class="form-control width-auto" id="drpStartMonth">
+					        	<option value="0">起始年月</option>
+					        </select>
+					        &nbsp;<span class="fa fa-arrow-right"></span>&nbsp;
+					        <select class="form-control width-auto" id="drpEndMonth">
+					        	<option value="0">結束年月</option>
+					        </select>
+					    </div>
+					</div>
+
+				</div>
+				<!-- </div> -->
 			</div>
-        	<div class="form-group">
-			    <label class="col-sm-2 control-label">顯示月份區間</label>
-			    <div class="col-sm-10">
-			        <select class="select-ym" id="drpStartMonth">
-			        	<option value="0">起始年月</option>
-			        </select>&nbsp;～&nbsp;
-			        <select class="select-ym" id="drpEndMonth">
-			        	<option value="0">結束年月</option>
-			        </select>
-			    </div>
-			</div>
+
 			<div class="tab-group">
 
 				<ul class="nav nav-tabs droptabs">
@@ -104,7 +121,19 @@
 		width: 98%;
 		margin: 0 auto 15px auto;
 	}
-	.select-ym {
+	.width-98 {
+        width: 98%;
+        margin: 0 auto;
+    }
+	.width-12 {
+        display: inline-block;
+        width: 12%;
+    }
+    .width-auto {
+        display: inline-block;
+        width: auto;
+    }
+	/*.select-ym {
 		font-size: 14px;
 	    font-weight: normal;
 	    color: #333;
@@ -117,13 +146,13 @@
 		padding: 6px 12px;
 		line-height: 1.42857143;
 		background-image: none;
-	}
+	}*/
 	@media (min-width: 768px) {
 		/*.hid-data {
 			height: 20px;
 		}*/
 		.tab-group {
-			margin: 45px auto 15px auto;
+			margin: 0 auto 15px auto;
 		}
 	}
 	.project-pending {/*委刊單審核中*/
@@ -161,5 +190,15 @@
 	.tooltip.top > .tooltip-arrow {
 		border-top: 5px solid green;
 	}
+
+	.color-box {
+        display: inline-block;
+        width: 8%;
+        padding: 0;
+        border-width: 0px;
+        text-align: center;
+        color: white;
+        border-radius: 4px;
+    }
     </style>
 @stop

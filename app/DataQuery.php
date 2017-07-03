@@ -5,11 +5,13 @@ namespace App;
 use App\Agent;
 use App\Customer;
 use App\CustomerAgent;
+use App\Dept;
 use App\Entrust;
 use App\Publish;
 use App\Publishposition;
 use App\Publishsite;
 use App\Publishuser;
+use App\Team;
 use App\User;
 use DB;
 use Illuminate\Support\Collection;
@@ -44,30 +46,6 @@ class DataQuery {
     
     static function arrayCustomer($userId)
     {
-        // $customers = Customer::withTrashed()
-        //                     ->where([
-        //                         ['is_agent', false],
-        //                         ['owner_user', $userId]
-        //                     ])
-        //                     ->selectRaw('*, "" AS agent_name')
-        //                     ->orderBy('created_at', 'desc')
-        //                     ->get();
-        // foreach ($customers as $customer) {
-        //     $ca = CustomerAgent::where('customer_id', $customer->id);
-        //     if($ca->count() > 0) {
-        //         // $a_tax_num = $ca->first()->a_tax_num;
-        //         $customer->agent_name = Customer::find($ca->first()->agent_id)->name;
-        //     }
-        // }
-
-        // $customer = Customer::withTrashed()
-        //                     ->leftJoin('agent', function ($join) {
-        //                         $join->on('agent.id', '=', 'customer.agent_id');
-        //                     })
-        //                     ->selectRaw('agent.name AS agent_name,customer.*')
-        //                     ->orderBy('customer.created_at', 'desc')
-        //                     ->get();
-        // $customer = self::collectionOfCustomerWithAgent()->get();
         return self::arrayAgentOrCustomer($userId, false);
     }
 
@@ -96,17 +74,22 @@ class DataQuery {
     
     static function arraySelectCustomer($userId)
     {
-        $customer = Customer::leftJoin('agent', function ($join) use ($userId) {
-                                $join->on('agent.id', '=', 'customer.agent_id');
-                            })
-                            ->where([
+        $customer = Customer::where([
                                 ['customer.is_agent', false],
                                 ['customer.owner_user', $userId]
                             ])
-                            // ->where('customer.owner_user', $userId)
-                            ->selectRaw('CASE WHEN agent.id IS NULL THEN customer.name ELSE CONCAT(agent.name,"-",customer.name) END AS agent_customer,customer.*')
                             ->pluck('name','id')
                             ->prepend('請選擇', 0);
+        // $customer = Customer::leftJoin('agent', function ($join) use ($userId) {
+        //                         $join->on('agent.id', '=', 'customer.agent_id');
+        //                     })
+        //                     ->where([
+        //                         ['customer.is_agent', false],
+        //                         ['customer.owner_user', $userId]
+        //                     ])
+        //                     ->selectRaw('CASE WHEN agent.id IS NULL THEN customer.name ELSE CONCAT(agent.name,"-",customer.name) END AS agent_customer,customer.*')
+        //                     ->pluck('name','id')
+        //                     ->prepend('請選擇', 0);
         // $customer = self::collectionOfCustomerWithAgent()->pluck('name','id');
         return $customer;
     }
@@ -133,7 +116,7 @@ class DataQuery {
         } else {
             $publishuser = Publishuser::join('users', function ($join) use ($userId) {
                                 $join->on('users.id', '=', 'publish_user.user_id')
-                                     ->where('users.id', $userId);
+                                     ->where('publish_user.user_id', $userId);
                             })
                             ->selectRaw('users.name AS user_name,publish_user.*');
         }
@@ -148,9 +131,9 @@ class DataQuery {
     
     static function collectionOfEntrustByUser($userId)
     {
-        // $entrust = Entrust::join('customer', function ($join) use ($userId) {
+        // $entrust = Entrust::join('customer', function ($join) use ($publishUserId) {
         //                         $join->on('entrust.customer_id', '=', 'customer.id')
-        //                              ->whereRaw('entrust.owner_user='.$userId.' AND entrust.deleted_at IS NULL');
+        //                              ->whereRaw('entrust.owner_user='.$publishUserId.' AND entrust.deleted_at IS NULL');
         //                     })->leftJoin('agent', function ($join) {
         //                         $join->on('customer.agent_id', '=', 'agent.id');
         //                     })
@@ -230,6 +213,10 @@ class DataQuery {
         $entrusts = Entrust::join('customer', function ($join) {
                                 $join->on('customer.id', 'entrust.customer_id');
                             })
+                            ->join('publish_user', function ($join) {
+                                $join->on('publish_user.user_id', 'entrust.owner_user')
+                                     ->whereRaw('publish_user.deleted_at IS NULL');
+                            })
                             ->selectRaw('customer.name AS customer_name, entrust.*')
                             ->orderBy('entrust.created_at', 'desc')
                             ->get();
@@ -259,5 +246,34 @@ class DataQuery {
         
     }
 
+    static function arraySelectDept()
+    {
+        return Dept::where('status', true)->pluck('name','id')->prepend('無', '');
+    }
+
+    static function arraySelectTeam()
+    {
+        return Team::where('status', true)->pluck('name','id')->prepend('無', '');
+    }
+
+    static function collectionOfTeamEntrust($userId)
+    {
+        $publishuser = Publishuser::where('user_id', $userId);
+        $aryDeptId = $publishuser->pluck('dept_id');
+        $aryTeamId = $publishuser->pluck('team_id');
+        $teamEntrust = Entrust::whereIn('dept_id', $aryDeptId)->whereIn('team_id', $aryTeamId);
+
+        $entrusts = $teamEntrust->join('customer', function ($join) {
+                                $join->on('customer.id', 'entrust.customer_id');
+                            })
+                            ->join('publish_user', function ($join) {
+                                $join->on('publish_user.user_id', 'entrust.owner_user')
+                                     ->whereRaw('publish_user.deleted_at IS NULL');
+                            })
+                            ->selectRaw('customer.name AS customer_name, entrust.*')
+                            ->orderBy('entrust.created_at', 'desc')
+                            ->get();
+        return $entrusts;
+    }
     
 }

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
 use App\Publishuser;
-use App\Glide;
+use App\DataQuery;
 use App\Http\Requests\CreatePublishuserRequest;
 use App\Http\Requests\UpdatePublishuserRequest;
 use Illuminate\Http\Request;
@@ -24,7 +24,14 @@ class PublishuserController extends Controller {
 	 */
 	public function index(Request $request)
     {
-        $publishuser = Glide::collectionPublishUser(0)->get();
+        $publishuser = DataQuery::collectionPublishUser(0)->get();
+        foreach ($publishuser as $row) {
+        	if($row->color_name == 'Gray')
+				$row->font_color = 'white';
+			else
+				$row->font_color = config('admin.publish.colors')[$row->color_name];
+        }
+
 		return view('admin.publishuser.index', compact('publishuser'));
 	}
 
@@ -35,7 +42,7 @@ class PublishuserController extends Controller {
 	 */
 	public function create()
 	{
-	    $user = Glide::arraySelectUser();
+	    $user = DataQuery::arraySelectUser();
 	    return view('admin.publishuser.create', compact('user'));
 	}
 
@@ -60,7 +67,7 @@ class PublishuserController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$user = Glide::arraySelectUser();
+		$user = DataQuery::arraySelectUser();
 		$publishuser = Publishuser::find($id);
 	    $userid = $publishuser->user_id;
 		return view('admin.publishuser.edit', compact(array('user','publishuser','userid')));

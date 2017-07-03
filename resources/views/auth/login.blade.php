@@ -95,13 +95,13 @@
         <!-- <script src="js/jquery-2.1.1.min.js" type="text/javascript"></script> -->
         <script>
         $('#login-button').click(function (event) {
-          event.preventDefault();
-          $('.alert-area').remove();
-          $('form').fadeOut(500);
-          $('.wrapper').addClass('form-success');
-          setTimeout(function() {
-            $('form').submit();
-          }, 1000);
+            event.preventDefault();
+            $('.alert-area').remove();
+            $('form').fadeOut(500);
+            $('.wrapper').addClass('form-success');
+            setTimeout(function() {
+                $('form').submit();
+            }, 1000);
         });
 
         $('form').keypress(function(e) {

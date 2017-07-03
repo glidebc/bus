@@ -2,58 +2,60 @@
 
 @section('content')
 
-<p>{!! link_to_route(config('quickadmin.route').'.publishuser.create', trans('quickadmin::templates.templates-view_index-add_new') , null, array('class' => 'btn btn-success')) !!}</p>
-
-@if ($publishuser->count())
+@if ($entrusts->count())
     <div class="portlet box green">
         <div class="portlet-title">
-            <div class="caption">{{ trans('quickadmin::templates.templates-view_index-list') }}</div>
+            <div class="caption">團隊委刊單列表</div>
         </div>
         <div class="portlet-body">
             <table class="table table-striped table-hover table-responsive datatable" id="datatable">
                 <thead>
                     <tr>
-                        <th>
+                        <!-- <th>
                             {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!}
-                        </th>
-                        <th>使用者</th>
-<th>顏色</th>
-<th>部門</th>
-
+                        </th> -->
                         <th>&nbsp;</th>
+                        <th>委刊單</th>
+<th>客戶</th>
+<th>部門</th>
+<th>使用者</th>
+<th>狀態</th>
+
                     </tr>
                 </thead>
 
                 <tbody>
-                    @foreach ($publishuser as $row)
+                    @foreach ($entrusts as $row)
                         <tr>
-                            <td>
+                            <!-- <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
-                            </td>
-                            <td>{{ $row->user_name }}</td>
-<td><span class="btn btn-xs" style='background-color: {{ $row->color_name }}; color: {{ $row->font_color }}''>{{ $row->color_name }}</span></td>
-<td>{{ $row->dept }}</td>
-
+                            </td> -->
                             <td>
-                                {!! link_to_route(config('quickadmin.route').'.publishuser.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
-                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.publishuser.destroy', $row->id))) !!}
-                                {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.read', $row->id))) !!}
+                                {!! Form::submit('查看', array('class' => 'hide', 'id' => 'read-'.$row->id)) !!}
+                                <span class="fa fa-file-o btn-read" onclick='$("#read-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
+                            <td>{{ $row->name }}</td>
+<td>{{ $row->customer_name }}</td>
+<td>{{ $row->user_dept }}</td>
+<td>{{ $row->user_name }}</td>
+<td>{{ $row->status_name }}</td>
+
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-xs-12">
                     <button class="btn btn-danger" id="delete">
                         {{ trans('quickadmin::templates.templates-view_index-delete_checked') }}
                     </button>
                 </div>
             </div>
-            {!! Form::open(['route' => config('quickadmin.route').'.publishuser.massDelete', 'method' => 'post', 'id' => 'massDelete']) !!}
+            {!! Form::open(['route' => config('quickadmin.route').'.publish.massDelete', 'method' => 'post', 'id' => 'massDelete']) !!}
                 <input type="hidden" id="send" name="toDelete">
-            {!! Form::close() !!}
+            {!! Form::close() !!} -->
         </div>
 	</div>
 @else
@@ -85,4 +87,14 @@
             });
         });
     </script>
+    <style>
+        .btn-read {
+            opacity: .4;
+            color: green;
+            cursor: pointer;;
+        }
+        .btn-read:hover {
+            opacity: 1;
+        }
+    </style>
 @stop

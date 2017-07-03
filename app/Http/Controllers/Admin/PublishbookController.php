@@ -7,6 +7,7 @@ use App\DataQuery;
 use App\Entrust;
 use App\Publishposition;
 use App\Publishsite;
+use App\Publishuser;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use stdClass;
@@ -51,8 +52,8 @@ class PublishbookController extends Controller {
     		// array_push($arraySitePosition, json_encode($arrayPublishposition, JSON_FORCE_OBJECT));
     	}
 
-		$userid = Auth::user()->id;
-		$entrust = DataQuery::arraySelectEntrust($userid);
+		$userId = Auth::user()->id;
+		$entrust = DataQuery::arraySelectEntrust($userId);
         // $entrust = Entrust::where('owner_user', $userid)->orderBy('created_at')->pluck('name', 'id');
 
         $myEntrustId = Input::get('eid');

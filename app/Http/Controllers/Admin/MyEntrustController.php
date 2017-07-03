@@ -61,7 +61,7 @@ class MyEntrustController extends Controller {
 	    $pay = config('admin.entrust.pay');//付款方式 array
 	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
 	    //
-	    return view(config('quickadmin.route').'.myEntrust.create', compact(array('customer', 'publishKind', 'pay', 'payStatus')));
+	    return view(config('quickadmin.route').'.myEntrust.create', compact(array('userId', 'customer', 'publishKind', 'pay', 'payStatus')));
 	}
 
 	/**
@@ -276,7 +276,7 @@ class MyEntrustController extends Controller {
 			
 		}
 		
-		return view(config('quickadmin.route').'.myEntrust.edit', compact(array('customer', 'entrust', 'publishKind', 'publishKindSelected', 'pay', 'payStatus')));
+		return view(config('quickadmin.route').'.myEntrust.edit', compact(array('userId', 'customer', 'entrust', 'publishKind', 'publishKindSelected', 'pay', 'payStatus')));
 	}
 
 	/**

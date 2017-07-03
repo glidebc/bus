@@ -35,7 +35,8 @@ class MyAgentController extends Controller {
 	 */
 	public function create()
 	{
-	    return view(config('quickadmin.route').'.myAgent.create');
+		$userId = Auth::user()->id;
+	    return view(config('quickadmin.route').'.myAgent.create', compact('userId'));
 	}
 
 	/**

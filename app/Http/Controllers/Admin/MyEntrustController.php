@@ -37,7 +37,7 @@ class MyEntrustController extends Controller {
         $pay = config('admin.entrust.pay');//付款方式 array
 	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
 
-	    // $countEntrust = 0;
+	    $countEntrust = 0;
 
         foreach ($entrust as $entrustOne) {
         	if(strlen($entrustOne->start_date) > 0) {
@@ -49,15 +49,20 @@ class MyEntrustController extends Controller {
 			$entrustOne->txt_pay = $pay[$entrustOne->pay];
 			$entrustOne->txt_pay_status = $payStatus[$entrustOne->pay_status];
 			//flow
-			if($this->countEntrustFlowStatus($entrustOne->id, 'ok') || $this->countEntrustFlowStatus($entrustOne->id, 'reject')) {
-				$entrustOne->verify_result = true;
-				// $countEntrust++;
-				// $this->deleteEntrustFlow($entrustOne->id);
+			$countOk = $this->countEntrustFlowStatus($entrustOne->id, 'ok');
+			$countReject = $this->countEntrustFlowStatus($entrustOne->id, 'reject');
+			// if($countOk)
+			// 	$entrustOne->verify_result = 'ok';
+			// if($countReject)
+			// 	$entrustOne->verify_result = 'reject';
+			if($countOk || $countReject) {
+				$countEntrust++;
+				$this->deleteEntrustFlow($entrustOne->id);
 			}
 			$entrustOne->verifying = $this->countEntrustFlowStatus($entrustOne->id, 'verifying');
         }
 
-		return view(config('quickadmin.route').'.myEntrust.index', compact(array('entrust')));
+		return view(config('quickadmin.route').'.myEntrust.index', compact(array('entrust', 'countEntrust')));
 	}
 
 	/**
@@ -432,15 +437,15 @@ class MyEntrustController extends Controller {
 				['status', $status]
 			])->count();
     }
-    // function deleteEntrustFlow($id) {
-    // 	EntrustFlow::where('entrust_id', $id)->delete();
-    // }
+    function deleteEntrustFlow($id) {
+    	EntrustFlow::where('entrust_id', $id)->delete();
+    }
     //已審核 and flow check
     function checkStatusAndFlow($id) {
     	$msg = '';
     	//已審核 check
 		$status = Entrust::find($id)->status;
-		if($status == 3 || $status == 4)
+		if($status == 3)
 			$msg = $this->alert_verified;
 		//flow check
 		if($this->countEntrustFlowStatus($id, 'verifying')) 

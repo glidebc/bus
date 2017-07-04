@@ -38,7 +38,14 @@
                             <td>
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.read', $row->id))) !!}
                                 {!! Form::submit('查看', array('class' => 'hide', 'id' => 'read-'.$row->id)) !!}
-                                <span class="fa fa-file-o btn-{{ $row->verify_result ? 'result' : 'read' }}" onclick='$("#read-{{ $row->id }}").click();'></span>
+                                <span class="fa fa-file-o  btn-<?php
+                                if($row->status==3)
+                                    echo 'ok';
+                                else if($row->status==4)
+                                    echo 'reject';
+                                else
+                                    echo 'read';
+                                ?>" onclick='$("#read-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
                             <td>{{ $row->customer_name }}</td>
@@ -53,17 +60,19 @@
                             @elseif($row->status == 2)
                                 審核中
                             @elseif($row->status == 3)
-                                @if($row->verify_result)
-                                    <span class="text-success">審核通過</span>
+                                <span class="text-success">審核通過</span>
+                                <!-- @if($row->verify_result)
+                                    
                                 @else
-                                    審核通過
-                                @endif
+                                    
+                                @endif -->
                             @elseif($row->status == 4)
-                                @if($row->verify_result)
-                                    <span class="text-danger">退件</span>
+                                <span class="text-danger">退件</span>
+                                <!-- @if($row->verify_result)
+                                    
                                 @else
-                                    退件
-                                @endif
+                                    
+                                @endif -->
                             @elseif($row->status == 0)
                                 取消委刊
                             @endif
@@ -145,8 +154,12 @@
         });
     </script>
     <style>
-    .btn-result {
+    .btn-ok {
         color: #428bca;
+        cursor: pointer;
+    }
+    .btn-reject {
+        color: #F3565D;
         cursor: pointer;
     }
     .btn-read {

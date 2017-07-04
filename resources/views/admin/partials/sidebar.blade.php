@@ -62,16 +62,16 @@
                                                             $countVerify = App\EntrustFlow::where('status', 'verify')->count();
                                                             if($countVerify > 0)
                                                                 echo '&nbsp;<span class="verify-count">'.($countVerify > 9 ? '10+' : $countVerify).'</span>';
-                                                        } else if($child->name == 'MyEntrust') {
-                                                            $entrusts = App\DataQuery::collectionOfEntrustByUser(Auth::user()->id)->get();
-                                                            $countEntrust = 0;
-                                                            foreach ($entrusts as $entrust) {
-                                                                $countOk = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'ok\'')->count();
-                                                                $countReject = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'reject\'')->count();
-                                                                if($countOk + $countReject > 0)
-                                                                    App\EntrustFlow::where('entrust_id', $entrust->id)->delete();
-                                                                $countEntrust += $countOk + $countReject;
-                                                            }
+                                                        } else if($child->name == 'MyEntrust' && !empty($countEntrust)) {
+                                                            // $entrusts = App\DataQuery::collectionOfEntrustByUser(Auth::user()->id)->get();
+                                                            // $countEntrust = 0;
+                                                            // foreach ($entrusts as $entrust) {
+                                                            //     $countOk = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'ok\'')->count();
+                                                            //     $countReject = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'reject\'')->count();
+                                                            //     if($countOk + $countReject > 0)
+                                                            //         App\EntrustFlow::where('entrust_id', $entrust->id)->delete();
+                                                            //     $countEntrust += $countOk + $countReject;
+                                                            // }
                                                             if($countEntrust > 0)
                                                                 echo '&nbsp;<span class="entrust-count">'.$countEntrust.'</span>';
                                                         }

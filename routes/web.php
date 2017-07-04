@@ -15,10 +15,10 @@ Route::get('/', function () {
 	return Redirect::to('/login');
     // return view('welcome');
 });
-Route::get('/home', function () {
-	return Redirect::to('/admin');
-    // return view('welcome');
-});
+Route::get('/home', 'Admin\HomeController@index');
+// Route::get('/home', function () {
+// 	return Redirect::to('/admin');
+// });
 
 Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('myentrust', 'Admin\MyEntrustController');

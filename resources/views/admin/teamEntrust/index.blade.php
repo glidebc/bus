@@ -89,8 +89,8 @@
     </script>
     <style>
         .btn-read {
-            opacity: .4;
-            color: green;
+            opacity: .5;
+            color: #428bca;
             cursor: pointer;;
         }
         .btn-read:hover {

@@ -19,10 +19,10 @@
 <th>客戶</th>
 <th>部門</th>
 <th>使用者</th>
-<th>狀態</th>
+<!-- <th>狀態</th> -->
 
                         <th>審核</th>
-                        <th>狀態回復</th>
+                        <!-- <th>狀態回復</th> -->
                     </tr>
                 </thead>
 
@@ -35,14 +35,14 @@
                             <td>
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.verify', $row->id))) !!}
                                 {!! Form::submit('查看', array('class' => 'hide', 'id' => 'verify-'.$row->id)) !!}
-                                <span class="fa fa-file-o btn-read" onclick='$("#verify-{{ $row->id }}").click();'></span>
+                                <span class="fa fa-file-o btn-{{ $row->verify ? 'verify' : 'read' }}" onclick='$("#verify-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
                             <td>{{ $row->name }}</td>
 <td>{{ $row->customer_name }}</td>
 <td>{{ $row->user_dept }}</td>
 <td>{{ $row->user_name }}</td>
-<td>{{ $row->status_name }}</td>
+<!-- <td>{{ $row->status_name }}</td> -->
 
                             <td>
                                 @if($row->status == 2)
@@ -57,13 +57,13 @@
                                 {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!} -->
                             </td>
-                            <td>
+                            <!-- <td>
                                 @if($row->status == 3)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要回復成審核中？');", 'route' => array(config('quickadmin.route').'.entrustverify.back', $row->id))) !!}
                                 {!! Form::submit('回復審核中', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
                                 @endif
-                            </td>
+                            </td> -->
                         </tr>
                     @endforeach
                 </tbody>
@@ -110,12 +110,17 @@
         });
     </script>
     <style>
-        .btn-read {
-            opacity: .4;
-            color: green;
-            cursor: pointer;;
+        .btn-verify {
+            opacity: .5;
+            color: red;
+            cursor: pointer;
         }
-        .btn-read:hover {
+        .btn-read {
+            opacity: .5;
+            color: #428bca;
+            cursor: pointer;
+        }
+        .btn-verify:hover, .btn-read:hover {
             opacity: 1;
         }
     </style>

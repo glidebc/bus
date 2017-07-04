@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\DataQuery;
 use App\Dept;
 use App\Entrust;
+use App\EntrustFlow;
 use App\Publish;
 use App\Publishuser;
 use App\User;
@@ -23,6 +24,8 @@ class PublishverifyController extends Controller {
 	 */
 	public function index()
     {
+    	$entrustVerify = EntrustFlow::where('status', 'verify');
+
     	$entrusts = DataQuery::collectionOfEntrustVerify();
     	foreach ($entrusts as $entrust) {
     		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
@@ -30,19 +33,34 @@ class PublishverifyController extends Controller {
             $entrust->user_dept = empty($dept) ? '' : $dept->name;
             $entrust->user_name = User::find($publishuser->user_id)->name;
             $entrust->status_name = config('admin.entrust.status')[$entrust->status];
+            
+            $entrust->verify = EntrustFlow::where('status', 'verify')->where('entrust_id', $entrust->id)->count();
         }
-		return view('admin.publishverify.index', compact('entrusts'));
+
+        // $countVerify = EntrustFlow::where('status', 'verify')->count();
+        // if($countVerify > 9) {
+        // 	// $countVerify = strval($entrustVerify);
+        // 	// if($entrustVerify->count() > 9)
+        // 		$countVerify = '9+';
+        // }
+
+		return view('admin.publishverify.index', compact(array('entrusts')));
 	}
 
 	public function publishOk($id)
 	{
 		$this->verify($id, 3);
+		//flow ok
+		EntrustFlow::where('entrust_id', $id)->update(['status' => 'ok']);
+
 		return redirect()->route('admin.publishverify.index');
 	}
 	public function publishReject($id)
 	{
 		//退件時把委刊單預約的資料刪除
 		Publish::where('entrust_id', $id)->delete();
+		//flow reject
+		EntrustFlow::where('entrust_id', $id)->update(['status' => 'reject']);
 		//
 		$this->verify($id, 4);
 		return redirect()->route('admin.publishverify.index');

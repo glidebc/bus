@@ -7,6 +7,7 @@ use Redirect;
 use Schema;
 use App\DataQuery;
 use App\Entrust;
+use App\EntrustFlow;
 use App\EntrustItem;
 use App\Glide;
 use App\Http\Requests\CreateEntrustRequest;
@@ -23,6 +24,8 @@ class EntrustController extends Controller {
 	public function entrustVerify($id)
 	{
 		$entrust = $this->getEntrust($id);
+		EntrustFlow::where('entrust_id', $entrust->id)->update(['status' => 'verifying']);//flow
+
 		$kind = 'verify';
 		return view(config('quickadmin.route').'.entrust.read', compact(array('entrust', 'kind')));
 	}

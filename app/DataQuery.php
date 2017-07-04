@@ -210,7 +210,9 @@ class DataQuery {
 
     static function collectionOfEntrustVerify()
     {
-        $entrusts = Entrust::join('customer', function ($join) {
+        // $entrustVerify = Entrust::where('status', 2);
+        $entrusts = Entrust::where('status', 2)
+                            ->join('customer', function ($join) {
                                 $join->on('customer.id', 'entrust.customer_id');
                             })
                             ->join('publish_user', function ($join) {
@@ -218,7 +220,7 @@ class DataQuery {
                                      ->whereRaw('publish_user.deleted_at IS NULL');
                             })
                             ->selectRaw('customer.name AS customer_name, entrust.*')
-                            ->orderBy('entrust.created_at', 'desc')
+                            ->orderBy('entrust.updated_at', 'desc')
                             ->get();
         return $entrusts;
         // 

@@ -38,7 +38,7 @@
                             <td>
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.read', $row->id))) !!}
                                 {!! Form::submit('查看', array('class' => 'hide', 'id' => 'read-'.$row->id)) !!}
-                                <span class="fa fa-file-o btn-read" onclick='$("#read-{{ $row->id }}").click();'></span>
+                                <span class="fa fa-file-o btn-{{ $row->verify_result ? 'result' : 'read' }}" onclick='$("#read-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
                             <td>{{ $row->customer_name }}</td>
@@ -48,44 +48,52 @@
 <td>{{ $row->txt_pay_status }}</td>
 
                             <td>
-                                @if($row->status == 1)
+                            @if($row->status == 1)
                                 提案
-                                @elseif($row->status == 2)
+                            @elseif($row->status == 2)
                                 審核中
-                                @elseif($row->status == 3)
-                                審核通過
-                                @elseif($row->status == 4)
-                                退件
-                                @elseif($row->status == 0)
-                                取消委刊
+                            @elseif($row->status == 3)
+                                @if($row->verify_result)
+                                    <span class="text-success">審核通過</span>
+                                @else
+                                    審核通過
                                 @endif
+                            @elseif($row->status == 4)
+                                @if($row->verify_result)
+                                    <span class="text-danger">退件</span>
+                                @else
+                                    退件
+                                @endif
+                            @elseif($row->status == 0)
+                                取消委刊
+                            @endif
                             </td>
                             <td>
-                                @if($row->status == 1 || $row->status == 4)
+                            @if($row->status == 1 || $row->status == 4)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.myentrust.go', $row->id))) !!}
                                 {!! Form::submit('送審', array('class' => 'btn btn-xs btn-success')) !!}
                                 {!! Form::close() !!}
                                 <!-- {!! link_to_route('admin.myentrust.go', '送審', array($row->id), array('class' => 'btn btn-xs btn-success')) !!} -->
-                                @elseif($row->status == 2)
+                            @elseif($row->status == 2 && !$row->verifying)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退回提案？');", 'route' => array(config('quickadmin.route').'.myentrust.back', $row->id))) !!}
                                 {!! Form::submit('取消送審', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
                                 <!-- {!! link_to_route('admin.myentrust.back', '退回提案', array($row->id), array('class' => 'btn btn-xs btn-warning')) !!} -->
-                                @elseif($row->status == 3)
+                            @elseif($row->status == 3)
                                 {!! link_to_route(config('quickadmin.route').'.publishbook.index', '委刊預約', array('eid='.$row->id), array('class' => 'btn btn-xs btn-default')) !!}
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.myentrust.excel', $row->id))) !!}
                                 {!! Form::submit('產生Excel', array('class' => 'btn btn-xs btn-default btn-excel')) !!}
                                 {!! Form::close() !!}
-                                @endif
+                            @endif
                             </td>
                             <td>
+                            @if($row->status == 1 || ($row->status == 2&&!$row->verifying) || $row->status == 4)
                                 {!! link_to_route(config('quickadmin.route').'.myentrust.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
-                                @if($row->status == 1 || $row->status == 2 || $row->status == 4)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定取消委刊單？');",  'route' => array(config('quickadmin.route').'.myentrust.cancel', $row->id))) !!}
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.myentrust.destroy', $row->id))) !!} -->
                                 {!! Form::submit('取消', array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!}
-                                @endif
+                            @endif
                             </td>
                         </tr>
                     @endforeach
@@ -105,6 +113,10 @@
 	</div>
 @else
     {{ trans('quickadmin::templates.templates-view_index-no_entries_found') }}
+@endif
+
+@if (session('msg'))
+<script>alert("{{ session('msg') }}");</script>
 @endif
 
 @endsection
@@ -133,10 +145,14 @@
         });
     </script>
     <style>
+    .btn-result {
+        color: #428bca;
+        cursor: pointer;
+    }
     .btn-read {
-        opacity: .4;
-        color: green;
-        cursor: pointer;;
+        opacity: .5;
+        color: #428bca;
+        cursor: pointer;
     }
     .btn-read:hover {
         opacity: 1;

@@ -31,15 +31,15 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('dept_id', '部門', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('dept_name', '部門', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::select('dept_id', $dept, $publishuser->dept_id, array('class'=>'form-control')) !!}
+        {!! Form::text('dept_name', $dept_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('team_id', '組別', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('team_name', '組別', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::select('team_id', $team, $publishuser->team_id, array('class'=>'form-control')) !!}
+        {!! Form::text('team_name', $team_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">

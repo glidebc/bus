@@ -19,21 +19,21 @@
 {!! Form::model($publishuser, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.publishuser.update', $publishuser->id))) !!}
 
 <div class="form-group">
-    {!! Form::label('user_id', '使用者*', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('user_name', '使用者', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::select('user_id', $user, $userid, array('class'=>'form-control')) !!}
+        {!! Form::text('user_name', $user_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('color_name', '顏色*', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('dept_id', '部門', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('color_name', old('color_name',$publishuser->color_name), array('class'=>'form-control')) !!}
+        {!! Form::select('dept_id', $dept, $publishuser->dept_id, array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('dept', '部門', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('team_id', '組別', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('dept', old('dept',$publishuser->dept), array('class'=>'form-control')) !!}
+        {!! Form::select('team_id', $team, $publishuser->team_id, array('class'=>'form-control')) !!}
         
     </div>
 </div>
@@ -48,3 +48,19 @@
 {!! Form::close() !!}
 
 @endsection
+
+@section('javascript')
+<script type="text/javascript">
+
+</script>
+<style>
+    .form-group input[type="text"]:-moz-read-only { /* For Firefox */
+        display: inline-block;
+        background-color: white;
+    }
+    .form-group input[type="text"]:read-only { 
+        display: inline-block;
+        background-color: white;
+    }
+</style>
+@stop

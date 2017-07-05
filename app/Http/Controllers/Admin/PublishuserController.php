@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
-use App\Publishuser;
 use App\DataQuery;
+use App\Publishuser;
+use App\User;
 use App\Http\Requests\CreatePublishuserRequest;
 use App\Http\Requests\UpdatePublishuserRequest;
 use Illuminate\Http\Request;
-
-
 
 class PublishuserController extends Controller {
 
@@ -69,8 +68,12 @@ class PublishuserController extends Controller {
 	{
 		$user = DataQuery::arraySelectUser();
 		$publishuser = Publishuser::find($id);
-	    $userid = $publishuser->user_id;
-		return view('admin.publishuser.edit', compact(array('user','publishuser','userid')));
+	    $user_name = User::find($publishuser->user_id)->name;
+
+	    $dept = DataQuery::arraySelectDept();
+		$team = DataQuery::arraySelectTeam();
+
+		return view('admin.publishuser.edit', compact(array('user','publishuser','user_name','dept','team')));
 	}
 
 	/**

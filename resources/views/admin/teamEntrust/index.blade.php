@@ -17,16 +17,22 @@
                         <th>&nbsp;</th>
                         <th>委刊單</th>
 <th>客戶</th>
+<th>總走期</th>
 <th>部門</th>
 <th>使用者</th>
-<th>狀態</th>
+<th>審核狀態</th>
+<th>執行狀態</th>
 
                     </tr>
                 </thead>
 
                 <tbody>
                     @foreach ($entrusts as $row)
+                        @if($row->status_publish == '執行中')
+                        <tr class="text-primary">
+                        @else
                         <tr>
+                        @endif
                             <!-- <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
                             </td> -->
@@ -38,9 +44,11 @@
                             </td>
                             <td>{{ $row->name }}</td>
 <td>{{ $row->customer_name }}</td>
+<td>{{ $row->duration }}</td>
 <td>{{ $row->user_dept }}</td>
 <td>{{ $row->user_name }}</td>
 <td>{{ $row->status_name }}</td>
+<td>{{ $row->status_publish }}</td>
 
                         </tr>
                     @endforeach
@@ -95,6 +103,9 @@
         }
         .btn-read:hover {
             opacity: 1;
+        }
+        .test-1 {
+            color: #428bca;
         }
     </style>
 @stop

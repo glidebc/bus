@@ -111,8 +111,14 @@ class DataQuery {
             $publishuser = Publishuser::join('users', function ($join) {
                                 $join->on('users.id', '=', 'publish_user.user_id');
                             })
-                            ->selectRaw('users.name AS user_name,publish_user.*')
-                            ->orderBy('publish_user.created_at', 'desc');
+                            ->leftJoin('dept', function ($join) {
+                                $join->on('dept.id', '=', 'publish_user.dept_id');
+                            })
+                            ->leftJoin('team', function ($join) {
+                                $join->on('team.id', '=', 'publish_user.team_id');
+                            })
+                            ->selectRaw('users.name AS user_name, dept.name AS dept_name, team.name AS team_name,publish_user.*')
+                            ->orderByRaw('dept.id, team.id, publish_user.created_at desc');
         } else {
             $publishuser = Publishuser::join('users', function ($join) use ($userId) {
                                 $join->on('users.id', '=', 'publish_user.user_id')

@@ -17,8 +17,8 @@
                             {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!}
                         </th> -->
                         <th>&nbsp;</th>
-                        <th>客戶</th>
-<th>委刊單名稱</th>
+                        <th>委刊單</th>
+<th>客戶</th>
 <th>總走期</th>
 <th>付款方式</th>
 <th>付款情況</th>
@@ -48,8 +48,8 @@
                                 ?>" onclick='$("#read-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
-                            <td>{{ $row->customer_name }}</td>
-<td>{{ $row->name }}</td>
+                            <td>{{ $row->name }}</td>
+<td>{{ $row->customer_name }}</td>
 <td>{{ $row->duration }}</td>
 <td>{{ $row->txt_pay }}</td>
 <td>{{ $row->txt_pay_status }}</td>
@@ -159,8 +159,12 @@
         cursor: pointer;
     }
     .btn-reject {
+        opacity: .5;
         color: #F3565D;
         cursor: pointer;
+    }
+    .btn-reject:hover {
+        opacity: 1;
     }
     .btn-read {
         opacity: .5;

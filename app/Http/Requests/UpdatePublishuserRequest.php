@@ -24,8 +24,7 @@ class UpdatePublishuserRequest extends FormRequest {
 	public function rules()
 	{
 		return [
-            'user_id' => 'required', 
-            'color_name' => 'required', 
+            
             
 		];
 	}

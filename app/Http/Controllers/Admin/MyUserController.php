@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Dept;
 use App\DataQuery;
 use App\Publishuser;
+use App\Team;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePublishuserRequest;
 use Illuminate\Support\Facades\Auth;
@@ -45,8 +47,10 @@ class MyUserController extends Controller {
 			}
 		}
 		//
-		$dept = DataQuery::arraySelectDept();
-		$team = DataQuery::arraySelectTeam();
+		$dept_name = Dept::find($publishuser->dept_id)->name;
+		$team_name = Team::find($publishuser->team_id)->name;
+		// $dept = DataQuery::arraySelectDept();
+		// $team = DataQuery::arraySelectTeam();
 		//
 		// Form::macro('selectColor', function($name, $list = array(), $selected = null, $options = array())
 		// {
@@ -68,7 +72,7 @@ class MyUserController extends Controller {
 		//     return "<select{$options}>{$list}</select>";
 		// });
 
-		return view(config('quickadmin.route').'.myUser.index', compact(array('user','colors','publishuser','dept','team')));
+		return view(config('quickadmin.route').'.myUser.index', compact(array('user','colors','publishuser','dept_name','team_name')));
 	}
 
 	/**

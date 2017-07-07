@@ -68,8 +68,7 @@
                                                             foreach ($entrusts as $entrust) {
                                                                 $countOk = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'ok\'')->count();
                                                                 $countReject = App\EntrustFlow::whereRaw('entrust_id='.$entrust->id.' AND status=\'reject\'')->count();
-                                                                // if($countOk + $countReject > 0)
-                                                                //     App\EntrustFlow::where('entrust_id', $entrust->id)->delete();
+
                                                                 $countEntrust += $countOk + $countReject;
                                                             }
                                                             if($countEntrust > 0)
@@ -105,7 +104,7 @@
         font-weight: bold;
     }
     .verify-count {
-        color: Red;
+        color: #eea236;
         font-weight: bold;
     }
 </style>

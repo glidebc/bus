@@ -87,6 +87,7 @@
 			</div>
         </div>
 	</div>
+	<input id='hidVal' type="hidden" value="" />
 	<div id='hidMsg' style="display: none;"></div>
 
 @endsection

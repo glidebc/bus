@@ -1,33 +1,31 @@
 var aryTable = new Array(); //每個site的table
 var aryCells = new Array(); //每個site的cell array
 var tbody, thead, trs, siteIdx = 0;
-// var aryAllCell = []; //所有的cell, 使用於檢查目前的預約狀況
-var strStartDate, strEndDate;
+var strStartDate, strEndDate; //月份區間
 
 var jsonData;
 var $drpSym = $('#drpStartMonth'),
     $drpEym = $('#drpEndMonth');
-var $hidMsg = $('#hidMsg');
+var $hidMsg = $('#hidMsg'),
+    $hidVal = $('#hidVal');
 var lastSelectedRow, lastSelectedCell;
 var aryToggleCell = [], //Control selected
     aryShiftCell = [], //Shift selected
     arySelectedTitleCell = []
 
 $(function() {
-    setStartMonthSelect();
-    $drpSym.on('change', function() {
+    initSelectYM(); //載入頁面時的預設起始與結束日期
+    $drpSym.on('change', function() { //Sym - Start Year Month
         if (this.value != '0') {
-            setEndMonthSelect(this.value);
-
-            beforeGetBookingData(); //清除現在的資料，準備更新每個site的表格
+            strStartDate = this.value;
+            setSelectYM(this.value, 's'); //set select year month
+            // alert('SD = ' + strStartDate + ', ED = ' + strEndDate);
             getBookingData(false);
         }
     });
-    $drpEym.on('change', function() {
-        var ed = new Date(this.value);
-        strEndDate = dateString(ed, 'dateFull'); //預約現況表 結束日期
-
-        beforeGetBookingData(); //清除現在的資料，準備更新每個site的表格
+    $drpEym.on('change', function() { //Eym - End Year Month
+        strEndDate = this.value;
+        // alert('SD = ' + strStartDate + ', ED = ' + strEndDate);
         getBookingData(false);
     });
 
@@ -40,69 +38,113 @@ $(function() {
     //儲存每個site的table
     for (var k in tables) {
         if (!isNaN(k)) {
-            aryTable.push(tables[k]);
-            // if (firstSiteID == undefined)
-            //     firstSiteID = aryTable[k].getAttribute('siteid')
+            aryTable[k] = tables[k];
+            // aryTable.push(tables[k]);
         }
     }
     //取得目前預約狀況
     getBookingData(true);
 });
 
-function setStartMonthSelect() {
-    var today = new Date();
-    var todayVal = today.valueOf();
-    var sd = new Date(todayVal);
-    sd.setMonth(today.getMonth() - 4);
-    sd.setDate(1);
-    var ed = new Date(todayVal);
-    ed.setMonth(sd.getMonth() + 12);
+function initSelectYM() {
+    var cd = new Date();
+    var sd = new Date(cd.valueOf());
+    sd.setMonth(sd.getMonth() - 1);
+    strStartDate = dateString(sd, 'dateFull'); //預約現況表 起始日期
+    var ed = new Date(cd.valueOf());
+    ed.setMonth(ed.getMonth() + 1);
+    strEndDate = dateString(ed, 'dateFull'); //預約現況表 結束日期
 
-    var cd = new Date(sd.valueOf());
-    while (cd < ed) {
-        $drpSym.append($("<option></option>").attr('value', dateString(cd, 'dateFull')).text(yearMonth(cd)));
+    setSelectYM(cd.valueOf());
+}
+
+function setSelectYM(txtSD, type) {
+    var sd, ed, cd;
+    //起始日期下拉選單
+    if (type != undefined)
+        $drpSym.empty(); //clear dropdownlist
+    //sd
+    sd = new Date(txtSD);
+    sd.setDate(1);
+    //first date(cd) and last date(ed) of list
+    cd = new Date(sd.valueOf());
+    cd.setMonth(cd.getMonth() - 4); //第一個年月 = sd-4個月
+    // cd.setDate(1); //cd的月份的第一天
+    ed = new Date(sd.valueOf());
+    ed.setMonth(ed.getMonth() + 8); //最後一個年月 = sd+8個月
+    //set select options
+    while (cd <= ed) {
+        $option = $("<option></option>").attr('value', dateString(cd, 'dateFull')).text(yearMonth(cd));
+        if (dateString(cd, 'dateFull') == txtSD)
+            $option.attr('selected', true);
+        $drpSym.append($option);
         cd.setMonth(cd.getMonth() + 1);
     }
 
-    //載入頁面時的預設起始與結束日期
-    var initSD = new Date(todayVal);
-    initSD.setMonth(initSD.getMonth() - 1);
-    strStartDate = dateString(initSD, 'dateFull'); //預約現況表 起始日期
-    var initED = new Date(todayVal);
-    initED.setMonth(initED.getMonth() + 1);
-    strEndDate = dateString(initED, 'dateFull'); //預約現況表 結束日期
-}
+    //結束日期下拉選單
+    if (type != undefined) {
+        // var firstDate_Eym = $drpEym.find('option:first').val();
+        // var lastDate_Eym = $drpEym.find('option:last').val();
 
-function setEndMonthSelect(sdVal) {
-    var cd = new Date(sdVal);
-    strStartDate = dateString(cd, 'dateFull'); //預約現況表 起始日期
-    //
-    var endVal = $drpEym.find(":selected").val();
-    var ed;
-    if (endVal == 0)
-        ed = new Date(sdVal);
-    else
-        ed = new Date(endVal);
-    if (cd >= ed) {
-        ed.setMonth(ed.getMonth() + 12);
-        strEndDate = ''; //還原 預約現況表 結束日期
-
-        $drpEym.find('option').remove().end();
-        while (cd < ed) {
-            var lastDayOfMonth = new Date(cd.valueOf());
-            lastDayOfMonth.setMonth(lastDayOfMonth.getMonth() + 1);
-            lastDayOfMonth.setDate(lastDayOfMonth.getDate() - 1);
-            $drpEym.append($("<option></option>").attr('value', dateString(lastDayOfMonth, 'dateFull')).text(yearMonth(lastDayOfMonth)));
-            if (strEndDate == '')
-                strEndDate = dateString(lastDayOfMonth, 'dateFull'); //預約現況表 結束日期
-
+        //first date(cd) and last date(ed) of list
+        cd = new Date(sd.valueOf());
+        cd = getLastDayOfDate(cd); //取得cd所屬月份的最後一天
+        ed = new Date(sd.valueOf());
+        ed.setMonth(ed.getMonth() + 12); //結束年月下拉選單 的 最後年月 = cd+12個月
+        //檢查下拉選單是否包含結束日期
+        var endDateSelectedIndex = 0,
+            idx = -1;
+        while (cd <= ed) {
+            idx++;
+            if (dateString(cd, 'dateFull') == strEndDate) {
+                endDateSelectedIndex = idx; //
+                break;
+            }
+            //cd +1 month
+            cd.setDate(1);
             cd.setMonth(cd.getMonth() + 1);
+            cd = getLastDayOfDate(cd); //取得cd所屬月份的最後一天
         }
+        // alert('idx = ' + endDateSelectedIndex);
+
+        //set end-date-dropdownlist
+        $drpEym.empty(); //clear dropdownlist
+
+        if (!endDateSelectedIndex)
+            strEndDate = ''; //改變結束日期
+
+        //reset first date(cd) of list
+        cd = new Date(sd.valueOf());
+        cd = getLastDayOfDate(cd); //取得cd所屬月份的最後一天
+        while (cd <= ed) {
+            //set 結束日期
+            if (strEndDate == '')
+                strEndDate = dateString(cd, 'dateFull');
+            //append option
+            $drpEym.append($("<option></option>").attr('value', dateString(cd, 'dateFull')).text(yearMonth(cd)));
+            //cd +1 month
+            cd.setDate(1);
+            cd.setMonth(cd.getMonth() + 1);
+            cd = getLastDayOfDate(cd); //取得cd所屬月份的最後一天
+        }
+        //set option selected
+        if (endDateSelectedIndex)
+            $drpEym.find('option:eq(' + endDateSelectedIndex + ')').attr('selected', true);
+
     }
-    // alert(strStartDate + ' ➜ ' + strEndDate);
+}
+//取得某日期所屬月份的最後一天的日期
+function getLastDayOfDate(date) {
+    var d = new Date(date.valueOf());
+    // d.setDate(1);
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(d.getDate() - 1);
+    return d;
 }
 
 function getBookingData(isFirst) {
+    // alert('SD = ' + strStartDate + ', ED = ' + strEndDate);
+    nowLoading(true);
     $.ajax({
         type: 'GET',
         url: "api/ad/book/list",
@@ -128,15 +170,17 @@ function getBookingData(isFirst) {
                     alert("資料取得錯誤");
                     break;
             }
-
+            // nowLoading(false);
         }
     });
 }
 
 function refreshTabs(isFirst) {
+    beforeRefreshBookingTable(); //準備更新每個site的表格
     for (var k in aryTable) {
         changeTableVar(k); //更換table中的element變數
-        refreshBookingTable(); //初始化每個site的表格
+        // alert('k=' + k);
+        refreshBookingTable(k); //更新每個site的表格，並顯示目前預約狀況
     }
 
     if (isFirst) {
@@ -158,6 +202,14 @@ function refreshTabs(isFirst) {
     }
 }
 
+//準備更新每個site的表格
+function beforeRefreshBookingTable() {
+    aryCells.splice(0, aryCells.length); //清除 每個site的cell array
+    lastSelectedCell = undefined;
+    lastSelectedRow = undefined;
+    clearSelectedCellAndData(); //清除 已選擇的cell
+}
+
 function changeTableVar(idx) {
     var table = aryTable[idx];
     tbody = table.tBodies[0];
@@ -166,12 +218,12 @@ function changeTableVar(idx) {
 }
 
 //更新每個site的表格，並顯示目前預約狀況
-function refreshBookingTable() {
-    // var eDate = new Date(jsonData.end_date);
+function refreshBookingTable(idxTable) {
+    $(tbody).empty(); //清除 table body
+
     var eDate = new Date(strEndDate);
-    var aryRowIdx = [], //array index of tr
-        aryRow = []; //array tr
-    var aryCellOfSite = new Array(); //save 每個site的cell array
+    var aryRow = []; //array tr
+    aryCells[idxTable] = []; //每個site的cell array
 
     //start column
     for (var j = 0; j < thead.cells.length; j++) { //j是thead的index，j = 0 為日期欄位
@@ -195,8 +247,8 @@ function refreshBookingTable() {
                     tdDate.innerText = dateString(d, 'dateText');
                     tr.appendChild(tdDate);
                     //
-                    aryRowIdx.push(dateString(d, 'date')); //save index of tr
-                    aryRow.push(tr); //save tr
+                    // aryRowIdx.push(dateString(d, 'date')); //save index of tr
+                    aryRow[dateString(d, 'date')] = tr; //save tr, key=date
                     //
                     d.setDate(d.getDate() + 1);
                 } while (d <= eDate);
@@ -212,10 +264,10 @@ function refreshBookingTable() {
                     var keyBooking = dateString(d, 'date') + '-' + itemID + '-' + col; //date-position-colspan
                     if (jsonData.data.hasOwnProperty(keyBooking)) {
                         days = parseInt(jsonData.data[keyBooking].days);
-                        createCellAppendToRow(d, itemID, col, days, jsonData.data[keyBooking], aryRowIdx, aryRow, aryCellOfSite); //tr append td
+                        createCellAppendToRow(d, itemID, col, days, jsonData.data[keyBooking], aryRow, idxTable); //tr append td
                     } else {
                         if (days == 0)
-                            createCellAppendToRow(d, itemID, col, days, null, aryRowIdx, aryRow, aryCellOfSite); //tr append td
+                            createCellAppendToRow(d, itemID, col, days, null, aryRow, idxTable); //tr append td
                     }
                     //date +1 day
                     d.setDate(d.getDate() + 1);
@@ -230,22 +282,11 @@ function refreshBookingTable() {
     //put each row into table body
     for (var k in aryRow)
         tbody.appendChild(aryRow[k]);
-
-    //save 每個site的cell array 到aryCells
-    aryCells.push(aryCellOfSite);
 }
 
-function createCellAppendToRow(d, itemID, col, days, data, aryRowIdx, aryRow, aryCellOfSite) {
+function createCellAppendToRow(d, itemID, col, days, data, aryRow, idxTable) {
     var strDate = dateString(d, 'date');
-    var key;
-    for (var idx in aryRowIdx) {
-        if (aryRowIdx[idx] == strDate) {
-            key = idx;
-            break;
-        }
-    }
-    // alert('strDate=' + strDate);
-    var tr = aryRow[key]; //get tr
+    var tr = aryRow[strDate]; //get tr
     //create td
     var td = document.createElement('td');
     td.setAttribute('itemid', itemID); //position
@@ -259,7 +300,7 @@ function createCellAppendToRow(d, itemID, col, days, data, aryRowIdx, aryRow, ar
     td.onmousedown = function() { cellClick(this, this.parentElement, false); };
     if (data == null) {
         //可預約的cell
-        aryCellOfSite.push(td); //把cell save在每個site的cell array中
+        aryCells[idxTable].push(td); //把cell save在每個site的cell array中
     } else {
         td.innerText = data.project;
         td.onmousedown = null;
@@ -291,123 +332,6 @@ function createCellAppendToRow(d, itemID, col, days, data, aryRowIdx, aryRow, ar
     });
     //
     tr.appendChild(td);
-}
-
-function initTable_OLD() {
-    //取得上個月第一天的日期
-    var d = new Date();
-    d.setDate(d.getDate() - 7);
-    // d.setDate(1); //設定日為第一天
-    // d.setMonth(d.getMonth() - 1); //設定月為上個月    
-    //
-    var countMonth = 0; //計算顯示了幾個月
-    var mMonth = d.getMonth(); //記錄目前計算到幾月了
-    //
-    do { //start row
-        var tr = document.createElement('tr');
-        var tdDate = document.createElement('td');
-        tdDate.innerText = dateString(d, 'dateText');
-        tr.appendChild(tdDate);
-        for (var j = 1; j < thead.cells.length; j++) { //因為j=0沒有item屬性，所以從1開始
-            var colspan = parseInt(thead.cells[j].getAttribute('colspan'));
-            for (var col = 0; col < colspan; col++) {
-                var td = document.createElement('td');
-                // td.setAttribute('siteid', siteID);
-                td.setAttribute('itemid', thead.cells[j].getAttribute('item'));
-                // td.setAttribute('itemname', thead.cells[j].innerText);
-                td.setAttribute('date', dateString(d, 'date'));
-                // td.setAttribute('datetext', dateString(d, 'dateText'));
-                tr.appendChild(td);
-                td.onmousedown = function() { cellClick(this, this.parentElement, false); };
-                //td鎖右鍵（mac: Ctrl+click）
-                td.addEventListener('contextmenu', function(evt) {
-                    evt.preventDefault();
-                });
-                tr.addEventListener('contextmenu', function(evt) {
-                    evt.preventDefault();
-                });
-                //
-                aryAllCell.push(td);
-            }
-        }
-        // tr.onmousedown =function(){RowClick(this,false);};
-        tbody.appendChild(tr);
-        //取得目前預約狀況所需要的起始與結束日期
-        if (strStartDate == undefined)
-            strStartDate = dateString(d, 'date');
-        strEndDate = dateString(d, 'date');
-        //下一天(next row)
-        d.setDate(d.getDate() + 1);
-        if (mMonth != d.getMonth()) {
-            mMonth = d.getMonth();
-            countMonth++;
-        }
-    } while (countMonth < 3); //顯示3個月份的所有日期
-}
-
-function setBookingInfo_OLD(siteID) {
-    var data = jsonData.data;
-    return;
-    for (var k in data)
-        setAllCell_OLD(cellList[k])
-}
-
-function setAllCell_OLD(oneBookingData) {
-    var date = oneBookingData.date;
-    var position = oneBookingData.publish_position_id;
-    var entrust_status = oneBookingData.entrust_status;
-
-    //檢查全部的cell
-    for (var k in aryAllCell) {
-        var cell = aryAllCell[k];
-        var d = cell.getAttribute('date'); //cell 日期
-        var pid = cell.getAttribute('itemid'); //cell 版位id
-        // var sid = cell.getAttribute('siteid'); //cell 刊登處id
-
-        if (date == d && position == pid) {
-            var oriTitle = ''; //滑鼠移過的泡泡資訊
-            for (var idx in jsonData.entrust_list) {
-                var oneEntrust = jsonData.entrust_list[idx];
-                if (oneEntrust.date == d && oneEntrust.position == pid) {
-                    if (oriTitle.length > 0)
-                        oriTitle += '\n\n';
-                    if (oneEntrust.status == 1) {
-                        oriTitle += '【已審核】' + oneEntrust.name + '\n客戶：' + oneEntrust.agent_customer;
-                    } else {
-                        oriTitle += '委刊單：' + oneEntrust.name + '\n客戶：' + oneEntrust.agent_customer;
-                    }
-                }
-            }
-
-            // entrust_status= '0':預約尚未額滿; '1':預約額滿; 2:預約都通過審核
-            if (entrust_status == 0) {
-                cell.className = 'status-count-0';
-            } else if (entrust_status == 1) {
-                cell.className = 'status-count-1';
-                cell.onmousedown = null;
-            } else if (entrust_status == 2) {
-                cell.className = 'status-all-ok';
-                cell.onmousedown = null;
-            }
-
-            // 有預約資料時顯示tooltip
-            if (entrust_status >= 0) {
-                cell.setAttribute('data-original-title', oriTitle);
-                cell.setAttribute('data-container', 'body');
-                cell.setAttribute('data-toggle', 'tooltip');
-                cell.setAttribute('data-placement', 'top');
-                $(cell).tooltip();
-            } else {
-                cell.className = '';
-                cell.removeAttribute('data-original-title');
-                cell.removeAttribute('data-container');
-                cell.removeAttribute('data-toggle');
-                cell.removeAttribute('data-placement');
-                $(cell).tooltip('disable');
-            }
-            break;
-        }
-    }
 }
 
 //BlockUI
@@ -449,11 +373,11 @@ function dateString(date, type) {
     var day = date.getDate();
     switch (type) {
         case 'dateFull':
-            return year + "-" + (month < 10 ? '0' + month : month) + "-" + (day < 10 ? '0' + day : day);
+            return year + "-" + (month > 9 ? month : '0' + month) + "-" + (day < 10 ? '0' + day : day);
         case 'dateText':
             return year + "-" + month + "-" + day;
         case 'date':
-            return year + (month < 10 ? '0' + month : month) + (day < 10 ? '0' + day : day);
+            return year + '' + (month > 9 ? month : '0' + month) + '' + (day < 10 ? '0' + day : day);
     }
 }
 
@@ -466,30 +390,12 @@ function cellClick(currenttd, currenttr, lock) {
 
     if (window.event.button === 0) {
         if (!window.event.ctrlKey && !window.event.shiftKey) {
-            // if (lastSelectedCell != currenttd)
-            //     clearSelectedCellAndData();
-            // refreshBookingInfo();
             toggleCell(currenttd, currenttr, false);
             setSelectedResult();
         }
 
         if (window.event.shiftKey) {
-            // clearSelectedCellAndData();
-            // refreshBookingInfo();
-            // alert([lastSelectedRow.rowIndex, currenttr.rowIndex]+'\n\n'+ [lastSelectedCell.cellIndex, currenttd.cellIndex]);
-            //********
-            // var cellIdx;
-            // for (var i = 0; i < thead.cells.length; i++) {
-            //     var itemId = thead.cells[i].getAttribute('item');
-            //     if (thead.cells[i].getAttribute('item') == currenttd.getAttribute('itemid')) {
-            //         cellIdx = i;
-            //         break;
-            //     }
-            // }
-
             shiftCell(currenttd);
-            // selectCellsBetweenRows([lastSelectedRow.rowIndex, currenttr.rowIndex], [lastSelectedCell.getAttribute('item-idx'), cellIdx])
-            // selectTitlesBetweenRows([lastSelectedRow.rowIndex, currenttr.rowIndex], [lastSelectedCell.getAttribute('item-idx'), currenttd.getAttribute('item-idx')]);
             setSelectedResult();
         }
     }
@@ -530,83 +436,12 @@ function toggleCell_SelectedTitleCell(cell, row) {
     arySelectedTitleCell.push(c); //save 選擇的日期
 }
 
-function toggleCell_OLD(cell, row, isNotKeyDown) {
-    var selectedItemClassName = '',
-        selectedDateClassName = '';
-    // cell.className = cell.className == 'selected' ? '' : 'selected';
-    if (lastSelectedCell == cell) {
-        cell.className = cell.className == 'selected' ? '' : 'selected';
-        toggleCellDelete(cell);
-        lastSelectedCell = undefined;
-        lastSelectedRow = undefined;
-    } else {
-        if (isNotKeyDown) {
-            clearSelectedCellAndData();
-            cell.className = 'selected';
-            aryToggleCell.push(cell);
-            selectedItemClassName = 'selected-item';
-            selectedDateClassName = 'selected-date';
-        } else {
-            if (cell.className == 'selected') {
-                cell.className = '';
-                toggleCellDelete(cell);
-                lastSelectedCell = undefined;
-                lastSelectedRow = undefined;
-            } else {
-                cell.className = 'selected';
-                aryToggleCell.push(cell);
-                selectedItemClassName = 'selected-item';
-                selectedDateClassName = 'selected-date';
-            }
-        }
-
-        lastSelectedCell = cell;
-        lastSelectedRow = row;
-        //
-
-    }
-    //*******shift選擇後再用ctrl反選擇，selected-item and selected-date都會消失
-    var c;
-    //取得選擇的 版位
-    for (var i = 0; i < thead.cells.length; i++) {
-        var itemId = thead.cells[i].getAttribute('item');
-        if (itemId == cell.getAttribute('itemid')) {
-            c = thead.cells[i];
-            break;
-        }
-    }
-    //凸顯選擇的 版位
-    c.className = selectedItemClassName;
-    arySelectedTitleCell.push(c);
-    //凸顯選擇的 日期
-    c = row.cells[0];
-    c.className = selectedDateClassName;
-    arySelectedTitleCell.push(c);
-}
-
-function toggleCellDelete(cell) {
-    //aryToggleCell
-    for (var i = 0; i < aryToggleCell.length; i++) {
-        if (aryToggleCell[i].getAttribute('itemid') == cell.getAttribute('itemid') &&
-            aryToggleCell[i].getAttribute('turn') == cell.getAttribute('turn') &&
-            aryToggleCell[i].getAttribute('date') == cell.getAttribute('date')) {
-            aryToggleCell.splice(i, 1);
-            break;
-        }
-    }
-    //aryShiftCell
-    for (var i = 0; i < aryShiftCell.length; i++) {
-        if (aryShiftCell[i].getAttribute('itemid') == cell.getAttribute('itemid') &&
-            aryShiftCell[i].getAttribute('turn') == cell.getAttribute('turn') &&
-            aryShiftCell[i].getAttribute('date') == cell.getAttribute('date')) {
-            aryShiftCell.splice(i, 1);
-            break;
-        }
-    }
-}
-
 function shiftCell(currentCell) {
     clearSelectedCellAndData();
+    //*****
+    if (currentCell == undefined) alert('currentCell undefined');
+    if (typeof currentCell.getAttribute !== "function") alert('currentCell no getAttribute');
+
     if (lastSelectedCell == undefined || currentCell == undefined || typeof lastSelectedCell.getAttribute !== "function" || typeof currentCell.getAttribute !== "function")
         return;
 
@@ -629,6 +464,8 @@ function shiftCell(currentCell) {
     // alert(sDate + ', ' + eDate + ', ' + sItem + ', ' + eItem + ', ' + sTurn + ', ' + eTurn);
 
     var aryCellOfSite = aryCells[siteIdx];
+    // alert('L = '+aryCells.length);
+
     for (var k in aryCellOfSite) {
         var cell = aryCellOfSite[k];
         var bDate = bItemTurn = false;
@@ -637,7 +474,11 @@ function shiftCell(currentCell) {
         // if (sItem <= cell.getAttribute('itemid') && eItem >= cell.getAttribute('itemid'))
         //     bItem = true;
         var itemid_turn = parseInt(cell.getAttribute('itemid').concat(cell.getAttribute('turn')));
-        if (sItemTurn <= itemid_turn && eItemTurn >= itemid_turn)
+
+        // if(cell.getAttribute('itemid') == '1' && cell.getAttribute('turn') == '1' && cell.getAttribute('date') == '20170606')
+        //     alert('itemid_turn = '+itemid_turn);//***********
+
+        if (sItemTurn <= itemid_turn && itemid_turn <= eItemTurn)
             bItemTurn = true;
         if (bDate && bItemTurn) {
             // alert(cell.getAttribute('itemid') + ', ' + cell.getAttribute('date'));
@@ -666,44 +507,6 @@ function shiftCell(currentCell) {
     }
 }
 
-function selectCellsBetweenRows_OLD(rowIndexes, cellIndexes) {
-    rowIndexes.sort(function(a, b) {
-        return a - b;
-    });
-    cellIndexes.sort(function(a, b) {
-        return a - b;
-    });
-
-    for (var i = rowIndexes[0]; i <= rowIndexes[1]; i++) {
-        for (var j = cellIndexes[0]; j <= cellIndexes[1]; j++) {
-            var c = trs[i - 1].cells[j];
-            c.className = 'selected';
-            aryShiftCell.push(c);
-        }
-        // trs[i - 1].className = 'selected';
-    }
-}
-
-function selectTitlesBetweenRows_OLD(rowIndexes, cellIndexes) {
-    rowIndexes.sort(function(a, b) {
-        return a - b;
-    });
-    cellIndexes.sort(function(a, b) {
-        return a - b;
-    });
-
-    for (var i = rowIndexes[0]; i <= rowIndexes[1]; i++) {
-        trs[i - 1].cells[0].className = 'selected-date';
-        arySelectedTitleCell.push(trs[i - 1].cells[0]);
-
-    }
-    for (var i = cellIndexes[0]; i <= cellIndexes[1]; i++) {
-
-        thead.cells[i].className = 'selected-item';
-        arySelectedTitleCell.push(thead.cells[i]);
-    }
-}
-
 function setSelectedResult() {
     dataPublish.data.splice(0, dataPublish.data.length);
     //Shift selected
@@ -727,7 +530,7 @@ function setSelectedResult() {
         dataPublish.data.push(d);
     }
     dataPublish.eid = $('#entrust_id option:selected').val();
-    $hidMsg.text(JSON.stringify(dataPublish));
+    $hidVal.val(JSON.stringify(dataPublish));
 }
 
 function clearSelectedCellAndData() {
@@ -742,14 +545,7 @@ function clearSelectedCellAndData() {
     aryShiftCell.splice(0, aryShiftCell.length); //清除 Shift selected
     arySelectedTitleCell.splice(0, arySelectedTitleCell.length);
     dataPublish.data.splice(0, dataPublish.data.length); //清除要送出的資料
-}
-
-function beforeGetBookingData() {
-    aryCells.splice(0, aryCells.length); //清除 每個site的cell array
-    $(tbody).empty(); //清除 table body
-    lastSelectedCell = undefined;
-    lastSelectedRow = undefined;
-    clearSelectedCellAndData(); //清除 已選擇的cell
+    $hidVal.val('');
 }
 
 //送出預約
@@ -780,7 +576,7 @@ function bookSubmit() {
                     $hidMsg.text(jqXHR.responseText);
                     document.body.scrollIntoView(true);
 
-                    beforeGetBookingData(); //清除現在的資料，準備更新每個site的表格
+                    // beforeGetBookingData(); //清除現在的資料，準備更新每個site的表格
                     getBookingData(false);
                     break;
                 default:

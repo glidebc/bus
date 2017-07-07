@@ -112,12 +112,12 @@
     <style>
         .btn-verify {
             opacity: .5;
-            color: red;
+            color: #eea236;
             cursor: pointer;
         }
         .btn-read {
             opacity: .5;
-            color: #428bca;
+            color: #26a69a;
             cursor: pointer;
         }
         .btn-verify:hover, .btn-read:hover {

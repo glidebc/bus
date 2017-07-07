@@ -98,14 +98,14 @@
     <style>
         .btn-read {
             opacity: .5;
-            color: #428bca;
+            color: #26a69a;
             cursor: pointer;;
         }
         .btn-read:hover {
             opacity: 1;
         }
         .test-1 {
-            color: #428bca;
+            color: #26a69a;
         }
     </style>
 @stop

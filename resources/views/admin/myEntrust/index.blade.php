@@ -155,7 +155,7 @@
     </script>
     <style>
     .btn-ok {
-        color: #428bca;
+        color: #26a69a;
         cursor: pointer;
     }
     .btn-reject {
@@ -168,7 +168,7 @@
     }
     .btn-read {
         opacity: .5;
-        color: #428bca;
+        color: #26a69a;
         cursor: pointer;
     }
     .btn-read:hover {

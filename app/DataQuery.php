@@ -176,7 +176,7 @@ class DataQuery {
                                 $join->on('entrust.customer_id', '=', 'customer.id')
                                      ->where('entrust.id', $entrustId);
                             })
-                            ->selectRaw('customer.name AS agent_customer,entrust.name,entrust.owner_user');
+                            ->selectRaw('customer.name AS agent_customer,entrust.name,entrust.start_date,entrust.end_date,entrust.owner_user');
                             // ->orderBy('entrust.created_at', 'desc');
         return $entrust;
     }

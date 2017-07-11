@@ -13,6 +13,7 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use stdClass;
+use DateInterval;
 
 class ServiceController extends Controller {
 
@@ -129,22 +130,36 @@ class ServiceController extends Controller {
 	public function adBookedList(Request $request)
 	{
 		$json = $request->all();
-		//
+
 		$res = new stdClass();
+		//
+		$dateStart = date_create($json['sDate']);
+		$dateEnd = date_create($json['eDate']);
+		$diff = date_diff($dateStart, $dateEnd);
+		$y = $diff->y + $diff->m / 12 + $diff->d / 365.25;
+		//超過一年的日期區間不顯示
+		if($y >= 1)
+			return response()->json(null, 400);
+
 		// $now = date('Y-m-d H:i:s');
-		$str_today = date('Y-m-d', strtotime('today'));
-		$str_start_date = date('Y-m-d', strtotime($str_today.' -1 week first sunday of this week'));
-		$str_end_date = date('Y-m-d', strtotime($str_today.' +1 month last day of this month'));
-		// $res->begin_date = $str_start_date;
-		// $res->end_date = $str_end_date;
+		// $str_today = date('Y-m-d', strtotime('today'));
+		// $str_start_date = date('Y-m-d', strtotime($str_today.' -1 week first sunday of this week'));
+		// $str_end_date = date('Y-m-d', strtotime($str_today.' +1 month last day of this month'));
+		// $res->sd = $dateStart->format('Y-m-d');
+		// $res->ed = $dateEnd->format('Y-m-d');
+
+		//起始日期-3個月, 結束日期+3個月
+		$interval = new DateInterval('P3M');
+		$dateStart->sub($interval);
+		$dateEnd->add($interval);
 		//
 		$data = new stdClass();
 		//有預約的日期與版位的table cell list
 		$listDatePosition = Publish::select('publish_position_id', 'turn', 'date')
 								// ->whereRaw('deleted_at IS NULL')
 								->where([
-									['date', '>=', str_replace('-', '', $json['sDate'])],
-									['date', '<=', str_replace('-', '', $json['eDate'])]
+									['date', '>=', $dateStart->format('Ymd')],
+									['date', '<=', $dateEnd->format('Ymd')]
 									// ['status', '!=', 2]
 								])
 								->groupBy('publish_position_id', 'turn', 'date')
@@ -156,25 +171,50 @@ class ServiceController extends Controller {
 									['turn', '=', $datePosition->turn],
 									['date', '=', $datePosition->date]
 								])->first();
-			//委刊單的status 2 or 3 才顯示
-			$entrustStatus = Entrust::find($publish->entrust_id)->status;
-			if ($entrustStatus == 2 || $entrustStatus == 3) {
-				$entrust = DataQuery::collectionOfEntrustByID($publish->entrust_id)->first();
-				$publishuser = DataQuery::collectionPublishUser($entrust->owner_user)->first();
-				$cell = new stdClass();
-				$cell->customer = $entrust->agent_customer;
-				$cell->project = $entrust->name;
-				$cell->dept = empty($publishuser->dept) ? '' : $publishuser->dept;
-				$cell->user = $publishuser->user_name;
-				$cell->days = $publish->days;
-				$cell->status = $entrustStatus;
-				$cell->bgcolor = $publishuser->color_name;//底色
-				$cell->color = $publishuser->color_name == 'Gray' ? 'white' : config('admin.publish.colors')[$publishuser->color_name];//字的顏色, 預設是白色字
-				// $cell->bgcolor = empty($publishuser->color_name) ? 'Gray' : $publishuser->color_name;//預設是灰色底色
-				// 
-				// $cell->color = Publishuser::where('user_id', $entrust->owner_user)->first()->color_name;
+			//
+			$dateText = substr($datePosition->date, 0, 4).'-'.substr($datePosition->date, -4, 2).'-'.substr($datePosition->date, -2);
+			//date+days 取得符合開始與結束日期區間的 開始日
+			$cd = date_create($dateText);
+			$interval = new DateInterval('P1D');
+			$date = $datePosition->date;//取得的開始日
+			$days = $publish->days;//剩下的天數
+			while($days > 0) {
+				if(date_create($json['sDate']) <= $cd && $cd <= date_create($json['eDate'])) {
+					$date = $cd->format('Ymd');
+					break;
+				}
+				$cd->add($interval);
+				$days--;
+			}
+			//
+			if($days > 0) {
+				//委刊單的status 2 or 3 才顯示
+				$entrustStatus = Entrust::find($publish->entrust_id)->status;
+				if ($entrustStatus == 2 || $entrustStatus == 3) {
+					$entrust = DataQuery::collectionOfEntrustByID($publish->entrust_id)->first();
+					$publishuser = DataQuery::collectionPublishUser($entrust->owner_user)->first();
+					$cell = new stdClass();
+					$cell->customer = $entrust->agent_customer;
+					$cell->project = $entrust->name;
+					//委刊單預約的日期區間
+					$sd = date_create($dateText);
+					$ed = date_create($dateText)->add(new DateInterval('P'.($publish->days - 1).'D'));
+					$cell->publish = $sd->format('Y-m-d').'～'.$ed->format('Y-m-d');
+					// $strSD = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
+					// $strED = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+					// $cell->duration = $strSD.'～'.$strED;//委刊單的總走期
+					$cell->dept = empty($publishuser->dept) ? '' : $publishuser->dept;
+					$cell->user = $publishuser->user_name;
+					$cell->days = $days;
+					$cell->status = $entrustStatus;
+					$cell->bgcolor = $publishuser->color_name;//底色
+					$cell->color = $publishuser->color_name == 'Gray' ? 'white' : config('admin.publish.colors')[$publishuser->color_name];//字的顏色, 預設是白色字
+					// $cell->bgcolor = empty($publishuser->color_name) ? 'Gray' : $publishuser->color_name;//預設是灰色底色
+					// 
+					// $cell->color = Publishuser::where('user_id', $entrust->owner_user)->first()->color_name;
 
-				$data->{$datePosition->date.'-'.$datePosition->publish_position_id.'-'.$datePosition->turn} = $cell;
+					$data->{$date.'-'.$datePosition->publish_position_id.'-'.$datePosition->turn} = $cell;
+				}
 			}
 		}
 		

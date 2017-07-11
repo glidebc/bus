@@ -160,7 +160,7 @@ function getBookingData(isFirst) {
             switch (jqXHR.status) {
                 // var str = JSON.parse(JSON.stringify(jqXHR.responseText));
                 case 200:
-                    // $hidMsg.text(jqXHR.responseText);
+                    $hidMsg.text(jqXHR.responseText);
                     //
                     jsonData = JSON.parse(jqXHR.responseText); //將資料字串存成資料json
                     refreshTabs(isFirst); //初始化每個site的table
@@ -315,7 +315,7 @@ function createCellAppendToRow(d, itemID, col, days, data, aryRow, idxTable) {
 
         //滑鼠移過的泡泡資訊
         var oriTitle = data.dept == '' ? '' : data.dept + '-';
-        oriTitle += data.user + '\n委刊單：' + data.project + '\n客戶：' + data.customer;
+        oriTitle += data.user + '\n委刊單：' + data.project + '\n客戶：' + data.customer + '\n預約日期：' + data.publish;
         td.setAttribute('data-original-title', oriTitle);
         td.setAttribute('data-container', 'body');
         td.setAttribute('data-toggle', 'tooltip');

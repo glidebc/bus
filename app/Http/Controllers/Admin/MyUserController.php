@@ -25,8 +25,9 @@ class MyUserController extends Controller {
     	$user = Auth::user();
     	$colors = config('admin.publish.colors');
     	//檢查業務資料表
-		$publishuser = Publishuser::where('user_id', $user->id)->first();
-		if(isset($publishuser)) {
+		$publishuser = Publishuser::where('user_id', $user->id);
+		if($publishuser->count() > 0) {
+			$publishuser = $publishuser->first();
 			if($publishuser->color_name == 'Gray')
 				$publishuser->font_color = 'white';
 			else
@@ -35,6 +36,8 @@ class MyUserController extends Controller {
 			$publishuser = new Publishuser();
 			$publishuser->user_id = $user->id;
 			$publishuser->color_name = 'Gray'; //預設是灰色底色
+			// $publishuser->dept_id = 0;
+			// $publishuser->team_id = 0;
 			$publishuser->save();
 			$publishuser->font_color = 'white';//預設是白色字
 		}
@@ -47,8 +50,13 @@ class MyUserController extends Controller {
 			}
 		}
 		//
-		$dept_name = Dept::find($publishuser->dept_id)->name;
-		$team_name = Team::find($publishuser->team_id)->name;
+		$dept_name = '';
+		$team_name = '';
+		if(isset($publishuser->dept_id)) {
+			$dept_name = Dept::find($publishuser->dept_id)->name;
+			$team_name = Team::find($publishuser->team_id)->name;
+		}
+		
 		// $dept = DataQuery::arraySelectDept();
 		// $team = DataQuery::arraySelectTeam();
 		//

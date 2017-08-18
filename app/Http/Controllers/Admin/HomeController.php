@@ -19,11 +19,15 @@ class HomeController extends Controller {
 	public function index()
     {
     	$userId = Auth::user()->id;
-    	$home_path = Publishuser::where('user_id', $userId)->first()->home_path;
-    	if(empty($home_path)) {
+        $publishuser = Publishuser::where('user_id', $userId)->get();
+        $home_path = '';
+        if($publishuser->count() > 0)
+            $home_path = Publishuser::where('user_id', $userId)->first()->home_path;
+
+    	if(empty($home_path))
     		return view('admin.dashboard');
-    	} else {
+    	else
     		return redirect()->route('admin'.$home_path.'index');
-    	}
+    	
 	}
 }

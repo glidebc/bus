@@ -16,7 +16,7 @@
     </div>
 </div>
 
-{!! Form::model($customer, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.mycustomer.update', $customer->id))) !!}
+{!! Form::model($customer, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.teamcustomer.update', $customer->id))) !!}
 
 <div class="form-group">
     {!! Form::label('name', '公司簡稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
@@ -33,8 +33,7 @@
 </div><div class="form-group">
     {!! Form::label('agent_id', '代理商', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('agent_name', old('agent',$agent), array('class'=>'form-control', 'readonly'=>'true')) !!}
-        <!-- {!! Form::select('agent_id', [], $agentid, array('class'=>'form-control')) !!} -->
+        {!! Form::select('agent_id', $agent, $agentid, array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">
@@ -79,31 +78,26 @@
         {{ Form::textarea('note', old('note',$customer->note), array('class'=>'form-control', 'rows' => '5')) }}
         
     </div>
+</div><div class="form-group">
+    {!! Form::label('note', '共用', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+    @foreach($arrayUser as $id => $name)
+        <label>
+            {!! Form::checkbox('array_user[]', $id, in_array($id, $arrayCustomerUser) ? true : false) !!}
+            {{ $name }}
+        </label>　　
+    @endforeach
+        
+    </div>
 </div>
 
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">
       {!! Form::submit(trans('quickadmin::templates.templates-view_edit-update'), array('class' => 'btn btn-primary')) !!}
-      {!! link_to_route(config('quickadmin.route').'.mycustomer.index', trans('quickadmin::templates.templates-view_edit-cancel'), null, array('class' => 'btn btn-default')) !!}
+      {!! link_to_route(config('quickadmin.route').'.teamcustomer.index', trans('quickadmin::templates.templates-view_edit-cancel'), null, array('class' => 'btn btn-default')) !!}
     </div>
 </div>
 
 {!! Form::close() !!}
 
 @endsection
-
-@section('javascript')
-<script type="text/javascript">
-
-</script>
-<style>
-    .form-group input[type="text"], .form-group textarea:-moz-read-only { /* For Firefox */
-        display: inline-block;
-        background-color: white;
-    }
-    .form-group input[type="text"], .form-group textarea:read-only { 
-        display: inline-block;
-        background-color: white;
-    }
-</style>
-@stop

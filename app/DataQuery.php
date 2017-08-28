@@ -5,6 +5,7 @@ namespace App;
 use App\Agent;
 use App\Customer;
 use App\CustomerAgent;
+use App\CustomerUser;
 use App\Dept;
 use App\Entrust;
 use App\Publish;
@@ -39,28 +40,26 @@ class DataQuery {
     //     return $customer;
     // }
 
+    //業務管理-我的代理商, 團隊管理-團隊代理商
     static function arrayAgent($userId)
     {
         return self::arrayAgentOrCustomer($userId, true);
     }
-    
     static function arrayCustomer($userId)
     {
         return self::arrayAgentOrCustomer($userId, false);
     }
-
     static function arrayAgentOrCustomer($userId, $isAgent)
     {
-        $customerCondition = array();
-        array_push($customerCondition, array('is_agent', $isAgent));
-        if(!is_null($userId))
-            array_push($customerCondition, array('owner_user', $userId));
+        $customers = self::collectionCustomer($userId, $isAgent);
+        // $customers = $customers->selectRaw('*, "" AS agent_name')->orderBy('created_at', 'desc')->get();
+        $customers = $customers->orderBy('created_at', 'desc')->get();
 
-        $customers = Customer::withTrashed()
-                            ->where($customerCondition)
-                            ->selectRaw('*, "" AS agent_name')
-                            ->orderBy('created_at', 'desc')
-                            ->get();
+        // $customers = Customer::withTrashed()
+        //                     ->where($customerCondition)
+        //                     ->selectRaw('*, "" AS agent_name')
+        //                     ->orderBy('created_at', 'desc')
+        //                     ->get();
         foreach ($customers as $customer) {
             $customerAgent = CustomerAgent::where([
                     ['customer_id', $customer->id],
@@ -68,18 +67,34 @@ class DataQuery {
                 ]);
             if($customerAgent->count() > 0)
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
+            //共用user的數量
+            $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
+            $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
+            $stringUserName = "";
+            foreach ($arrayUserName as $name) {
+                if(!empty($stringUserName))
+                    $stringUserName .= "\n";
+                $stringUserName .= $name;
+            }
+            $customer->user_names = $stringUserName;
         }
+        
         return $customers;
     }
-    
+
+    //業務管理-我的委刊單-新增與修改
     static function arraySelectCustomer($userId)
     {
+        $customers = self::collectionCustomer($userId, false);
+        $customers = $customers->pluck('name','id')->prepend('請選擇', 0);
+
         $customer = Customer::where([
                                 ['customer.is_agent', false],
                                 ['customer.owner_user', $userId]
                             ])
                             ->pluck('name','id')
                             ->prepend('請選擇', 0);
+
         // $customer = Customer::leftJoin('agent', function ($join) use ($userId) {
         //                         $join->on('agent.id', '=', 'customer.agent_id');
         //                     })
@@ -91,9 +106,33 @@ class DataQuery {
         //                     ->pluck('name','id')
         //                     ->prepend('請選擇', 0);
         // $customer = self::collectionOfCustomerWithAgent()->pluck('name','id');
-        return $customer;
+        return $customers;
     }
-    
+
+    static function collectionCustomer($userId, $isAgent)
+    {
+        $customers;
+        $countCustomer = Customer::where([
+                ['owner_user', $userId],
+                ['is_agent', $isAgent]
+            ])->count();
+        if($countCustomer > 0) {
+            //企劃
+            $customerCondition = array();
+            array_push($customerCondition, array('is_agent', $isAgent));
+            if(!is_null($userId))
+                array_push($customerCondition, array('owner_user', $userId));
+
+            $customers = Customer::withTrashed()->where($customerCondition);
+        } else {
+            //一般業務
+            $aryCustomerId = CustomerUser::where('user_id', $userId)->pluck('customer_id');
+            $customers = Customer::where('is_agent', $isAgent)->whereIn('id', $aryCustomerId);
+        }
+        return $customers;
+    }
+
+    //團隊管理-管理客戶
     static function arraySelectAgent($userId)
     {
         $agent = Customer::where([
@@ -103,6 +142,20 @@ class DataQuery {
                             ->select('name','id')
                             ->orderBy('name')->pluck('name','id')->prepend('無代理商', 0);
         return $agent;
+    }
+    //業務管理-我的客戶-修改客戶-顯示代理商名稱
+    static function myAgentName($customerId)
+    {
+        $agentName = '無代理商';
+        $customerAgent = CustomerAgent::where([
+                ['customer_id', $customerId],
+                ['status', 1]
+            ]);
+        if($customerAgent->count() > 0) {
+            $agentId = $customerAgent->first()->agent_id;
+            $agentName = Customer::find($agentId)->name;
+        }
+        return $agentName;
     }
 
     static function collectionPublishUser($userId)
@@ -133,6 +186,86 @@ class DataQuery {
     {
         $user = User::select('name','id')->orderBy('name')->pluck('name','id')->prepend('請選擇', '');
         return $user;
+    }
+
+    static function arraySelectDept()
+    {
+        return Dept::where('status', true)->pluck('name','id')->prepend('無', '');
+    }
+
+    static function arraySelectTeam()
+    {
+        return Team::where('status', true)->pluck('name','id')->prepend('無', '');
+    }
+
+    static function collectionOfTeamUser($userId, $isNotInThisUser)
+    {
+        $publishuser = Publishuser::where('user_id', $userId);
+        $aryDeptId = $publishuser->pluck('dept_id');
+
+        $teamUser;
+        if($isNotInThisUser)
+            $teamUser = Publishuser::whereNotIn('user_id', [$userId])->whereIn('dept_id', $aryDeptId);
+        else
+            $teamUser = Publishuser::whereIn('dept_id', $aryDeptId);
+
+        if(isset($publishuser->first()->team_id)) {
+            $aryTeamId = $publishuser->pluck('team_id');
+            $teamUser = $teamUser->whereIn('team_id', $aryTeamId);
+        }
+
+        return $teamUser;
+    }
+
+    //團隊管理-團隊委刊單
+    static function collectionOfTeamEntrust($userId)
+    {
+        $teamUser = self::collectionOfTeamUser($userId, false);
+        // $publishuser = Publishuser::where('user_id', $userId);
+        // $aryDeptId = $publishuser->pluck('dept_id');
+        // $aryTeamId = $publishuser->pluck('team_id');
+        // $teamUser;// = Entrust::whereIn('dept_id', $aryDeptId);
+        // // if(empty($publishuser->team_id)) {
+        // if($aryTeamId->isEmpty())
+        //     $teamUser = Publishuser::whereIn('dept_id', $aryDeptId);
+        // else
+        //     $teamUser = Publishuser::whereIn('dept_id', $aryDeptId)->whereIn('team_id', $aryTeamId);
+
+        $teamEntrust = Entrust::whereIn('entrust.owner_user', $teamUser->pluck('user_id'));
+
+        $entrusts = $teamEntrust->join('customer', function ($join) {
+                                $join->on('customer.id', 'entrust.customer_id');
+                            })
+                            // ->join('publish_user', function ($join) {
+                            //     $join->on('publish_user.user_id', 'entrust.owner_user')
+                            //          ->whereRaw('publish_user.deleted_at IS NULL');
+                            // })
+                            ->selectRaw('customer.name AS customer_name, entrust.*')
+                            ->orderBy('entrust.created_at', 'desc')
+                            ->get();
+        // $entrusts = $teamEntrust->join('customer', function ($join) {
+        //                         $join->on('customer.id', 'entrust.customer_id');
+        //                     })
+        //                     ->join('publish_user', function ($join) {
+        //                         $join->on('publish_user.user_id', 'entrust.owner_user')
+        //                              ->whereRaw('publish_user.deleted_at IS NULL');
+        //                     })
+        //                     ->selectRaw('customer.name AS customer_name, entrust.*')
+        //                     ->orderBy('entrust.created_at', 'desc')
+        //                     ->get();
+        return $entrusts;
+    }
+
+    //團隊管理-團隊代理商
+    static function arrayTeamUser($userId)
+    {
+        $teamUser = self::collectionOfTeamUser($userId, true);
+        // if($aryTeamId->isEmpty())
+        //     $teamUser = Publishuser::whereNotIn('user_id', [$userId])->whereIn('dept_id', $aryDeptId);
+        // else
+        //     $teamUser = Publishuser::whereNotIn('user_id', [$userId])->whereIn('dept_id', $aryDeptId)->whereIn('team_id', $aryTeamId);
+
+        return User::whereIn('id', $teamUser->pluck('user_id'))->orderBy('name')->pluck('name', 'id');
     }
     
     static function collectionOfEntrustByUser($userId)
@@ -253,35 +386,4 @@ class DataQuery {
         // $publish = $query->addSelect(DB::raw(''))
         
     }
-
-    static function arraySelectDept()
-    {
-        return Dept::where('status', true)->pluck('name','id')->prepend('無', '');
-    }
-
-    static function arraySelectTeam()
-    {
-        return Team::where('status', true)->pluck('name','id')->prepend('無', '');
-    }
-
-    static function collectionOfTeamEntrust($userId)
-    {
-        $publishuser = Publishuser::where('user_id', $userId);
-        $aryDeptId = $publishuser->pluck('dept_id');
-        $aryTeamId = $publishuser->pluck('team_id');
-        $teamEntrust = Entrust::whereIn('dept_id', $aryDeptId)->whereIn('team_id', $aryTeamId);
-
-        $entrusts = $teamEntrust->join('customer', function ($join) {
-                                $join->on('customer.id', 'entrust.customer_id');
-                            })
-                            ->join('publish_user', function ($join) {
-                                $join->on('publish_user.user_id', 'entrust.owner_user')
-                                     ->whereRaw('publish_user.deleted_at IS NULL');
-                            })
-                            ->selectRaw('customer.name AS customer_name, entrust.*')
-                            ->orderBy('entrust.created_at', 'desc')
-                            ->get();
-        return $entrusts;
-    }
-    
 }

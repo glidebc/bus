@@ -30,6 +30,10 @@ class UpdateCustomerRequest extends FormRequest {
 			$exceptId = $this->mycustomer;
 		if($exceptId == null)
 			$exceptId = $this->myagent;
+		if($exceptId == null)
+			$exceptId = $this->teamcustomer;
+		if($exceptId == null)
+			$exceptId = $this->teamagent;
 
 		return [
             'name' => 'required|unique:customer,name,'.$exceptId,

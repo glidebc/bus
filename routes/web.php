@@ -33,6 +33,14 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 	    'as' => 'admin.myagent.resetDelete',
 	    'uses' => 'Admin\MyAgentController@resetDelete'
 	]);
+	Route::post('/teamcustomer/resetDelete/{id}',[
+	    'as' => 'admin.teamcustomer.resetDelete',
+	    'uses' => 'Admin\TeamCustomerController@resetDelete'
+	]);
+	Route::post('/teamagent/resetDelete/{id}',[
+	    'as' => 'admin.teamagent.resetDelete',
+	    'uses' => 'Admin\TeamAgentController@resetDelete'
+	]);
 
 	// Route::resource('myuser', 'Admin\MyUserController', ['only' => [
 	//     'index', 'update'

@@ -7,27 +7,18 @@ use Redirect;
 use Schema;
 use App\Customer;
 use App\CustomerAgent;
+use App\CustomerUser;
 use App\DataQuery;
 use App\Http\Requests\CreateCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class MyCustomerController extends Controller {
 
-	// private $agentIdArray;
-	// // private $agentArray;
-
-	// public function __construct()
- //    {
- //        // $this->agent = Agent::where('deleted_at', null)->orderBy('name')->pluck('name','id');
- //        // $agentCollection = Agent::where('deleted_at', null)->orderBy('name');
- //        // $this->agentArray = Agent::where('deleted_at', null)->orderBy('name')->pluck('name','id')->prepend('無代理商', null);
- //        $this->agentIdArray = Agent::where('deleted_at', null)->orderBy('name')->pluck('id');
- //    }
+class TeamCustomerController extends Controller {
 
 	/**
-	 * Display a listing of mycustomer
+	 * Display a listing of teamcustomer
 	 *
      * @param Request $request
      *
@@ -37,37 +28,49 @@ class MyCustomerController extends Controller {
     {
         $userId = Auth::user()->id;
         $customer = DataQuery::arrayCustomer($userId);
-		return view(config('quickadmin.route').'.myCustomer.index', compact('customer'));
+		return view(config('quickadmin.route').'.teamCustomer.index', compact('customer'));
 	}
 
 	/**
-	 * Show the form for creating a new mycustomer
+	 * Show the form for creating a new teamcustomer
 	 *
      * @return \Illuminate\View\View
 	 */
 	public function create()
 	{
 		$userId = Auth::user()->id;
-	    $agent = null;//DataQuery::arraySelectAgent($userId);
-	    return view(config('quickadmin.route').'.myCustomer.create', compact('userId', 'agent'));
+	    $agent = DataQuery::arraySelectAgent($userId);
+	    //同個部門與組別的user
+	    $arrayUser = DataQuery::arrayTeamUser($userId);
+	    return view(config('quickadmin.route').'.teamCustomer.create', compact(array('userId', 'agent', 'arrayUser')));
 	}
 
 	/**
-	 * Store a newly created mycustomer in storage.
+	 * Store a newly created teamcustomer in storage.
 	 *
      * @param CreateCustomerRequest|Request $request
 	 */
 	public function store(CreateCustomerRequest $request)
 	{
-		$id = Customer::create($request->all())->id;
+	    $id = Customer::create($request->all())->id;
 		//更新客戶與代理商關聯
-		// $agentid = $request->input('agent_id');
-		// $this->checkCustomerAgent($id, $agentid);
-		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+		$agentid = $request->input('agent_id');
+		$this->checkCustomerAgent($id, $agentid);
+		//更新共用user的關聯
+		$arrayUserID = $request->input('array_user');
+		if(isset($arrayUserID)) {
+			foreach ($arrayUserID as $userId) {
+				$customerUser = new CustomerUser();
+				$customerUser->customer_id = $id;
+				$customerUser->user_id = $userId;
+				$customerUser->save();
+			}
+		}
+		return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
 	}
 
 	/**
-	 * Show the form for editing the specified mycustomer.
+	 * Show the form for editing the specified teamcustomer.
 	 *
 	 * @param  int  $id
      * @return \Illuminate\View\View
@@ -75,9 +78,9 @@ class MyCustomerController extends Controller {
 	public function edit($id)
 	{
 		$userId = Auth::user()->id;
-		$agent = DataQuery::myAgentName($id);
+		$agent = DataQuery::arraySelectAgent($userId);
 		$customer = Customer::withTrashed()->find($id);
-		//
+		//客戶的代理商
 		$agentid = null;
 		$customerAgent = CustomerAgent::where([
 				['customer_id', $id],
@@ -85,11 +88,16 @@ class MyCustomerController extends Controller {
 			]);
 		if($customerAgent->count() > 0)
 			$agentid = $customerAgent->first()->agent_id;
-		return view(config('quickadmin.route').'.myCustomer.edit', compact(array('agent','customer','agentid')));
+		//同個部門與組別的user
+		$userId = Auth::user()->id;
+	    $arrayUser = DataQuery::arrayTeamUser($userId);
+	    //共用user
+		$arrayCustomerUser = CustomerUser::where('customer_id', $id)->pluck('user_id')->toArray();
+		return view(config('quickadmin.route').'.teamCustomer.edit', compact(array('agent','customer','agentid','arrayUser','arrayCustomerUser')));
 	}
 
 	/**
-	 * Update the specified mycustomer in storage.
+	 * Update the specified teamcustomer in storage.
      * @param UpdateCustomerRequest|Request $request
      *
 	 * @param  int  $id
@@ -99,20 +107,42 @@ class MyCustomerController extends Controller {
 		$customer = Customer::withTrashed()->findOrFail($id);
 		$customer->update($request->all());
 		//更新客戶與代理商關聯
-		// $agentid = $request->input('agent_id');
-		// $this->checkCustomerAgent($id, $agentid);
-		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+		$agentid = $request->input('agent_id');
+		$this->checkCustomerAgent($id, $agentid);
+		//共用user
+		$arrayUserID = $request->input('array_user');
+		//同個部門與組別的user
+	    $arrayUser = DataQuery::arrayTeamUser(Auth::user()->id);
+	    //更新共用user的關聯
+	    foreach ($arrayUser as $userId => $name) {
+	    	$customerUser = CustomerUser::where([
+						['customer_id', $id],
+						['user_id', $userId]
+					])->first();
+			if(isset($arrayUserID) && in_array($userId, $arrayUserID)) {
+				if(empty($customerUser)) {
+					$customerUser = new CustomerUser();
+					$customerUser->customer_id = $id;
+					$customerUser->user_id = $userId;
+					$customerUser->save();
+				}
+			} else {
+				if(!empty($customerUser))
+					CustomerUser::find($customerUser->id)->delete();
+			}
+		}
+		return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
 	}
 
 	/**
-	 * Remove the specified mycustomer from storage.
+	 * Remove the specified teamcustomer from storage.
 	 *
 	 * @param  int  $id
 	 */
 	public function destroy($id)
 	{
 		Customer::destroy($id);
-		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+		return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
 	}
 
     /**
@@ -130,7 +160,7 @@ class MyCustomerController extends Controller {
             Customer::whereNotNull('id')->delete();
         }
 
-        return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+        return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
     }
 
     //列表中的啟用按鈕
@@ -165,31 +195,5 @@ class MyCustomerController extends Controller {
 		$ca->agent_id = $agentId;
 		$ca->status = $status;
 		$ca->save();
-		
-
-		
-
-
-		// if($agentId == 0) {
-		// 	$agentId = CustomerAgent::where('customer_id', $customerId)->first()->agent_id;
-		// 	$customerAgent = CustomerAgent::where([
-		// 			['customer_id', $customerId],
-		// 			['agent_id', $agentId]
-		// 		])->first();
-		// 	$customerAgent->status = 0;
-		// 	$customerAgent->save();
-		// } else {
-		// 	$customerAgent = CustomerAgent::where([
-		// 			['customer_id', $customerId],
-		// 			['agent_id', $agentId]
-		// 		]);
-		// 	if($customerAgent->count() > 0) {
-
-		// 	}
-		// 	$customerAgent = new CustomerAgent();
-		// 	$customerAgent->customer_id = $customerId;
-		// 	$customerAgent->agent_id = $agentId;
-		// 	$customerAgent->save();
-		// }
 	}
 }

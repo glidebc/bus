@@ -54,7 +54,9 @@ class MyUserController extends Controller {
 		$team_name = '';
 		if(isset($publishuser->dept_id)) {
 			$dept_name = Dept::find($publishuser->dept_id)->name;
-			$team_name = Team::find($publishuser->team_id)->get()->name;
+			$team_name = '';
+			if(!empty($publishuser->team_id))
+				$team_name = Team::find($publishuser->team_id)->name;
 		}
 		
 		// $dept = DataQuery::arraySelectDept();

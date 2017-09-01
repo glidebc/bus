@@ -131,13 +131,97 @@ class MyEntrustController extends Controller {
 		EntrustFlow::where('entrust_id', $id)->delete();//flow delete
 		return redirect()->route(config('quickadmin.route').'.myentrust.index');
 	}
+	public function entrustExcel_T($id)
+	{
+		$entrust = Entrust::find($id);
+		$customer = Customer::find($entrust->customer_id);
+		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
+			
+			Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
+				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
+					//日期
+					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
+					//客戶資料
+					$sheet->setCellValue('C3', $customer->tax_title);
+					$sheet->setCellValue('G3', $customer->tax_num);
+					$sheet->setCellValue('C4', $customer->zip_code.$customer->address);
+					$sheet->setCellValue('G4', $customer->com_fax);
+
+					$sheet->setCellValue('G5', $customer->com_tel);
+
+					$sheet->setCellValue('G6', $customer->mobile);
+
+					//合作內容
+					$sheet->setCellValue('C8', $entrust->name);
+
+					$dateStart = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
+					$dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+					$sheet->setCellValue('C9', $dateStart.' ～ '.$dateEnd);
+					$days = $this->countDays($entrust->start_date, $entrust->end_date);
+					$sheet->setCellValue('F9', '(共 '.$days.' 天) / 實際走期依排期表');
+
+					$strPublishKind = '';
+					$aryPublishKind = config('admin.entrust.items');//委刊類別 array
+					$publishKindSelected = explode(',', $entrust->publish_kind);
+					foreach ($publishKindSelected as $publishKind) {
+						if(strlen($strPublishKind) > 0)
+							$strPublishKind .= ', ';
+						$strPublishKind .= $aryPublishKind[$publishKind];
+					}
+					$sheet->setCellValue('C10', $strPublishKind);
+
+					//付款方式與金額
+					$numRow = 13; $numItem = 1; $count = 0;
+					foreach ($entrustItems as $entrustItem) {
+						$sheet->setCellValue('B'.$numRow, $numItem++);
+						$sheet->setCellValue('C'.$numRow, $entrustItem->name);
+						$sheet->setCellValue('E'.$numRow, $entrustItem->cost);
+						$count += $entrustItem->cost;
+						$numRow++;
+					}
+					$sheet->setCellValue('E18', $count);
+					$tax = round($count * .05);
+					$sheet->setCellValue('E19', $tax);
+					$sheet->setCellValue('E20', $count + $tax);
+
+					$aryPay = config('admin.entrust.pay');
+					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);
+					if($entrust->pay == 2) {
+						$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
+					}
+
+					//表格邊線補回去
+					$this->redrawBorder($sheet);
+
+					$this->createExcel($sheet);
+				});
+
+				// $sheet1 = $reader->setActiveSheetIndex(0);
+				// $this->createExcel($sheet1);
+			});
+		
+		
+		// Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
+		// 	$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
+				
+		// 	});
+			
+		// })->export('xlsx');
+	}
+	function createExcel($es){
+		$fileName = '委刊單_'.date('Ymd', strtotime('today'));
+		Excel::create($fileName, function($excel) use ($es) {
+			// add $sheet1 for new file
+            $excel->addExternalSheet($es);
+		})->export('xlsx');
+	}
 	public function entrustExcel($id)
 	{
 		$entrust = Entrust::find($id);
 		$customer = Customer::find($entrust->customer_id);
 		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
 
-		$data = Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
+		Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
 				// $sheet = $reader->getExcel()->getSheet();
 				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
 					//日期

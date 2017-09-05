@@ -61,8 +61,8 @@ class MyCustomerController extends Controller {
 	{
 		$id = Customer::create($request->all())->id;
 		//更新客戶與代理商關聯
-		// $agentid = $request->input('agent_id');
-		// $this->checkCustomerAgent($id, $agentid);
+		$agentid = $request->input('agent_id');
+		$this->checkCustomerAgent($id, $agentid);
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 
@@ -99,8 +99,8 @@ class MyCustomerController extends Controller {
 		$customer = Customer::withTrashed()->findOrFail($id);
 		$customer->update($request->all());
 		//更新客戶與代理商關聯
-		// $agentid = $request->input('agent_id');
-		// $this->checkCustomerAgent($id, $agentid);
+		$agentid = $request->input('agent_id');
+		$this->checkCustomerAgent($id, $agentid);
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 

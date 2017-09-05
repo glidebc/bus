@@ -2,12 +2,12 @@
 
 @section('content')
 
-<p>{!! link_to_route(config('quickadmin.route').'.teamcustomer.create', '新增客戶' , null, array('class' => 'btn btn-success')) !!}</p>
+<!-- <p>{!! link_to_route(config('quickadmin.route').'.teamcustomer.create', '新增客戶' , null, array('class' => 'btn btn-success')) !!}</p> -->
 
 @if ($customer->count())
     <div class="portlet box green">
         <div class="portlet-title">
-            <div class="caption">客戶列表</div>
+            <div class="caption">團隊客戶列表</div>
         </div>
         <div class="portlet-body">
             <table class="table table-striped table-hover table-responsive datatable" id="datatable">

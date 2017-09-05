@@ -2,12 +2,12 @@
 
 @section('content')
 
-<p>{!! link_to_route(config('quickadmin.route').'.teamagent.create', '新增代理商' , null, array('class' => 'btn btn-success')) !!}</p>
+<!-- <p>{!! link_to_route(config('quickadmin.route').'.teamagent.create', '新增代理商' , null, array('class' => 'btn btn-success')) !!}</p> -->
 
 @if ($agent->count())
     <div class="portlet box green">
         <div class="portlet-title">
-            <div class="caption">代理商列表</div>
+            <div class="caption">團隊代理商列表</div>
         </div>
         <div class="portlet-body">
             <table class="table table-striped table-hover table-responsive datatable" id="datatable">

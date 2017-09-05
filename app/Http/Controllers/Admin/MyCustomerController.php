@@ -75,7 +75,7 @@ class MyCustomerController extends Controller {
 	public function edit($id)
 	{
 		$userId = Auth::user()->id;
-		$agent = DataQuery::arraySelectAgent($id);
+		$agent = DataQuery::arraySelectAgent($userId);
 		$customer = Customer::withTrashed()->find($id);
 		//
 		$agentid = null;

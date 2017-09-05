@@ -33,8 +33,8 @@
 </div><div class="form-group">
     {!! Form::label('agent_id', '代理商', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('agent_name', old('agent',$agent), array('class'=>'form-control', 'readonly'=>'true')) !!}
-        <!-- {!! Form::select('agent_id', [], $agentid, array('class'=>'form-control')) !!} -->
+        <!-- {!! Form::text('agent_name', old('agent',$agent), array('class'=>'form-control', 'readonly'=>'true')) !!} -->
+        {!! Form::select('agent_id', old('agent',$agent), $agentid, array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">

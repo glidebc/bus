@@ -27,7 +27,7 @@ class TeamCustomerController extends Controller {
 	public function index(Request $request)
     {
         $userId = Auth::user()->id;
-        $customer = DataQuery::arrayCustomer($userId);
+        $customer = DataQuery::arrayTeamCustomer($userId);
 		return view(config('quickadmin.route').'.teamCustomer.index', compact('customer'));
 	}
 

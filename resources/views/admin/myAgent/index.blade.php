@@ -2,7 +2,7 @@
 
 @section('content')
 
-<!-- <p>{!! link_to_route(config('quickadmin.route').'.myagent.create', '新增代理商' , null, array('class' => 'btn btn-success')) !!}</p> -->
+<p>{!! link_to_route(config('quickadmin.route').'.myagent.create', '新增代理商' , null, array('class' => 'btn btn-success')) !!}</p>
 
 @if ($agent->count())
     <div class="portlet box green">
@@ -27,6 +27,7 @@
 <!-- <th>公司傳真</th> -->
 <!-- <th>手機</th> -->
 <!-- <th>備註</th> -->
+                        <th>狀態</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -49,9 +50,24 @@
 <!-- <td>{{ $row->mobile }}</td> -->
 <!-- <td>{{ $row->note }}</td> -->
                             <td>
+                                @if($row->deleted_at != '')
+                                    停用
+                                @endif
+                            </td>
+
+                            <td>
+                            @if($row->owner)
                                 {!! link_to_route(config('quickadmin.route').'.myagent.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
                                 
+                                @if($row->deleted_at == '')
+                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.myagent.destroy', $row->id))) !!}
+                                    {!! Form::submit('停用', array('class' => 'btn btn-xs btn-warning')) !!}
+                                @else
+                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.myagent.resetDelete', $row->id))) !!}
+                                    {!! Form::submit('啟用', array('class' => 'btn btn-xs btn-success')) !!}
+                                @endif
                                 {!! Form::close() !!}
+                            @endif
                             </td>
                         </tr>
                     @endforeach

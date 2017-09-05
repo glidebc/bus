@@ -40,11 +40,12 @@ class DataQuery {
     //     return $customer;
     // }
 
-    //業務管理-我的代理商, 團隊管理-團隊代理商
+    //業務管理-我的代理商
     static function arrayAgent($userId)
     {
         return self::arrayAgentOrCustomer($userId, true);
     }
+    //業務管理-我的客戶
     static function arrayCustomer($userId)
     {
         return self::arrayAgentOrCustomer($userId, false);
@@ -61,22 +62,27 @@ class DataQuery {
         //                     ->orderBy('created_at', 'desc')
         //                     ->get();
         foreach ($customers as $customer) {
+            //代理商名稱
             $customerAgent = CustomerAgent::where([
                     ['customer_id', $customer->id],
                     ['status', 1]
-                ]);
+                ])->get();
             if($customerAgent->count() > 0)
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
-            //共用user的數量
-            $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
-            $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
-            $stringUserName = "";
-            foreach ($arrayUserName as $name) {
-                if(!empty($stringUserName))
-                    $stringUserName .= "\n";
-                $stringUserName .= $name;
-            }
-            $customer->user_names = $stringUserName;
+            //(teamAgent)共用user的數量
+            // $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
+            // $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
+            // $stringUserName = "";
+            // foreach ($arrayUserName as $name) {
+            //     if(!empty($stringUserName))
+            //         $stringUserName .= "\n";
+            //     $stringUserName .= $name;
+            // }
+            // $customer->user_names = $stringUserName;
+            //(myAgent)自己建立的才可以修改
+            $customer->owner = false;
+            if($userId == $customer->owner_user)
+                $customer->owner = true;
         }
         
         return $customers;
@@ -111,6 +117,17 @@ class DataQuery {
 
     static function collectionCustomer($userId, $isAgent)
     {
+        $aryCustomerId = CustomerUser::where('user_id', $userId)->pluck('customer_id');
+        $customers = Customer::withTrashed()
+                            ->where('is_agent', $isAgent)
+                            ->where(function ($query) use ($userId, $aryCustomerId) {
+                                $query->where('owner_user', $userId)
+                                      ->orWhereIn('id', $aryCustomerId);
+                            });
+        return $customers;
+    }
+    static function collectionCustomer_OLD($userId, $isAgent)
+    {
         $customers;
         $countCustomer = Customer::where([
                 ['owner_user', $userId],
@@ -130,6 +147,93 @@ class DataQuery {
             $customers = Customer::where('is_agent', $isAgent)->whereIn('id', $aryCustomerId);
         }
         return $customers;
+    }
+
+    //團隊管理-管理代理商
+    static function arrayTeamAgent($userId)
+    {
+        return self::arrayTeamAgentOrCustomer($userId, true);
+    }
+    //團隊管理-管理客戶
+    static function arrayTeamCustomer($userId)
+    {
+        return self::arrayTeamAgentOrCustomer($userId, false);
+    }
+    static function arrayTeamAgentOrCustomer($userId, $isAgent)
+    {
+        //team id and dept id
+        $publishuser = Publishuser::where('user_id', $userId)->get()->first();
+        $arrayUserId = Publishuser::where([
+                ['dept_id', $publishuser->dept_id],
+                ['team_id', $publishuser->team_id]
+            ])->pluck('user_id');
+        $customers = Customer::withTrashed()
+                            ->where('is_agent', $isAgent)
+                            ->whereIn('owner_user', $arrayUserId)
+                            ->orderBy('created_at', 'desc')->get();
+
+        foreach ($customers as $customer) {
+            //代理商名稱
+            $customerAgent = CustomerAgent::where([
+                    ['customer_id', $customer->id],
+                    ['status', 1]
+                ])->get();
+            if($customerAgent->count() > 0)
+                $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
+            //owner user name
+            $customer->owner_user_name = User::find($customer->owner_user)->name;
+            //共用user的數量
+            $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
+            $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
+            $stringUserName = "";
+            foreach ($arrayUserName as $name) {
+                if(!empty($stringUserName))
+                    $stringUserName .= "\n";
+                $stringUserName .= $name;
+            }
+            $customer->user_names = $stringUserName;
+            //(myAgent)自己建立的才可以修改
+            // $customer->owner = false;
+            // if($userId == $customer->owner_user)
+            //     $customer->owner = true;
+        }
+
+        return $customers;
+
+        // $customers = self::collectionCustomer($userId, $isAgent);
+        // // $customers = $customers->selectRaw('*, "" AS agent_name')->orderBy('created_at', 'desc')->get();
+        // $customers = $customers->orderBy('created_at', 'desc')->get();
+
+        // // $customers = Customer::withTrashed()
+        // //                     ->where($customerCondition)
+        // //                     ->selectRaw('*, "" AS agent_name')
+        // //                     ->orderBy('created_at', 'desc')
+        // //                     ->get();
+        // foreach ($customers as $customer) {
+        //     //代理商名稱
+        //     $customerAgent = CustomerAgent::where([
+        //             ['customer_id', $customer->id],
+        //             ['status', 1]
+        //         ])->get();
+        //     if($customerAgent->count() > 0)
+        //         $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
+        //     //(teamAgent)共用user的數量
+        //     $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
+        //     $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
+        //     $stringUserName = "";
+        //     foreach ($arrayUserName as $name) {
+        //         if(!empty($stringUserName))
+        //             $stringUserName .= "\n";
+        //         $stringUserName .= $name;
+        //     }
+        //     $customer->user_names = $stringUserName;
+        //     //(myAgent)自己建立的才可以修改
+        //     $customer->owner = false;
+        //     if($userId == $customer->owner_user)
+        //         $customer->owner = true;
+        // }
+        
+        
     }
 
     //團隊管理-管理客戶

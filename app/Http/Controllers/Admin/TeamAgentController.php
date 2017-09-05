@@ -26,7 +26,7 @@ class TeamAgentController extends Controller {
 	public function index(Request $request)
     {
         $userId = Auth::user()->id;
-    	$agent = DataQuery::arrayAgent($userId);
+    	$agent = DataQuery::arrayTeamAgent($userId);
 		return view('admin.teamAgent.index', compact('agent'));
 	}
 

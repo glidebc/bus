@@ -80,17 +80,6 @@ class MyAgentController extends Controller {
 	}
 
 	/**
-	 * agent 的 deleted_at 改成 null.
-	 *
-	 * @param  int  $id
-	 */
-	public function resetDelete($id)
-	{
-		Customer::withTrashed()->find($id)->restore();
-		return redirect()->route(config('quickadmin.route').'.myagent.index');
-	}
-
-	/**
 	 * Remove the specified myagent from storage.
 	 *
 	 * @param  int  $id
@@ -120,4 +109,10 @@ class MyAgentController extends Controller {
         return redirect()->route(config('quickadmin.route').'.myagent.index');
     }
 
+    //列表中的啟用按鈕
+    public function resetDelete($id)
+	{
+		Customer::withTrashed()->find($id)->restore();
+		return redirect()->route(config('quickadmin.route').'.myagent.index');
+	}
 }

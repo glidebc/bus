@@ -14,11 +14,12 @@
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
-                        <th>共用</th>
                         <th>公司簡稱</th>
                         <th>統編</th>
                         <th>郵遞區號</th>
                         <th>公司電話</th>
+                        <th>擁有者</th>
+                        <th>共用</th>
                         <th>狀態</th>
                         <th>&nbsp;</th>
                     </tr>
@@ -28,15 +29,16 @@
                     @foreach ($agent as $row)
                         <tr>
                             <th>&nbsp;</th>
-                            <td>
-                            @if(!empty($row->user_names))
-                                <span class="fa fa-child user-name" data-original-title='{{ $row->user_names }}' data-container="body" data-toggle="tooltip" data-placement="left"></span>
-                            @endif
-                            </td>
                             <td>{{ $row->name }}</td>
                             <td>{{ $row->tax_num }}</td>
                             <td>{{ $row->zip_code }}</td>
                             <td>{{ $row->com_tel }}</td>
+                            <td>{{ $row->owner_user_name }}</td>
+                            <td>
+                            @if(!empty($row->user_names))
+                                <span class="fa fa-child user-name" data-original-title='{{ $row->user_names }}' data-container="body" data-toggle="tooltip" data-placement="bottom"></span>
+                            @endif
+                            </td>
                             <td>
                                 @if($row->deleted_at != '')
                                     停用
@@ -122,8 +124,8 @@
             /*width: 800px; */
         }
         /* Tooltip on top */
-        .tooltip.left > .tooltip-arrow {
-            border-left: 5px solid lightgray;
+        .tooltip.bottom > .tooltip-arrow {
+            border-bottom: 5px solid lightgray;
         }
     </style>
 @stop

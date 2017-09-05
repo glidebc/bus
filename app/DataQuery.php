@@ -237,16 +237,20 @@ class DataQuery {
     }
 
     //業務管理-我的客戶, 團隊管理-管理客戶
-    static function arraySelectAgent($userId)
+    static function arraySelectAgent($userId, $isGetAll)
     {
         $aryAgentId = CustomerUser::where('user_id', $userId)->pluck('customer_id');
-        $agent = Customer::where('is_agent', true)
-                            ->where(function ($query) use ($userId, $aryAgentId) {
-                                $query->where('owner_user', $userId)
-                                      ->orWhereIn('id', $aryAgentId);
-                            })
-                            ->select('name','id')
-                            ->orderBy('name')->pluck('name','id')->prepend('無代理商', 0);
+        $customer;
+        if ($isGetAll)
+            $customer = Customer::withTrashed()->where('is_agent', true);
+        else
+            $customer = Customer::where('is_agent', true);
+        $agent = $customer->where(function ($query) use ($userId, $aryAgentId) {
+                $query->where('owner_user', $userId)
+                      ->orWhereIn('id', $aryAgentId);
+            })
+            ->select('name','id')
+            ->orderBy('name')->pluck('name','id')->prepend('無代理商', 0);
 
         // $agent = self::collectionCustomer($userId, false);
         // $agent = Customer::where('is_agent', $isAgent)

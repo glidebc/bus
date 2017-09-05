@@ -39,7 +39,7 @@ class TeamCustomerController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
-	    $agent = DataQuery::arraySelectAgent($userId);
+	    $agent = DataQuery::arraySelectAgent($userId, false);
 	    //同個部門與組別的user
 	    $arrayUser = DataQuery::arrayTeamUser($userId);
 	    return view(config('quickadmin.route').'.teamCustomer.create', compact(array('userId', 'agent', 'arrayUser')));
@@ -78,7 +78,7 @@ class TeamCustomerController extends Controller {
 	public function edit($id)
 	{
 		$userId = Auth::user()->id;
-		$agent = DataQuery::arraySelectAgent($userId);
+		$agent = DataQuery::arraySelectAgent($userId, true);
 		$customer = Customer::withTrashed()->find($id);
 		//客戶的代理商
 		$agentid = null;

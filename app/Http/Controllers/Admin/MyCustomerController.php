@@ -48,7 +48,7 @@ class MyCustomerController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
-		$agent = DataQuery::arraySelectAgent($userId);
+		$agent = DataQuery::arraySelectAgent($userId, false);
 	    return view(config('quickadmin.route').'.myCustomer.create', compact('userId', 'agent'));
 	}
 
@@ -75,7 +75,7 @@ class MyCustomerController extends Controller {
 	public function edit($id)
 	{
 		$userId = Auth::user()->id;
-		$agent = DataQuery::arraySelectAgent($userId);
+		$agent = DataQuery::arraySelectAgent($userId, true);
 		$customer = Customer::withTrashed()->find($id);
 		//
 		$agentid = null;

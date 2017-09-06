@@ -229,7 +229,7 @@ class MyEntrustController extends Controller {
 					//日期
 					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
 					//委刊單編號
-					$sheet->setCellValue('H2', $customer->enum);
+					$sheet->setCellValue('H2', $entrust->enum);
 					//客戶資料
 					$sheet->setCellValue('C3', $customer->tax_title);
 					$sheet->setCellValue('G3', $customer->tax_num);

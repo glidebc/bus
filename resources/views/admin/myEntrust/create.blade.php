@@ -19,6 +19,12 @@
 {!! Form::open(array('route' => config('quickadmin.route').'.myentrust.store', 'id' => 'form-with-validation', 'class' => 'form-horizontal')) !!}
 
 <div class="form-group">
+    {!! Form::label('customer_id', '編號', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('enum', $enum, array('class'=>'form-control entrust-number', 'readonly'=>'true')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('customer_id', '客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::select('customer_id', $customer, null, array('class'=>'form-control')) !!}
@@ -248,10 +254,10 @@
         /*text-align: center;*/
         border-width: 0px;
     }
-    .item-info:-moz-read-only, .day-count:-moz-read-only { /* For Firefox */
+    .item-info:-moz-read-only, .day-count:-moz-read-only, .entrust-number:-moz-read-only { /* For Firefox */
         background-color: white;
     }
-    .item-info:read-only, .day-count:read-only { 
+    .item-info:read-only, .day-count:read-only, .entrust-number:read-only { 
         background-color: white;
     }
     .item-name {

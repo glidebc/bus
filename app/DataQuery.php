@@ -88,6 +88,14 @@ class DataQuery {
         return $customers;
     }
 
+    //委刊單編號，業務管理-我的委刊單-新增
+    static function genEntrustNumber()
+    {
+        $ymd = date('Ymd', strtotime('today'));
+        $count = Entrust::where('enum', 'like', $ymd . '%')->get()->count();
+        return $ymd.($count + 1 < 10 ? '0'.($count + 1) : $count + 1);
+    }
+
     //業務管理-我的委刊單-新增與修改
     static function arraySelectCustomer($userId)
     {

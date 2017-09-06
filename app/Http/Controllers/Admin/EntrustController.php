@@ -41,11 +41,12 @@ class EntrustController extends Controller {
 		$entrust->id = $id;
 		$e = Entrust::find($id);
 
-		$userId = Auth::user()->id;
+		// $userId = Auth::user()->id;
 		// $aryCustomer = DataQuery::arrayCustomer($userId)->pluck('name','id');
-		$entrust->customer_name = Customer::find($e->customer_id)->name;//$aryCustomer[$e->customer_id];
+		//$aryCustomer[$e->customer_id];
 
 		$entrust->name = $e->name;
+		$entrust->customer_name = Customer::find($e->customer_id)->name;
 
 		$sd = ''; $ed = ''; $dayCount = 0;
 		if($e->start_date != null && $e->end_date != null) {

@@ -43,7 +43,7 @@ class EntrustController extends Controller {
 
 		$userId = Auth::user()->id;
 		// $aryCustomer = DataQuery::arrayCustomer($userId)->pluck('name','id');
-		$entrust->customer_name = Customer::find($agentId)->name;//$aryCustomer[$e->customer_id];
+		$entrust->customer_name = Customer::find($$e->customer_id)->name;//$aryCustomer[$e->customer_id];
 
 		$entrust->name = $e->name;
 

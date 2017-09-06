@@ -143,8 +143,6 @@ class MyEntrustController extends Controller {
 				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
 					//日期
 					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
-					//委刊單編號
-					$sheet->setCellValue('H2', $customer->enum);
 					//客戶資料
 					$sheet->setCellValue('C3', $customer->tax_title);
 					$sheet->setCellValue('G3', $customer->tax_num);
@@ -230,6 +228,8 @@ class MyEntrustController extends Controller {
 				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
 					//日期
 					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
+					//委刊單編號
+					$sheet->setCellValue('H2', $customer->enum);
 					//客戶資料
 					$sheet->setCellValue('C3', $customer->tax_title);
 					$sheet->setCellValue('G3', $customer->tax_num);
@@ -275,9 +275,9 @@ class MyEntrustController extends Controller {
 
 					$aryPay = config('admin.entrust.pay');
 					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);
-					if($entrust->pay == 2) {
-						$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
-					}
+					// if($entrust->pay == 2) {
+					// 	$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
+					// }
 
 					//表格邊線補回去
 					$this->redrawBorder($sheet);

@@ -27,8 +27,8 @@ class CreateEntrustRequest extends FormRequest {
 		return [
             'customer_id' => 'required|check_customer', 
             'name' => 'required|unique:entrust,name,'.$this->myentrust,
-            'start_date' => 'required|min:8', 
-            'end_date' => 'required|min:8', 
+            'start_date' => 'required', 
+            // 'end_date' => 'required', 
             'publish_kind' => 'required|array|min:1', 
             'item_count' => 'check_item_count', 
 

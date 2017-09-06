@@ -13,19 +13,19 @@
 <div class="form-group">
     {!! Form::label('entrust_number', '編號', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('entrust_number', $entrust->enum, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        {!! Form::text('entrust_number', $entrust->enum, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('customer_name', '客戶', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('customer_name', $entrust->customer_name, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        {!! Form::text('customer_name', $entrust->customer_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('name', '委刊單名稱', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('name', $entrust->name, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        {!! Form::text('name', $entrust->name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
@@ -63,19 +63,19 @@
 </div><div class="form-group">
     {!! Form::label('pay', '付款方式', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('pay', $entrust->pay, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        {!! Form::text('pay', $entrust->pay, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('pay_status', '付款情況', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('pay_status', $entrust->pay_status, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        {!! Form::text('pay_status', $entrust->pay_status, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('note', '補充說明', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {{ Form::textarea('note', $entrust->note, array('class'=>'form-control txt', 'rows' => '5', 'readonly'=>'true')) }}
+        {{ Form::textarea('note', $entrust->note, array('class'=>'form-control', 'rows' => '5', 'readonly'=>'true')) }}
         
     </div>
 </div>

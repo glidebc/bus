@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Customer;
 use App\DataQuery;
 use App\Entrust;
 use App\EntrustFlow;
@@ -41,8 +42,8 @@ class EntrustController extends Controller {
 		$e = Entrust::find($id);
 
 		$userId = Auth::user()->id;
-		$aryCustomer = DataQuery::arrayCustomer($userId)->pluck('name','id');
-		$entrust->customer_name = $aryCustomer[$e->customer_id];
+		// $aryCustomer = DataQuery::arrayCustomer($userId)->pluck('name','id');
+		$entrust->customer_name = Customer::find($agentId)->name;//$aryCustomer[$e->customer_id];
 
 		$entrust->name = $e->name;
 

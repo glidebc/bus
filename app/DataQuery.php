@@ -267,19 +267,19 @@ class DataQuery {
         return $agent;
     }
     //業務管理-我的客戶-修改客戶-顯示代理商名稱
-    static function myAgentName($customerId)
-    {
-        $agentName = '無代理商';
-        $customerAgent = CustomerAgent::where([
-                ['customer_id', $customerId],
-                ['status', 1]
-            ]);
-        if($customerAgent->count() > 0) {
-            $agentId = $customerAgent->first()->agent_id;
-            $agentName = Customer::find($agentId)->name;
-        }
-        return $agentName;
-    }
+    // static function myAgentName($customerId)
+    // {
+    //     $agentName = '無代理商';
+    //     $customerAgent = CustomerAgent::where([
+    //             ['customer_id', $customerId],
+    //             ['status', 1]
+    //         ]);
+    //     if($customerAgent->count() > 0) {
+    //         $agentId = $customerAgent->first()->agent_id;
+    //         $agentName = Customer::find($agentId)->name;
+    //     }
+    //     return $agentName;
+    // }
 
     static function collectionPublishUser($userId)
     {

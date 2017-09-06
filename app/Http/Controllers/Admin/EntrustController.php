@@ -49,11 +49,13 @@ class EntrustController extends Controller {
 		$entrust->name = $e->name;
 		$entrust->customer_name = Customer::find($e->customer_id)->name;
 
-		$sd = ''; $ed = ''; $dayCount = 0;
+		$sd = ''; $ed = ''; $dayCount = 1;
 		if($e->start_date != null) { //&& $e->end_date != null
 			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
-			$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
-			$dayCount = $this->countDays($sd, $ed);
+			if($e->end_date != null) {
+				$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
+				$dayCount = $this->countDays($sd, $ed);
+			}
 		}
 		$entrust->txt_start_date = $sd;
 		$entrust->txt_end_date = $ed;

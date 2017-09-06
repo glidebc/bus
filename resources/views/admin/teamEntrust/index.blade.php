@@ -15,6 +15,7 @@
                             {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!}
                         </th> -->
                         <th>&nbsp;</th>
+                        <th>編號</th>
                         <th>委刊單</th>
 <th>客戶</th>
 <th>總走期</th>
@@ -42,6 +43,7 @@
                                 <span class="fa fa-file-o btn-read" onclick='$("#read-{{ $row->id }}").click();'></span>
                                 {!! Form::close() !!}
                             </td>
+                            <td>{{ $row->enum }}</td>
                             <td>{{ $row->name }}</td>
 <td>{{ $row->customer_name }}</td>
 <td>{{ $row->duration }}</td>

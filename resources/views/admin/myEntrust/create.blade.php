@@ -19,7 +19,7 @@
 {!! Form::open(array('route' => config('quickadmin.route').'.myentrust.store', 'id' => 'form-with-validation', 'class' => 'form-horizontal')) !!}
 
 <div class="form-group">
-    {!! Form::label('customer_id', '編號', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('entrust_number', '編號', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::text('enum', $enum, array('class'=>'form-control entrust-number', 'readonly'=>'true')) !!}
         

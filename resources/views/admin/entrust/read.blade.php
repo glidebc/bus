@@ -11,6 +11,12 @@
 <form method="GET" accept-charset="UTF-8" class="form-horizontal">
 
 <div class="form-group">
+    {!! Form::label('entrust_number', '編號', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('entrust_number', $entrust->enum, array('class'=>'form-control txt', 'readonly'=>'true')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('customer_name', '客戶', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::text('customer_name', $entrust->customer_name, array('class'=>'form-control txt', 'readonly'=>'true')) !!}

@@ -31,7 +31,8 @@ class Entrust extends Model {
           'pay_status',
           'note',
           'owner_user',
-          'status'
+          'status',
+          'enum'
     ];
     
 

@@ -375,11 +375,17 @@ class MyEntrustController extends Controller {
 		$customer = DataQuery::arraySelectCustomer($userId);
 		$entrust = Entrust::find($id);
 		//
+		$dayCount = 1;
 		$sd = $entrust->start_date;
 		$entrust->txt_start_date = substr($sd, 0, 4).'-'.substr($sd, -4, 2).'-'.substr($sd, -2);
 		$ed = $entrust->end_date;
-		$entrust->txt_end_date = substr($ed, 0, 4).'-'.substr($ed, -4, 2).'-'.substr($ed, -2);
-		$entrust->day_count = $this->countDays($sd, $ed);
+		if($ed == null) {
+			$entrust->txt_end_date = '';
+		} else {
+			$entrust->txt_end_date = substr($ed, 0, 4).'-'.substr($ed, -4, 2).'-'.substr($ed, -2);
+			$dayCount = $this->countDays($sd, $ed);
+		}
+		$entrust->day_count = $dayCount;
 		//
 		$publishKindSelected = explode(',', $entrust->publish_kind);
 		//

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Eloquent\Model;
 
-class CreatePublishTable extends Migration {
+class CreateContactTable extends Migration {
 
     /**
      * Run the migrations.
@@ -14,14 +14,10 @@ class CreatePublishTable extends Migration {
     public function up()
     {
         Model::unguard();
-        Schema::create('publish',function(Blueprint $table){
+        Schema::create('contact',function(Blueprint $table){
             $table->increments("id");
-            $table->string("entrust_id");
-            $table->string("date");
-            $table->string("publish_position_id");
-            $table->string("status")->nullable();
+            $table->string("name")->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -32,7 +28,7 @@ class CreatePublishTable extends Migration {
      */
     public function down()
     {
-        // Schema::drop('publish');
+        // Schema::drop('contact');
     }
 
 }

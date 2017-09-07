@@ -31,7 +31,7 @@ class CreateEntrustTable extends Migration {
      */
     public function down()
     {
-        Schema::drop('entrust');
+        // Schema::drop('entrust');
     }
 
 }

@@ -76,11 +76,11 @@ class MyEntrustController extends Controller {
 	    $customer = DataQuery::arraySelectCustomer($userId);
 	    //委刊單編號
 	    $enum = DataQuery::genEntrustNumber();
-	    //
+	    
 	    $publishKind = config('admin.entrust.items');//委刊類別 array
 	    $pay = config('admin.entrust.pay');//付款方式 array
 	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
-	    //
+	    
 	    return view(config('quickadmin.route').'.myEntrust.create', compact(array('userId', 'enum', 'customer', 'publishKind', 'pay', 'payStatus')));
 	}
 

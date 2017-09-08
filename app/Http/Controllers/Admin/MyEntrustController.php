@@ -73,7 +73,7 @@ class MyEntrustController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
-	    $customer = DataQuery::arraySelectCustomer($userId);
+	    $customer = DataQuery::arraySelectAgentAndCustomer($userId);
 	    //委刊單編號
 	    $enum = DataQuery::genEntrustNumber();
 	    
@@ -372,7 +372,7 @@ class MyEntrustController extends Controller {
 			return redirect()->route(config('quickadmin.route').'.myentrust.index')->with('msg', $msg);
 		//
 		$userId = Auth::user()->id;
-		$customer = DataQuery::arraySelectCustomer($userId);
+		$customer = DataQuery::arraySelectAgentAndCustomer($userId);
 		$entrust = Entrust::find($id);
 		//
 		$dayCount = 1;

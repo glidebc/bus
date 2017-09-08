@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
 use App\Contact;
+use App\DataQuery;
 use App\Http\Requests\CreateContactRequest;
 use App\Http\Requests\UpdateContactRequest;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 
 class ContactController extends Controller {
@@ -35,9 +36,9 @@ class ContactController extends Controller {
 	 */
 	public function create()
 	{
-	    
-	    
-	    return view('admin.contact.create');
+		$userId = Auth::user()->id;
+		$agent_and_customer = DataQuery::arraySelectAgentAndCustomer($userId);
+	    return view('admin.contact.create', compact('agent_and_customer'));
 	}
 
 	/**

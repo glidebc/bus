@@ -16,7 +16,15 @@ class Contact extends Model {
 
     protected $table    = 'contact';
     
-    protected $fillable = ['name'];
+    protected $fillable = [
+          'customer_id',
+          'name',
+          'address',
+          'tel',
+          'fax',
+          'mobile',
+          'email'
+    ];
     
 
     public static function boot()

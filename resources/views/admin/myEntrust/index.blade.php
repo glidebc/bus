@@ -19,7 +19,7 @@
                         <th>&nbsp;</th>
                         <th>編號</th>
                         <th>委刊單</th>
-<th>客戶</th>
+<th>公司簡稱</th>
 <th>總走期</th>
 <th>付款方式</th>
 <th>付款情況</th>

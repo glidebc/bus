@@ -92,11 +92,15 @@ class DataQuery {
     static function genEntrustNumber()
     {
         $ymd = date('Ymd', strtotime('today'));
-        $count = Entrust::where('enum', 'like', $ymd . '%')->get()->count();
-        return $ymd.($count + 1 < 10 ? '0'.($count + 1) : $count + 1);
+        $entrust = Entrust::where('enum', 'like', $ymd . '%')
+                        ->orderBy('enum', 'desc');
+        $enum = $ymd . '01';
+        if($entrust->get()->count() > 0)
+            $enum = strval(intval($entrust->first()->enum) + 1);
+        return $enum;//$ymd.($count + 1 < 10 ? '0'.($count + 1) : $count + 1);
     }
 
-    //業務管理-我的委刊單-新增與修改
+    //未使用
     static function arraySelectCustomer($userId)
     {
         $customers = self::collectionCustomer($userId, false);
@@ -288,6 +292,19 @@ class DataQuery {
     //     }
     //     return $agentName;
     // }
+
+    //業務管理-我的委刊單-新增與修改, 我的聯絡人-新增與修改
+    static function arraySelectAgentAndCustomer($userId)
+    {
+        $aryCustomerId = CustomerUser::where('user_id', $userId)->pluck('customer_id');
+        $customer = Customer::where(function ($query) use ($userId, $aryCustomerId) {
+                $query->where('owner_user', $userId)
+                      ->orWhereIn('id', $aryCustomerId);
+            })
+            ->selectRaw('CASE WHEN is_agent THEN CONCAT("代理商 - ",`name`) ELSE CONCAT("客戶 - ",`name`) END AS "name", id')
+            ->orderBy('name')->pluck('name','id')->prepend('請選擇', 0);
+        return $customer;
+    }
 
     static function collectionPublishUser($userId)
     {

@@ -25,7 +25,7 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('customer_id', '客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    {!! Form::label('customer_id', '代理商｜客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::select('customer_id', $customer, null, array('class'=>'form-control')) !!}
         

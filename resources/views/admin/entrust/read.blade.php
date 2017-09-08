@@ -17,7 +17,7 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('customer_name', '客戶', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('customer_name', '代理商｜客戶', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::text('customer_name', $entrust->customer_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
         

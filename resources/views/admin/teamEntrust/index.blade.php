@@ -17,7 +17,7 @@
                         <th>&nbsp;</th>
                         <th>編號</th>
                         <th>委刊單</th>
-<th>公司簡稱</th>
+                        <th>公司簡稱</th>
 <th>總走期</th>
 <th>部門</th>
 <th>使用者</th>

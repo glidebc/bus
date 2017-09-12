@@ -79,7 +79,7 @@ class TeamAgentController extends Controller {
 	    //共用user
 		$arrayCustomerUser = CustomerUser::where('customer_id', $id)->pluck('user_id')->toArray();
 		//聯絡人
-		$contact = DataQuery::arraySelectContactByCustomer($id);
+		$contact = DataQuery::arraySelectContactByTeamCustomer($id);
 		// foreach ($customerUsers as $customerUser) {
 		// 	if($listUser[$customerUser->user_id])
 		// }

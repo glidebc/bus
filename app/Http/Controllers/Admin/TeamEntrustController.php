@@ -45,7 +45,13 @@ class TeamEntrustController extends Controller {
     		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
             $dept = Dept::find($publishuser->dept_id);
             $entrust->user_dept = empty($dept) ? '' : $dept->name;
-            $entrust->user_name = User::find($publishuser->user_id)->name;
+            //owner user name
+            $ownerUser = User::find($publishuser->user_id);
+            if(isset($ownerUser))
+                $entrust->user_name = $ownerUser->name;
+
+            // $entrust->user_name = User::find($publishuser->user_id)->name;
+            
             $entrust->status_name = config('admin.entrust.status')[$entrust->status];
 
             $status_publish;

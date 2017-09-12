@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Contact;
 use App\DataQuery;
 use App\Entrust;
 use App\Glide;
@@ -327,6 +328,24 @@ class ServiceController extends Controller {
 		return Publish::where('date', '=', $date)
 						->where('publish_position_id', '=', $id)
 						->count();
+	}
+
+	function customerContact(Request $request)
+	{
+		// $aryContact = array();
+		// $contacts = Contact::where('customer_id', $customerId);
+		// foreach ($contacts as $contact) {
+		// 	$c = new StdClass();
+		// 	$c->id = $contact->id;
+		// 	$c->name = $contact->name;
+		// 	array_push($aryContact, $co);
+		// }
+
+		// $data = new stdClass();
+		$aryContact = Contact::where('customer_id', $request->id)->pluck('name','id');
+		// $data = json_decode(json_encode($aryContact));
+		// header('Content-Type: application/json; charset=utf-8');
+		return response()->json($aryContact, 200, [], JSON_UNESCAPED_UNICODE);
 	}
 
 }

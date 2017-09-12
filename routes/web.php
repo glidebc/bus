@@ -54,6 +54,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 
 Route::get('/admin/api/ad/book/list', 'Admin\ServiceController@adBookedList');
 Route::post('/admin/api/ad/book', 'Admin\ServiceController@adBook');
+Route::post('/admin/api/contact', 'Admin\ServiceController@customerContact');
 
 Route::group(['prefix' => 'admin'], function () {
     //
@@ -95,6 +96,11 @@ Route::group(['prefix' => 'admin'], function () {
 	Route::post('entrust/read/{id}', [
 	    'as'   => 'admin.entrust.read',
 	    'uses' => 'Admin\EntrustController@entrustRead'
+	]);
+	//委刊單的承辦窗口
+	Route::post('contact/read/{id}', [
+	    'as'   => 'admin.contact.read',
+	    'uses' => 'Admin\ContactController@contactRead'
 	]);
 });
 

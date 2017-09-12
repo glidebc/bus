@@ -25,7 +25,8 @@ class UpdateEntrustRequest extends FormRequest {
 	public function rules()
 	{
 		return [
-            'customer_id' => 'required|check_customer', 
+            'customer_id' => 'required|check_customer',
+            'contact_id' => 'required|check_contact',
             'name' => 'required|unique:entrust,name,'.$this->myentrust, 
             'start_date' => 'required', 
             // 'end_date' => 'required|size:8', 
@@ -59,6 +60,7 @@ class UpdateEntrustRequest extends FormRequest {
 	{
 	    return [
 	        'customer_id.check_customer' => '請選擇客戶',
+	        'contact_id.check_contact' => '請選擇承辦窗口',
 	        'name.required' => '請輸入委刊專案名稱',
 	        'name.unique' => '輸入的委刊單名稱已存在',
 
@@ -90,6 +92,9 @@ class UpdateEntrustRequest extends FormRequest {
     public function validator(Factory $factory)
     {
 		$factory->extend('check_customer', function($attribute, $value, $parameters, $validator) {
+    		return $value > 0;
+        });
+        $factory->extend('check_contact', function($attribute, $value, $parameters, $validator) {
     		return $value > 0;
         });
         $factory->extend('check_item_count', function($attribute, $value, $parameters, $validator) {

@@ -49,7 +49,15 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('contact', '聯絡窗口', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('contact_id', '聯絡窗口', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    <div class="col-sm-10">
+        {!! Form::select('contact_id', $contact, $agent->contact_id, array('class'=>'form-control')) !!}
+        
+    </div>
+</div>
+
+<!-- <div class="form-group">
+    {!! Form::label('contact', 'c', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::text('contact', old('contact',$agent->contact), array('class'=>'form-control')) !!}
         
@@ -72,7 +80,9 @@
         {!! Form::text('mobile', old('mobile',$agent->mobile), array('class'=>'form-control')) !!}
         
     </div>
-</div><div class="form-group">
+</div> -->
+
+<div class="form-group">
     {!! Form::label('note', '備註', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {{ Form::textarea('note', old('note',$agent->note), array('class'=>'form-control', 'rows' => '5')) }}

@@ -55,34 +55,15 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('contact', '聯絡窗口', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('contact_id', '聯絡窗口', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::text('contact', old('contact'), array('class'=>'form-control')) !!}
-        
-    </div>
-</div><div class="form-group">
-    {!! Form::label('com_tel', '公司電話', array('class'=>'col-sm-2 control-label text-primary')) !!}
-    <div class="col-sm-10">
-        {!! Form::text('com_tel', old('com_tel'), array('class'=>'form-control')) !!}
-        
-    </div>
-</div><div class="form-group">
-    {!! Form::label('com_fax', '公司傳真', array('class'=>'col-sm-2 control-label')) !!}
-    <div class="col-sm-10">
-        {!! Form::text('com_fax', old('com_fax'), array('class'=>'form-control')) !!}
-        
-    </div>
-</div><div class="form-group">
-    {!! Form::label('mobile', '手機', array('class'=>'col-sm-2 control-label')) !!}
-    <div class="col-sm-10">
-        {!! Form::text('mobile', old('mobile'), array('class'=>'form-control')) !!}
+        {!! Form::select('contact_id', $contact, null, array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('note', '備註', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {{ Form::textarea('note', old('note'), array('class'=>'form-control', 'rows' => '5')) }}
-        <!-- {!! Form::text('note', old('note'), array('class'=>'form-control')) !!} -->
         
     </div>
 </div>

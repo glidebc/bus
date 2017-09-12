@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Contact;
 use App\Customer;
 use App\DataQuery;
 use App\Entrust;
@@ -40,10 +41,18 @@ class MyEntrustController extends Controller {
 	    $countEntrust = 0;
 
         foreach ($entrust as $entrustOne) {
+        	//聯絡窗口button
+        	$contact = Contact::find($entrustOne->contact_id);
+			if(isset($contact))
+				$entrustOne->contact_name = $contact->name;
+			//總走期
         	if(strlen($entrustOne->start_date) > 0) {
         		$dateStart = substr($entrustOne->start_date, 0, 4).'-'.substr($entrustOne->start_date, -4, 2).'-'.substr($entrustOne->start_date, -2);
-				$dateEnd = substr($entrustOne->end_date, 0, 4).'-'.substr($entrustOne->end_date, -4, 2).'-'.substr($entrustOne->end_date, -2);
-				$entrustOne->duration = $dateStart.'～'.$dateEnd;
+        		$dateEnd = '';
+        		if(strlen($entrustOne->end_date) >= 8) {
+        			$dateEnd = '～'.substr($entrustOne->end_date, 0, 4).'-'.substr($entrustOne->end_date, -4, 2).'-'.substr($entrustOne->end_date, -2);
+        		}
+				$entrustOne->duration = $dateStart.$dateEnd;
         	}
 			//
 			$entrustOne->txt_pay = $pay[$entrustOne->pay];
@@ -73,10 +82,22 @@ class MyEntrustController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
-	    $customer = DataQuery::arraySelectAgentAndCustomer($userId);
 	    //委刊單編號
 	    $enum = DataQuery::genEntrustNumber();
-	    
+	    //可用的代理商與客戶
+	    $customer = DataQuery::arraySelectAgentAndCustomer($userId);
+	    //代理商與客戶的承辦窗口
+	    // $contact = new stdClass();
+	    // $objContact->{'2290'} = '';
+        // foreach ($custs->get() as $cust) {
+        //     $aryContact = Contact::where('customer_id', $cust->id)->pluck('name','id');
+        //     if(count($aryContact) > 0)
+        //     	$contact->{strval($cust->id)} = $aryContact;
+        // }
+        // $contact = response()->json($objContact, 200, [], JSON_NUMERIC_CHECK)
+        // $contact = json_decode(json_encode($objContact, JSON_NUMERIC_CHECK));
+	    // $contact = DataQuery::jsonSelectContact($cust);
+	    //
 	    $publishKind = config('admin.entrust.items');//委刊類別 array
 	    $pay = config('admin.entrust.pay');//付款方式 array
 	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
@@ -483,7 +504,7 @@ class MyEntrustController extends Controller {
 		$input['publish_kind'] = $publishKind;
 		return $input;
     }
-    //委刊項的input逐一檢查，insert ot update
+    //委刊項的input逐一檢查，insert or update
     function checkEntrustItem($id, $request) {
     	$aryItemDeleteNo = explode(',', $request->input('item_delete_list'));
     	//

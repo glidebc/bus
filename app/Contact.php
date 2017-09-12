@@ -23,7 +23,8 @@ class Contact extends Model {
           'tel',
           'fax',
           'mobile',
-          'email'
+          'email',
+          'owner_user'
     ];
     
 

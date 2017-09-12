@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Contact;
 use App\Customer;
 use App\DataQuery;
 use App\Http\Requests\CreateCustomerRequest;
@@ -36,7 +37,8 @@ class MyAgentController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
-	    return view(config('quickadmin.route').'.myAgent.create', compact('userId'));
+		$contact = DataQuery::arraySelectContactByCustomer($userId, 0);
+	    return view(config('quickadmin.route').'.myAgent.create', compact('userId', 'contact'));
 	}
 
 	/**
@@ -46,7 +48,13 @@ class MyAgentController extends Controller {
 	 */
 	public function store(CreateCustomerRequest $request)
 	{
-	    Customer::create($request->all());
+	    $id = Customer::create($request->all())->id;
+	    //將聯絡人指定所屬公司
+	    $contactId = $request->input('contact_id');
+	    $contact = Contact::find($contactId);
+	    $contact->customer_id = $id;
+	    $contact->save();
+
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
 	}
 
@@ -59,7 +67,10 @@ class MyAgentController extends Controller {
 	public function edit($id)
 	{
 		$agent = Customer::withTrashed()->find($id);
-		return view(config('quickadmin.route').'.myAgent.edit', compact('agent'));
+		$userId = Auth::user()->id;
+		//聯絡人	
+		$contact = DataQuery::arraySelectContactByCustomer($userId, $id);
+		return view(config('quickadmin.route').'.myAgent.edit', compact('agent', 'contact'));
 	}
 
 	/**
@@ -72,6 +83,21 @@ class MyAgentController extends Controller {
 	{
 		$agent = Customer::withTrashed()->findOrFail($id);
 		$agent->update($request->all());
+		//取消代理商所屬的聯絡窗口
+		// $customerContact = Contact::where('customer_id', $id);
+		// if($customerContact->get()->count() > 0) {
+		// 	$customerContact = $customerContact->first();
+		// 	$customerContact->customer_id = 0;
+		// 	$customerContact->save();
+		// }
+		//將聯絡人指定所屬公司
+		$contactId = $request->input('contact_id');
+	 //    if($contactId > 0) {
+	    $contact = Contact::find($contactId);
+	    $contact->customer_id = $id;
+	    $contact->save();
+		// }
+
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
 
 		// $myagent = Customer::findOrFail($id);

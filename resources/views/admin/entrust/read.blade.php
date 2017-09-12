@@ -23,6 +23,12 @@
         
     </div>
 </div><div class="form-group">
+    {!! Form::label('contact_name', '承辦窗口', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('contact_name', $entrust->contact_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('name', '委刊單名稱', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::text('name', $entrust->name, array('class'=>'form-control', 'readonly'=>'true')) !!}

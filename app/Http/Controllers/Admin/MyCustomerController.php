@@ -49,7 +49,8 @@ class MyCustomerController extends Controller {
 	{
 		$userId = Auth::user()->id;
 		$agent = DataQuery::arraySelectAgent($userId, false);
-	    return view(config('quickadmin.route').'.myCustomer.create', compact('userId', 'agent'));
+		$contact = DataQuery::arraySelectContactByCustomer($userId, 0);
+	    return view(config('quickadmin.route').'.myCustomer.create', compact(array('userId', 'agent', 'contact')));
 	}
 
 	/**
@@ -85,7 +86,9 @@ class MyCustomerController extends Controller {
 			]);
 		if($customerAgent->count() > 0)
 			$agentid = $customerAgent->first()->agent_id;
-		return view(config('quickadmin.route').'.myCustomer.edit', compact(array('agent','customer','agentid')));
+		//聯絡人
+		$contact = DataQuery::arraySelectContactByCustomer($userId, $id);
+		return view(config('quickadmin.route').'.myCustomer.edit', compact(array('agent','customer','agentid','contact')));
 	}
 
 	/**

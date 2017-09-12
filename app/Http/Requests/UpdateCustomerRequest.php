@@ -41,7 +41,8 @@ class UpdateCustomerRequest extends FormRequest {
             // 'agent_id' => 'required',
             'tax_num' => 'required|numeric|check_min_length|check_valid_tax_num|unique:customer,tax_num,'.$exceptId,
             'address' => 'required',
-            'com_tel' => 'required',
+            'contact_id' => 'required|check_contact',
+            // 'com_tel' => 'required',
             
 		];
 	}
@@ -66,7 +67,8 @@ class UpdateCustomerRequest extends FormRequest {
 	        'tax_num.unique' => '輸入的統編已存在',
 
 	        'address.required'  => '請輸入公司地址',
-	        'com_tel.required' => '請輸入公司電話',
+	        'contact_id.check_contact' => '請選擇聯絡窗口',
+	        // 'com_tel.required' => '請輸入公司電話',
 
 	    ];
 	}
@@ -83,6 +85,10 @@ class UpdateCustomerRequest extends FormRequest {
 
         $factory->extend('check_valid_tax_num', function($attribute, $value, $parameters, $validator) {
         	return Glide::taxNumberValid($value);
+        });
+
+        $factory->extend('check_contact', function($attribute, $value, $parameters, $validator) {
+    		return $value > 0;
         });
 
         return $factory->make(

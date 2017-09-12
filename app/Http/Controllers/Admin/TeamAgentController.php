@@ -78,10 +78,12 @@ class TeamAgentController extends Controller {
 	    $arrayUser = DataQuery::arrayTeamUser($userId);
 	    //共用user
 		$arrayCustomerUser = CustomerUser::where('customer_id', $id)->pluck('user_id')->toArray();
+		//聯絡人
+		$contact = DataQuery::arraySelectContactByCustomer($id);
 		// foreach ($customerUsers as $customerUser) {
 		// 	if($listUser[$customerUser->user_id])
 		// }
-		return view(config('quickadmin.route').'.teamAgent.edit', compact(array('agent','arrayUser','arrayCustomerUser')));
+		return view(config('quickadmin.route').'.teamAgent.edit', compact(array('agent','arrayUser','arrayCustomerUser','contact')));
 	}
 
 	/**

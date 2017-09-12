@@ -20,9 +20,10 @@
                         <th>編號</th>
                         <th>委刊單</th>
                         <th>公司簡稱</th>
-<th>總走期</th>
-<th>付款方式</th>
-<th>付款情況</th>
+                        <th>承辦窗口</th>
+                        <th>總走期</th>
+                        <th>付款方式</th>
+                        <th>付款情況</th>
 
                         <th>審核狀態</th>
                         <th>&nbsp;</th>
@@ -51,10 +52,16 @@
                             </td>
                             <td>{{ $row->enum }}</td>
                             <td>{{ $row->name }}</td>
-<td>{{ $row->customer_name }}</td>
-<td>{{ $row->duration }}</td>
-<td>{{ $row->txt_pay }}</td>
-<td>{{ $row->txt_pay_status }}</td>
+                            <td>{{ $row->customer_name }}</td>
+                            <td>
+                            @if(!empty($row->contact_id))
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.contact.read', $row->contact_id))) !!}
+                                {!! Form::submit($row->contact_name, array('class' => 'btn btn-xs btn-default')) !!}
+                            @endif
+                            </td>
+                            <td>{{ $row->duration }}</td>
+                            <td>{{ $row->txt_pay }}</td>
+                            <td>{{ $row->txt_pay_status }}</td>
 
                             <td>
                             @if($row->status == 1)
@@ -63,18 +70,8 @@
                                 審核中
                             @elseif($row->status == 3)
                                 <span class="text-success">審核通過</span>
-                                <!-- @if($row->verify_result)
-                                    
-                                @else
-                                    
-                                @endif -->
                             @elseif($row->status == 4)
                                 <span class="text-danger">退件</span>
-                                <!-- @if($row->verify_result)
-                                    
-                                @else
-                                    
-                                @endif -->
                             @elseif($row->status == 0)
                                 取消委刊
                             @endif

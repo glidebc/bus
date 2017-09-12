@@ -13,11 +13,12 @@
             <table class="table table-striped table-hover table-responsive datatable" id="datatable">
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th></th>
                         <th>公司簡稱</th>
                         <th>統編</th>
                         <th>郵遞區號</th>
-                        <th>公司電話</th>
+                        <th>公司地址</th>
+                        <th>聯絡窗口</th>
                         <th>擁有者</th>
                         <th>共用</th>
                         <th>狀態</th>
@@ -28,11 +29,12 @@
                 <tbody>
                     @foreach ($agent as $row)
                         <tr>
-                            <th>&nbsp;</th>
+                            <th></th>
                             <td>{{ $row->name }}</td>
                             <td>{{ $row->tax_num }}</td>
                             <td>{{ $row->zip_code }}</td>
-                            <td>{{ $row->com_tel }}</td>
+                            <td>{{ $row->address }}</td>
+                            <td>{{ $row->contact_name }}</td>
                             <td>{{ $row->owner_user_name }}</td>
                             <td>
                             @if(!empty($row->user_names))

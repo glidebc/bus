@@ -25,9 +25,16 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('customer_id', '客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    {!! Form::label('customer_id', '代理商｜客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::select('customer_id', $customer, $entrust->customer_id, array('class'=>'form-control')) !!}
+        {!! Form::select('customer_id', $customer, $entrust->customer_id, array('class'=>'form-control', 'id' => 'drpCustomer')) !!}
+        
+    </div>
+</div><div class="form-group">
+    {!! Form::label('contact_id', '承辦窗口', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    <div class="col-sm-10">
+        {!! Form::select('drpContact', [], null, array('class'=>'form-control', 'id' => 'drpContact')) !!}
+        {{ Form::hidden('contact_id', old('contact_id',$entrust->contact_id), array('id' => 'hidContact')) }}
         
     </div>
 </div><div class="form-group">
@@ -108,14 +115,62 @@
 
 {!! Form::close() !!}
 
+<div id='hidMsg' style="display: none;"></div>
+
 @endsection
 
 @section('javascript')
 <script type="text/javascript">
-    // $(function() {
-    //     setItemCount();
-    //     $('#item_delete_list').val('');
-    // });
+    var $drpCustomer = $('#drpCustomer');
+    var $drpContact = $('#drpContact');
+    var $hidContact = $('#hidContact');
+    $drpContact.append('<option value="0">先選擇代理商｜客戶</option>');
+
+    if($drpCustomer.val() > 0) {
+        setContact($drpCustomer.val());
+    }
+    $drpCustomer.change(function(){
+        setContact($(this).val());
+    });
+    $drpContact.change(function(){
+        $hidContact.val($(this).val());
+    });
+
+    function setContact(custId){
+        $drpContact.empty();
+
+        $.ajax({
+            type: 'POST',
+            url: "../../api/contact",
+            headers: { 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+            data: {
+                id: custId
+            },
+            dataType: "json",
+            complete: function(jqXHR, textStatus) {
+                switch (jqXHR.status) {
+                    case 200:
+                        var jsonContact = JSON.parse(jqXHR.responseText); //將資料字串存成資料json
+                        $drpContact.append('<option value="0">請選擇</option>');
+                        var contactSelected = '';
+                        for(var k in jsonContact) {
+                            if(k == $hidContact.val())
+                                contactSelected = ' selected';
+                            $drpContact.append('<option value="'+k+'"'+contactSelected+'>'+jsonContact[k]+'</option>');
+                        }
+                        //
+                        if(contactSelected == '')
+                            $hidContact.val('0');
+                        break;
+                    default:
+                        alert('聯絡人載入失敗，請再選擇代理商｜客戶');
+                        $('#hidMsg').text(jqXHR.responseText);
+                        break;
+                }
+
+            }
+        });
+    }
 
     $('#txtStartDate, #txtEndDate').datepicker({
         changeMonth: true,

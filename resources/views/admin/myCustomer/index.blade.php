@@ -16,20 +16,16 @@
                         <!-- <th>
                             {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!}
                         </th> -->
-                        <th>&nbsp;</th>
+                        <th></th>
                         <th>公司簡稱</th>
-<!-- <th>抬頭</th> -->
-<th>代理商</th>
-<th>統編</th>
-<th>公司電話</th>
-<th>郵遞區號</th>
-<th>公司地址</th>
-<!-- <th>聯絡窗口</th>
-<th>公司傳真</th>
-<th>手機</th>
-<th>備註</th> -->
+                        <th>代理商</th>
+                        <th>統編</th>
+                        <th>公司電話</th>
+                        <th>郵遞區號</th>
+                        <th>公司地址</th>
+                        <th>聯絡窗口</th>
                         <th>狀態</th>
-                        <th>&nbsp;</th>
+                        <!-- <th></th> -->
                     </tr>
                 </thead>
 
@@ -39,25 +35,21 @@
                             <!-- <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
                             </td> -->
-                            <td>&nbsp;</td>
+                            <td></td>
                             <td>{{ $row->name }}</td>
-<!-- <td>{{ $row->tax_title }}</td> -->
-<td>{{ $row->agent_name }}</td>
-<td>{{ $row->tax_num }}</td>
-<td>{{ $row->com_tel }}</td>
-<td>{{ $row->zip_code }}</td>
-<td>{{ $row->address }}</td>
-<!-- <td>{{ $row->contact }}</td>
-<td>{{ $row->com_fax }}</td>
-<td>{{ $row->mobile }}</td>
-<td>{{ $row->note }}</td> -->
+                            <td>{{ $row->agent_name }}</td>
+                            <td>{{ $row->tax_num }}</td>
+                            <td>{{ $row->com_tel }}</td>
+                            <td>{{ $row->zip_code }}</td>
+                            <td>{{ $row->address }}</td>
+                            <td>{{ $row->contact_name }}</td>
                             <td>
                                 @if($row->deleted_at != '')
                                     停用
                                 @endif
                             </td>
 
-                            <td>
+                            <!-- <td>
                             @if($row->owner)
                                 {!! link_to_route(config('quickadmin.route').'.mycustomer.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
 
@@ -70,7 +62,7 @@
                                 @endif
                                 {!! Form::close() !!}
                             @endif
-                            </td>
+                            </td> -->
                         </tr>
                     @endforeach
                 </tbody>

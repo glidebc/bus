@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Agent;
+use App\Contact;
 use App\Customer;
 use App\CustomerAgent;
 use App\CustomerUser;
@@ -69,17 +69,11 @@ class DataQuery {
                 ])->get();
             if($customerAgent->count() > 0)
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
-            //(teamAgent)共用user的數量
-            // $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
-            // $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
-            // $stringUserName = "";
-            // foreach ($arrayUserName as $name) {
-            //     if(!empty($stringUserName))
-            //         $stringUserName .= "\n";
-            //     $stringUserName .= $name;
-            // }
-            // $customer->user_names = $stringUserName;
-            //(myAgent)自己建立的才可以修改
+            //聯絡人
+            if($customer->contact_id > 0) {
+                $customer->contact_name = Contact::find($customer->contact_id)->name;
+            }
+            //自己建立的才可以修改
             $customer->owner = false;
             if($userId == $customer->owner_user)
                 $customer->owner = true;
@@ -192,6 +186,10 @@ class DataQuery {
                 ])->get();
             if($customerAgent->count() > 0)
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
+            //聯絡人
+            if($customer->contact_id > 0) {
+                $customer->contact_name = Contact::find($customer->contact_id)->name;
+            }
             //owner user name
             $customer->owner_user_name = User::find($customer->owner_user)->name;
             //共用user的數量
@@ -302,8 +300,72 @@ class DataQuery {
                       ->orWhereIn('id', $aryCustomerId);
             })
             ->selectRaw('CASE WHEN is_agent THEN CONCAT("代理商 - ",`name`) ELSE CONCAT("客戶 - ",`name`) END AS "name", id')
-            ->orderBy('name')->pluck('name','id')->prepend('請選擇', 0);
+            ->orderBy('name')->pluck('name','id')->prepend('無', 0);
         return $customer;
+    }
+    //
+    // static function arraySelectAgentAndCustomer_refCustomer($userId, &$customer) {
+    //     $aryCustomerId = CustomerUser::where('user_id', $userId)->pluck('customer_id');
+    //     $customer = Customer::where(function ($query) use ($userId, $aryCustomerId) {
+    //             $query->where('owner_user', $userId)
+    //                   ->orWhereIn('id', $aryCustomerId);
+    //         });
+    //     $aryCustomerOption = $customer->selectRaw('CASE WHEN is_agent THEN CONCAT("代理商 - ",`name`) ELSE CONCAT("客戶 - ",`name`) END AS "name", id')
+    //         ->orderBy('name')
+    //         ->pluck('name','id')
+    //         ->prepend('請選擇', 0);
+    //     return $aryCustomerOption;
+    // }
+    // static function jsonSelectContact($customers) {  
+    // }
+
+    //業務管理-我的聯絡人
+    static function collectionOfContact($userId)
+    {
+        $contact = Contact::leftJoin('customer', function ($join) use ($userId) {
+                $join->on('customer.id', '=', 'contact.customer_id')
+                    ->where('contact.owner_user', $userId);
+            })
+            ->selectRaw('customer.name AS customer_name, contact.*')
+            ->orderBy('contact.created_at', 'desc')
+            ->get();
+        return $contact;
+    }
+
+    //業務管理-我的代理商, 我的客戶
+    static function arraySelectContactByCustomer($userId, $customerId)
+    {
+        // $contact;
+        // if($customerId == 0) {
+        $contactCondition = array();
+        array_push($contactCondition, array('owner_user', $userId));
+        array_push($contactCondition, array('customer_id', $customerId));
+        $contact = Contact::where($contactCondition);
+        // } else {
+            // $contact = Contact::where('owner_user', $userId)
+            //     ->where(function ($query) use ($customerId) {
+            //         $query->where('customer_id', 0)
+            //               ->orWhere('customer_id', $customerId);
+            //     });
+        // }
+        $contact = $contact->orderBy('name')->pluck('name','id')->prepend('請選擇', 0);
+        return $contact;
+    }
+
+    //團隊管理-管理代理商, 管理客戶
+    static function arraySelectContactByTeamCustomer($customerId)
+    {
+        $contactCondition = array();
+        array_push($contactCondition, array('customer_id', $customerId));
+        $contact = Contact::where($contactCondition);
+        $contact = $contact->orderBy('name')->pluck('name','id')->prepend('請選擇', 0);
+        return $contact;
+    }
+
+    //業務管理-我的委刊單
+    static function arraySelectContactByEntrust($userId)
+    {
+
     }
 
     static function collectionPublishUser($userId)

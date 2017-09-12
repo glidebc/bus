@@ -23,6 +23,7 @@ class Entrust extends Model {
     
     protected $fillable = [
           'customer_id',
+          'contact_id',
           'name',
           'start_date',
           'end_date',

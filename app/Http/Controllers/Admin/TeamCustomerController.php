@@ -88,12 +88,14 @@ class TeamCustomerController extends Controller {
 			]);
 		if($customerAgent->count() > 0)
 			$agentid = $customerAgent->first()->agent_id;
+		//聯絡人
+		$contact = DataQuery::arraySelectContactByTeamCustomer($id);
 		//同個部門與組別的user
 		$userId = Auth::user()->id;
 	    $arrayUser = DataQuery::arrayTeamUser($userId);
 	    //共用user
 		$arrayCustomerUser = CustomerUser::where('customer_id', $id)->pluck('user_id')->toArray();
-		return view(config('quickadmin.route').'.teamCustomer.edit', compact(array('agent','customer','agentid','arrayUser','arrayCustomerUser')));
+		return view(config('quickadmin.route').'.teamCustomer.edit', compact(array('agent','customer','agentid','contact','arrayUser','arrayCustomerUser')));
 	}
 
 	/**
@@ -166,7 +168,7 @@ class TeamCustomerController extends Controller {
     //列表中的啟用按鈕
 	public function resetDelete($id) {
 		Customer::withTrashed()->find($id)->restore();
-		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
+		return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
 	}
 	//加入或取消 客戶與代理商關聯
 	function checkCustomerAgent($customerId, $agentId) {

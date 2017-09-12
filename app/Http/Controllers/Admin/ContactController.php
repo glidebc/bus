@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
 use App\Contact;
+use App\Customer;
 use App\DataQuery;
 use App\Http\Requests\CreateContactRequest;
 use App\Http\Requests\UpdateContactRequest;
@@ -24,9 +25,9 @@ class ContactController extends Controller {
 	 */
 	public function index(Request $request)
     {
-        $contact = Contact::all();
-
-		return view('admin.contact.index', compact('contact'));
+    	$userId = Auth::user()->id;
+        $contact = DataQuery::collectionOfContact($userId);
+		return view(config('quickadmin.route').'.contact.index', compact('contact'));
 	}
 
 	/**
@@ -38,7 +39,7 @@ class ContactController extends Controller {
 	{
 		$userId = Auth::user()->id;
 		$agent_and_customer = DataQuery::arraySelectAgentAndCustomer($userId);
-	    return view('admin.contact.create', compact('agent_and_customer'));
+	    return view(config('quickadmin.route').'.contact.create', compact('agent_and_customer', 'userId'));
 	}
 
 	/**
@@ -48,9 +49,7 @@ class ContactController extends Controller {
 	 */
 	public function store(CreateContactRequest $request)
 	{
-	    
 		Contact::create($request->all());
-
 		return redirect()->route(config('quickadmin.route').'.contact.index');
 	}
 
@@ -63,9 +62,11 @@ class ContactController extends Controller {
 	public function edit($id)
 	{
 		$contact = Contact::find($id);
+
+		$userId = Auth::user()->id;
+	    $agent_and_customer = DataQuery::arraySelectAgentAndCustomer($userId);
 	    
-	    
-		return view('admin.contact.edit', compact('contact'));
+		return view('admin.contact.edit', compact('contact', 'agent_and_customer'));
 	}
 
 	/**
@@ -115,4 +116,11 @@ class ContactController extends Controller {
         return redirect()->route(config('quickadmin.route').'.contact.index');
     }
 
+    //列表的承辦窗口
+    public function contactRead($id)
+	{
+		$contact = Contact::find($id);
+		$contact->customer_name = Customer::find($contact->customer_id)->name;
+		return view(config('quickadmin.route').'.contact.read', compact('contact'));
+	}
 }

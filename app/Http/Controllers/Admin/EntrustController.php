@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Contact;
 use App\Customer;
 use App\DataQuery;
 use App\Entrust;
@@ -48,6 +49,10 @@ class EntrustController extends Controller {
 		$entrust->enum = $e->enum;
 		$entrust->name = $e->name;
 		$entrust->customer_name = Customer::find($e->customer_id)->name;
+		$entrust->contact_name = '';
+		$contact = Contact::find($e->contact_id);
+		if(isset($contact))
+			$entrust->contact_name = $contact->name;
 
 		$sd = ''; $ed = ''; $dayCount = 1;
 		if($e->start_date != null) { //&& $e->end_date != null

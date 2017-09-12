@@ -13,13 +13,14 @@
             <table class="table table-striped table-hover table-responsive datatable" id="datatable">
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th></th>
                         <th>公司簡稱</th>
                         <th>代理商</th>
                         <th>統編</th>
                         <th>公司電話</th>
                         <th>郵遞區號</th>
                         <th>公司地址</th>
+                        <th>聯絡窗口</th>
                         <th>擁有者</th>
                         <th>共用</th>
                         <th>狀態</th>
@@ -30,13 +31,14 @@
                 <tbody>
                     @foreach ($customer as $row)
                         <tr>
-                            <td>&nbsp;</td>
+                            <td></td>
                             <td>{{ $row->name }}</td>
                             <td>{{ $row->agent_name }}</td>
                             <td>{{ $row->tax_num }}</td>
                             <td>{{ $row->com_tel }}</td>
                             <td>{{ $row->zip_code }}</td>
                             <td>{{ $row->address }}</td>
+                            <td>{{ $row->contact_name }}</td>
                             <td>{{ $row->owner_user_name }}</td>
                             <td>
                             @if(!empty($row->user_names))
@@ -53,10 +55,10 @@
                                 {!! link_to_route(config('quickadmin.route').'.teamcustomer.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}
                                 
                                 @if($row->deleted_at == '')
-                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.mycustomer.destroy', $row->id))) !!}
+                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.teamcustomer.destroy', $row->id))) !!}
                                     {!! Form::submit('停用', array('class' => 'btn btn-xs btn-warning')) !!}
                                 @else
-                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.mycustomer.resetDelete', $row->id))) !!}
+                                    {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.teamcustomer.resetDelete', $row->id))) !!}
                                     {!! Form::submit('啟用', array('class' => 'btn btn-xs btn-success')) !!}
                                 @endif
                                 {!! Form::close() !!}

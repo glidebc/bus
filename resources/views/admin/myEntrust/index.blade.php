@@ -57,6 +57,7 @@
                             @if(!empty($row->contact_id))
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.contact.read', $row->contact_id))) !!}
                                 {!! Form::submit($row->contact_name, array('class' => 'btn btn-xs btn-default')) !!}
+                                {!! Form::close() !!}
                             @endif
                             </td>
                             <td>{{ $row->duration }}</td>

@@ -57,7 +57,7 @@ class EntrustController extends Controller {
 		$sd = ''; $ed = ''; $dayCount = 1;
 		if($e->start_date != null) { //&& $e->end_date != null
 			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
-			if($e->end_date != null) {
+			if(!empty($e->end_date)) {
 				$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
 				$dayCount = $this->countDays($sd, $ed);
 			}

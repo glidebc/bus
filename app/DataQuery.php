@@ -188,7 +188,9 @@ class DataQuery {
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
             //聯絡人
             if($customer->contact_id > 0) {
-                $customer->contact_name = Contact::find($customer->contact_id)->name;
+                $contact = Contact::find($customer->contact_id);
+                if(isset($contact))
+                    $customer->contact_name = $contact->name;
             }
             //owner user name
             $customer->owner_user_name = User::find($customer->owner_user)->name;

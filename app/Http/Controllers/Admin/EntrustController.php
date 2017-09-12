@@ -55,13 +55,13 @@ class EntrustController extends Controller {
 			$entrust->contact_name = $contact->name;
 
 		$sd = ''; $ed = ''; $dayCount = 1;
-		if(!empty($e->start_date)) { //&& $e->end_date != null
+		if(!empty($e->start_date))
 			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
-			if(!empty($e->end_date)) {
-				$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
-				$dayCount = $this->countDays($sd, $ed);
-			}
-		}
+		if(!empty($e->end_date))
+			$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
+		if($sd && $ed)
+			$dayCount = $this->countDays($sd, $ed);
+		
 		$entrust->txt_start_date = $sd;
 		$entrust->txt_end_date = $ed;
 		$entrust->day_count = $dayCount;

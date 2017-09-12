@@ -193,7 +193,9 @@ class DataQuery {
                     $customer->contact_name = $contact->name;
             }
             //owner user name
-            $customer->owner_user_name = User::find($customer->owner_user)->name;
+            $ownerUser = User::find($customer->owner_user);
+            if(isset($ownerUser))
+                $customer->owner_user_name = $ownerUser->name;
             //共用user的數量
             $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
             $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');

@@ -326,7 +326,7 @@ class DataQuery {
     //業務管理-我的聯絡人
     static function collectionOfContact($userId)
     {
-        $contact = Contact::where('owner_user', $userId);
+        $contact = Contact::where('contact.owner_user', $userId);
         $contactWithCustomer = $contact->leftJoin('customer', function ($join) use ($userId) {
                 $join->on('customer.id', '=', 'contact.customer_id')
                     ->where('contact.owner_user', $userId);

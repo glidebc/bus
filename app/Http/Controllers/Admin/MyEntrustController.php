@@ -60,10 +60,6 @@ class MyEntrustController extends Controller {
 			//flow
 			$countOk = $this->countEntrustFlowStatus($entrustOne->id, 'ok');
 			$countReject = $this->countEntrustFlowStatus($entrustOne->id, 'reject');
-			// if($countOk)
-			// 	$entrustOne->verify_result = 'ok';
-			// if($countReject)
-			// 	$entrustOne->verify_result = 'reject';
 			if($countOk || $countReject) {
 				$countEntrust++;
 				$this->deleteEntrustFlow($entrustOne->id);

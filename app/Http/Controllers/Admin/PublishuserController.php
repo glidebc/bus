@@ -42,7 +42,9 @@ class PublishuserController extends Controller {
 	public function create()
 	{
 	    $user = DataQuery::arraySelectUser();
-	    return view('admin.publishuser.create', compact('user'));
+	    $dept = DataQuery::arraySelectDept();
+		$team = DataQuery::arraySelectTeam();
+	    return view('admin.publishuser.create', compact(array('user','dept','team')));
 	}
 
 	/**
@@ -68,7 +70,11 @@ class PublishuserController extends Controller {
 	{
 		$user = DataQuery::arraySelectUser();
 		$publishuser = Publishuser::find($id);
-	    $user_name = User::find($publishuser->user_id)->name;
+
+		$user_name = '';
+		$user = User::find($publishuser->user_id);
+		if(isset($user))
+	    	$user_name = $user->name;
 
 	    $dept = DataQuery::arraySelectDept();
 		$team = DataQuery::arraySelectTeam();
@@ -100,6 +106,11 @@ class PublishuserController extends Controller {
 	 */
 	public function destroy($id)
 	{
+		//改回預設顏色
+		$publishuser = Publishuser::find($id);
+		$publishuser->color_name = 'Gray';
+		$publishuser->save();
+		//
 		Publishuser::destroy($id);
 
 		return redirect()->route(config('quickadmin.route').'.publishuser.index');

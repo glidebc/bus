@@ -23,6 +23,7 @@ class Publishuser extends Model {
     
     protected $fillable = [
           'user_id',
+          'user_name',
           'color_name',
           'dept_id',
           'team_id'

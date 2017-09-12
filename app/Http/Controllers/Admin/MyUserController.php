@@ -35,6 +35,7 @@ class MyUserController extends Controller {
 		} else {
 			$publishuser = new Publishuser();
 			$publishuser->user_id = $user->id;
+			$publishuser->user_name = $user->name;
 			$publishuser->color_name = 'Gray'; //預設是灰色底色
 			// $publishuser->dept_id = 0;
 			// $publishuser->team_id = 0;

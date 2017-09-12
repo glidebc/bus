@@ -385,7 +385,7 @@ class DataQuery {
                             ->leftJoin('team', function ($join) {
                                 $join->on('team.id', '=', 'publish_user.team_id');
                             })
-                            ->selectRaw('users.name AS user_name, dept.name AS dept_name, team.name AS team_name,publish_user.*')
+                            ->selectRaw('users.id AS acct_id,dept.name AS dept_name, team.name AS team_name,publish_user.*')
                             ->orderByRaw('dept.id, team.id, publish_user.created_at desc');
         } else {
             $publishuser = Publishuser::leftJoin('users', function ($join) use ($userId) {

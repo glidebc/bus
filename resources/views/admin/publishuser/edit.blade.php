@@ -25,6 +25,12 @@
         
     </div>
 </div><div class="form-group">
+    {!! Form::label('color_name', '顏色', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('color_name', old('color_name'), array('class'=>'form-control')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('dept_id', '部門', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::select('dept_id', $dept, $publishuser->dept_id, array('class'=>'form-control')) !!}

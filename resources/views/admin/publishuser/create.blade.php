@@ -19,21 +19,28 @@
 {!! Form::open(array('route' => config('quickadmin.route').'.publishuser.store', 'id' => 'form-with-validation', 'class' => 'form-horizontal')) !!}
 
 <div class="form-group">
-    {!! Form::label('user_id', '使用者*', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('user_id', '使用者', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::select('user_id', $user, null, array('class'=>'form-control')) !!}
+        {{ Form::hidden('user_name', '', array('id' => 'user_name')) }}
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('color_name', '顏色*', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('color_name', '顏色', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('color_name', old('color_name'), array('class'=>'form-control')) !!}
+        {!! Form::text('color_name', old('color_name','Gray'), array('class'=>'form-control')) !!}
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('dept', '部門', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('dept_id', '部門', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('dept', old('dept'), array('class'=>'form-control')) !!}
+        {!! Form::select('dept_id', $dept, null, array('class'=>'form-control')) !!}
+        
+    </div>
+</div><div class="form-group">
+    {!! Form::label('team_id', '組別', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::select('team_id', $team, null, array('class'=>'form-control')) !!}
         
     </div>
 </div>
@@ -47,3 +54,11 @@
 {!! Form::close() !!}
 
 @endsection
+
+@section('javascript')
+<script type="text/javascript">
+    $('#user_id').change(function(){
+        $('#user_name').val($(this).find('option:selected').text());
+    });
+</script>
+@stop

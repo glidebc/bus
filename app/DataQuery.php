@@ -375,7 +375,7 @@ class DataQuery {
     static function collectionPublishUser($userId)
     {
         if($userId == 0) {
-            $publishuser = Publishuser::join('users', function ($join) {
+            $publishuser = Publishuser::leftJoin('users', function ($join) {
                                 $join->on('users.id', '=', 'publish_user.user_id');
                             })
                             ->leftJoin('dept', function ($join) {
@@ -387,7 +387,7 @@ class DataQuery {
                             ->selectRaw('users.name AS user_name, dept.name AS dept_name, team.name AS team_name,publish_user.*')
                             ->orderByRaw('dept.id, team.id, publish_user.created_at desc');
         } else {
-            $publishuser = Publishuser::join('users', function ($join) use ($userId) {
+            $publishuser = Publishuser::leftJoin('users', function ($join) use ($userId) {
                                 $join->on('users.id', '=', 'publish_user.user_id')
                                      ->where('publish_user.user_id', $userId);
                             })

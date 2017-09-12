@@ -16,10 +16,11 @@
                         <th>
                             {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!}
                         </th>
+                        <th>ID</th>
                         <th>使用者</th>
-<th>顏色</th>
-<th>部門</th>
-<th>組別</th>
+                        <th>顏色</th>
+                        <th>部門</th>
+                        <th>組別</th>
 
                         <th>&nbsp;</th>
                     </tr>
@@ -31,10 +32,11 @@
                             <td>
                                 {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!}
                             </td>
+                            <td>{{ $row->id }}</td>
                             <td>{{ $row->user_name }}</td>
-<td><span class="btn btn-xs" style='background-color: {{ $row->color_name }}; color: {{ $row->font_color }}''>{{ $row->color_name }}</span></td>
-<td>{{ $row->dept_name }}</td>
-<td>{{ $row->team_name }}</td>
+                            <td><span class="btn btn-xs" style='background-color: {{ $row->color_name }}; color: {{ $row->font_color }}''>{{ $row->color_name }}</span></td>
+                            <td>{{ $row->dept_name }}</td>
+                            <td>{{ $row->team_name }}</td>
 
                             <td>
                                 {!! link_to_route(config('quickadmin.route').'.publishuser.edit', trans('quickadmin::templates.templates-view_index-edit'), array($row->id), array('class' => 'btn btn-xs btn-info')) !!}

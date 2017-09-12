@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Contact;
 use App\DataQuery;
 use App\Dept;
 use App\Publish;
@@ -24,12 +25,23 @@ class TeamEntrustController extends Controller {
     	$userId = Auth::user()->id;
     	$entrusts = DataQuery::collectionOfTeamEntrust($userId);
     	foreach ($entrusts as $entrust) {
+            //聯絡窗口button
+            $contact = Contact::find($entrust->contact_id);
+            if(isset($contact))
+                $entrust->contact_name = $contact->name;
+            //總走期
             if(strlen($entrust->start_date) > 0) {
                 $dateStart = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
-                $dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
-                $entrust->duration = $dateStart.'～'.$dateEnd;
-            }
+                $dateEnd = '';
+                if(strlen($entrust->end_date) >= 8) {
+                    $dateEnd = '～'.substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+                }
+                $entrust->duration = $dateStart.$dateEnd;
 
+                // $dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+                // $entrust->duration = $dateStart.'～'.$dateEnd;
+            }
+            //
     		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
             $dept = Dept::find($publishuser->dept_id);
             $entrust->user_dept = empty($dept) ? '' : $dept->name;

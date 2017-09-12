@@ -18,11 +18,12 @@
                         <th>編號</th>
                         <th>委刊單</th>
                         <th>公司簡稱</th>
-<th>總走期</th>
-<th>部門</th>
-<th>使用者</th>
-<th>審核狀態</th>
-<th>執行狀態</th>
+                        <th>承辦窗口</th>
+                        <th>總走期</th>
+                        <th>部門</th>
+                        <th>使用者</th>
+                        <th>審核狀態</th>
+                        <th>執行狀態</th>
 
                     </tr>
                 </thead>
@@ -45,12 +46,18 @@
                             </td>
                             <td>{{ $row->enum }}</td>
                             <td>{{ $row->name }}</td>
-<td>{{ $row->customer_name }}</td>
-<td>{{ $row->duration }}</td>
-<td>{{ $row->user_dept }}</td>
-<td>{{ $row->user_name }}</td>
-<td>{{ $row->status_name }}</td>
-<td>{{ $row->status_publish }}</td>
+                            <td>{{ $row->customer_name }}</td>
+                            <td>
+                            @if(!empty($row->contact_id))
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.contact.read', $row->contact_id))) !!}
+                                {!! Form::submit($row->contact_name, array('class' => 'btn btn-xs btn-default')) !!}
+                            @endif
+                            </td>
+                            <td>{{ $row->duration }}</td>
+                            <td>{{ $row->user_dept }}</td>
+                            <td>{{ $row->user_name }}</td>
+                            <td>{{ $row->status_name }}</td>
+                            <td>{{ $row->status_publish }}</td>
 
                         </tr>
                     @endforeach

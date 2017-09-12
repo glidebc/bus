@@ -61,7 +61,7 @@ class EntrustController extends Controller {
 			$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
 		if($sd && $ed)
 			$dayCount = $this->countDays($sd, $ed);
-		
+
 		$entrust->txt_start_date = $sd;
 		$entrust->txt_end_date = $ed;
 		$entrust->day_count = $dayCount;
@@ -96,8 +96,10 @@ class EntrustController extends Controller {
     function countDays($strSD, $strED) {
 		$sd = date_create($strSD);
 		$ed = date_create($strED);
-		$interval = date_diff($sd, $ed);
-		return $interval->days + 1;
+		$dayCount = 1;
+		if($sd && $ed)
+			$dayCount = date_diff($sd, $ed)->days + 1;
+		return $dayCount;
     }
 
 	// private $customer;

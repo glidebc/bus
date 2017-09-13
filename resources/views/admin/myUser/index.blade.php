@@ -46,7 +46,8 @@
     {!! Form::label('color_name', '委刊預約的顏色', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10" id="color-area">
         目前的顏色 – 
-        {!! Form::text('color_name', $publishuser->color_name, array('class'=>'form-control color-box', 'readonly'=>'true', 'style'=>'cursor:pointer; background-color: '.$publishuser->color_name.';color: '.$publishuser->font_color)) !!}　
+        {!! Form::text('color_name', $publishuser->color_name, array('class'=>'form-control color-box', 'readonly'=>'true', 'style'=>'background-color: '.$publishuser->color_name.';color: '.$publishuser->font_color)) !!}　
+    @if($publishuser->color_name == 'Gray')
         <input class="btn btn-color" type="button" value="換顏色" onclick="showOrHideColorList(this);"><br>
         <div id="color-list" style="display: none;">
             請選擇下列替換的顏色<br>
@@ -55,16 +56,16 @@
             <input type="text" class="form-control color-box" readonly="true" value="{{ $color_name }}" onclick='colorSelected("{{ $color_name }}", "{{ $font_color }}");'' style="cursor:pointer; background-color: {{ $color_name }};color: {{ $font_color }};">
             @endforeach
         </div>
-        
+    @endif
     </div>
 </div>
-
+@if($publishuser->color_name == 'Gray')
 <div class="form-group">
     <div class="col-sm-10 col-sm-offset-2">
-      {!! Form::submit(trans('quickadmin::templates.templates-view_edit-update'), array('class' => 'btn btn-primary')) !!}
-      <!-- {!! link_to_route(config('quickadmin.route').'.publishuser.index', trans('quickadmin::templates.templates-view_edit-cancel'), null, array('class' => 'btn btn-default')) !!} -->
+        {!! Form::submit(trans('quickadmin::templates.templates-view_edit-update'), array('class' => 'btn btn-primary')) !!}
     </div>
 </div>
+@endif
 
 {{ Form::hidden('user_id', $user->id, array('id' => 'invisible_id')) }}
 

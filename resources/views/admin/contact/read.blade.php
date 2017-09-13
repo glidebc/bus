@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-sm-10 col-sm-offset-2">
-        <h1>修改聯絡人資料</h1>
+        <h1>聯絡人資料</h1>
 
         @if ($errors->any())
         	<div class="alert alert-danger">

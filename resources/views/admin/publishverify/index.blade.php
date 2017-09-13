@@ -16,9 +16,9 @@
                         </th> -->
                         <th>&nbsp;</th>
                         <th>委刊單</th>
-<th>客戶</th>
-<th>部門</th>
-<th>使用者</th>
+                        <th>客戶</th>
+                        <th>部門</th>
+                        <th>使用者</th>
 <!-- <th>狀態</th> -->
 
                         <th>審核</th>
@@ -39,20 +39,20 @@
                                 {!! Form::close() !!}
                             </td>
                             <td>{{ $row->name }}</td>
-<td>{{ $row->customer_name }}</td>
-<td>{{ $row->user_dept }}</td>
-<td>{{ $row->user_name }}</td>
+                            <td>{{ $row->customer_name }}</td>
+                            <td>{{ $row->user_dept }}</td>
+                            <td>{{ $row->user_name }}</td>
 <!-- <td>{{ $row->status_name }}</td> -->
 
                             <td>
-                                @if($row->status == 2)
+                            @if($row->status == 2)
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrustverify.yes', $row->id))) !!}
                                 {!! Form::submit('核可', array('class' => 'btn btn-xs btn-info')) !!}
                                 {!! Form::close() !!}
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退件？');", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
                                 {!! Form::submit('退件', array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!}
-                                @endif
+                            @endif
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.publish.destroy', $row->id))) !!}
                                 {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!} -->

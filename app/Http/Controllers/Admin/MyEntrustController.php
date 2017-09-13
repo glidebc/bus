@@ -171,7 +171,7 @@ class MyEntrustController extends Controller {
 					$sheet->setCellValue('C3', $customer->tax_title);
 					$sheet->setCellValue('G3', $customer->tax_num);
 					//承辦窗口
-					$contact = Contact::find($customer->contact_id);
+					$contact = Contact::find($entrust->contact_id);
 					$sheet->setCellValue('C4', $contact->zip_code.$contact->address);
 					$sheet->setCellValue('G4', $contact->fax);
 					$sheet->setCellValue('C5', $contact->name);
@@ -182,11 +182,16 @@ class MyEntrustController extends Controller {
 					$sheet->setCellValue('C7', $entrust->note);
 					//合作內容
 					$sheet->setCellValue('C8', $entrust->name);//專案名稱
-
-					$dateStart = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
-					$dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
-					$sheet->setCellValue('C9', $dateStart.' ～ '.$dateEnd);
-					$days = $this->countDays($entrust->start_date, $entrust->end_date);
+					//總走期
+					$strSD = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
+					$strED = '';
+					if(strlen($entrust->end_date) >= 8) {
+						$strED = ' ～ '.substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+					}
+					$sheet->setCellValue('C9', $strSD.$strED);
+					$days = 1;
+					if($strSD && $strED)
+						$days = $this->countDays($strSD, $strED);
 					$sheet->setCellValue('F9', '(共 '.$days.' 天) / 實際走期依排期表');
 
 					$strPublishKind = '';
@@ -214,7 +219,11 @@ class MyEntrustController extends Controller {
 					$sheet->setCellValue('E20', $count + $tax);
 
 					$aryPay = config('admin.entrust.pay');
-					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);
+					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);//付款方式
+					$aryPayStatus = config('admin.entrust.pay_status');
+					if($entrust->pay_status != 1) //不使用Excel上的預設付款條件
+						$sheet->setCellValue('F19', $aryPayStatus[$entrust->pay_status]);//付款條件
+					$sheet->setCellValue('G17', $entrust->invoice_date);//發票日期
 					// if($entrust->pay == 2) {
 					// 	$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
 					// }
@@ -399,6 +408,15 @@ class MyEntrustController extends Controller {
 
     //計算天數
     function countDays($strSD, $strED) {
+		$sd = date_create($strSD);
+		$ed = date_create($strED);
+		$dayCount = 1;
+		if($sd && $ed)
+			$dayCount = date_diff($sd, $ed)->days + 1;
+		return $dayCount;
+    }
+    //計算天數_OLD
+    function countDays_OLD($strSD, $strED) {
 		$sd = date_create($strSD);
 		$ed = date_create($strED);
 		$interval = date_diff($sd, $ed);

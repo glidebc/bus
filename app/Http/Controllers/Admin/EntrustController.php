@@ -87,6 +87,8 @@ class EntrustController extends Controller {
 
 		$entrust->pay = config('admin.entrust.pay')[$e->pay];
 		$entrust->pay_status = config('admin.entrust.pay_status')[$e->pay_status];
+		$entrust->invoice_date = $e->invoice_date;
+		$entrust->invoice_num = $e->invoice_num;
 		$entrust->note = $e->note;
 
 		return $entrust;

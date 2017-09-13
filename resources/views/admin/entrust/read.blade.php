@@ -84,6 +84,18 @@
         {!! Form::text('pay_status', $entrust->pay_status, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
+</div><div class="form-group">
+    {!! Form::label('invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('invoice_date', $entrust->invoice_date, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        
+    </div>
+</div><div class="form-group">
+    {!! Form::label('invoice_num', '發票號碼', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('invoice_num', $entrust->invoice_num, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        
+    </div>
 </div>
 </form>
 

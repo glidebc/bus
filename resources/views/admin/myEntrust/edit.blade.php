@@ -99,6 +99,18 @@
         {!! Form::select('pay_status', $payStatus, null, array('class'=>'form-control')) !!}
         
     </div>
+</div><div class="form-group">
+    {!! Form::label('invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('invoice_date', old('invoice_date',$entrust->invoice_date), array('class'=>'form-control')) !!}
+        
+    </div>
+</div><div class="form-group">
+    {!! Form::label('invoice_num', '發票號碼', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('invoice_num', old('invoice_num',$entrust->invoice_num), array('class'=>'form-control', 'placeholder' => '10碼', 'maxlength' => 10)) !!}
+        
+    </div>
 </div>
 
 {{ Form::hidden('item_count', old('item_count'), array('id' => 'item_count')) }}

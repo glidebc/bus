@@ -52,8 +52,10 @@ class MyAgentController extends Controller {
 	    //將聯絡人指定所屬公司
 	    $contactId = $request->input('contact_id');
 	    $contact = Contact::find($contactId);
-	    $contact->customer_id = $id;
-	    $contact->save();
+	    if($contact->customer_id == 0) {
+	    	$contact->customer_id = $id;
+	    	$contact->save();
+	    }
 
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
 	}

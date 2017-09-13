@@ -25,7 +25,7 @@ class CreateContactRequest extends FormRequest {
 	public function rules()
 	{
 		return [
-			'customer_id' => 'check_customer',
+			// 'customer_id' => 'check_customer',
             'name' => 'required',
             'address' => 'required',
             'tel' => 'required',
@@ -40,7 +40,7 @@ class CreateContactRequest extends FormRequest {
 	public function messages()
 	{
 	    return [
-	    	'customer_id.check_customer' => '請選擇代理商｜客戶',
+	    	// 'customer_id.check_customer' => '請選擇代理商｜客戶',
 	        'name.required' => '請輸入姓名',
 	        'address.required' => '請輸入地址',
 	        'tel.required' => '請輸入電話',
@@ -53,9 +53,9 @@ class CreateContactRequest extends FormRequest {
      */
     public function validator(Factory $factory)
     {
-        $factory->extend('check_customer', function($attribute, $value, $parameters, $validator) {
-    		return $value > 0;
-        });
+      //   $factory->extend('check_customer', function($attribute, $value, $parameters, $validator) {
+    		// return $value > 0;
+      //   });
 
         return $factory->make(
             $this->all(),

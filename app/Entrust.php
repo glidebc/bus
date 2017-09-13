@@ -30,6 +30,8 @@ class Entrust extends Model {
           'publish_kind',
           'pay',
           'pay_status',
+          'invoice_date',
+          'invoice_num',
           'note',
           'owner_user',
           'status',

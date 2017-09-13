@@ -38,6 +38,13 @@
         
     </div>
 </div><div class="form-group">
+    {!! Form::label('note', '其他說明', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        <!-- {{ Form::textarea('note', old('note'), array('class'=>'form-control', 'rows' => '5')) }} -->
+        {!! Form::text('note', old('note'), array('class'=>'form-control', 'placeholder' => '40字以內', 'maxlength' => 40)) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('name', '委刊單名稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::text('name', old('name'), array('class'=>'form-control')) !!}
@@ -86,16 +93,9 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('pay_status', '付款情況', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('pay_status', '付款條件', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::select('pay_status', $payStatus, null, array('class'=>'form-control')) !!}
-        
-    </div>
-</div><div class="form-group">
-    {!! Form::label('note', '補充說明', array('class'=>'col-sm-2 control-label')) !!}
-    <div class="col-sm-10">
-        {{ Form::textarea('note', old('note'), array('class'=>'form-control', 'rows' => '5')) }}
-        <!-- {!! Form::text('note', old('note'), array('class'=>'form-control')) !!} -->
         
     </div>
 </div>

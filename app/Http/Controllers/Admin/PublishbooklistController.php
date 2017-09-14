@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Glide;
+use App\DataQuery;
 
 class PublishbooklistController extends Controller {
 
@@ -16,7 +16,7 @@ class PublishbooklistController extends Controller {
 	 */
 	public function index()
     {
-    	$publish = Glide::arrayPublishList();
+    	$publish = DataQuery::arrayPublishList();
 		return view('admin.publishbooklist.index', compact('publish'));
 	}
 

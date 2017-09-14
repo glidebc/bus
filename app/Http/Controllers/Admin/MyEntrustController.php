@@ -8,6 +8,7 @@ use Schema;
 use App\Contact;
 use App\Customer;
 use App\DataQuery;
+use App\DataFunc;
 use App\Entrust;
 use App\EntrustFlow;
 use App\EntrustItem;
@@ -183,15 +184,13 @@ class MyEntrustController extends Controller {
 					//合作內容
 					$sheet->setCellValue('C8', $entrust->name);//專案名稱
 					//總走期
-					$strSD = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
-					$strED = '';
-					if(strlen($entrust->end_date) >= 8) {
-						$strED = ' ～ '.substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+					$duration = substr($entrust->start_date, 0, 4).'-'.substr($entrust->start_date, -4, 2).'-'.substr($entrust->start_date, -2);
+					if($entrust->end_date) {
+						$strED = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
+						$duration .= ' ～ '.$strED;
 					}
-					$sheet->setCellValue('C9', $strSD.$strED);
-					$days = 1;
-					if($strSD && $strED)
-						$days = $this->countDays($strSD, $strED);
+					$sheet->setCellValue('C9', $duration);
+					$days = (new DataFunc)->countDays($entrust->start_date, $entrust->end_date);//天數
 					$sheet->setCellValue('F9', '(共 '.$days.' 天) / 實際走期依排期表');
 
 					$strPublishKind = '';
@@ -223,7 +222,8 @@ class MyEntrustController extends Controller {
 					$aryPayStatus = config('admin.entrust.pay_status');
 					if($entrust->pay_status != 1) //不使用Excel上的預設付款條件
 						$sheet->setCellValue('F19', $aryPayStatus[$entrust->pay_status]);//付款條件
-					$sheet->setCellValue('G17', $entrust->invoice_date);//發票日期
+					$invoiceDate = date_create($entrust->invoice_date)->format('Y年m月d日');
+					$sheet->setCellValue('G17', $invoiceDate);//發票日期
 					// if($entrust->pay == 2) {
 					// 	$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');
 					// }
@@ -324,17 +324,14 @@ class MyEntrustController extends Controller {
 		$customer = DataQuery::arraySelectAgentAndCustomer($userId);
 		$entrust = Entrust::find($id);
 		//
-		$dayCount = 1;
 		$sd = $entrust->start_date;
 		$entrust->txt_start_date = substr($sd, 0, 4).'-'.substr($sd, -4, 2).'-'.substr($sd, -2);
 		$ed = $entrust->end_date;
-		if($ed == null) {
+		if(empty($ed))
 			$entrust->txt_end_date = '';
-		} else {
+		else
 			$entrust->txt_end_date = substr($ed, 0, 4).'-'.substr($ed, -4, 2).'-'.substr($ed, -2);
-			$dayCount = $this->countDays($sd, $ed);
-		}
-		$entrust->day_count = $dayCount;
+		$entrust->day_count = (new DataFunc)->countDays($sd, $ed);//天數
 		//
 		$publishKindSelected = explode(',', $entrust->publish_kind);
 		//
@@ -404,23 +401,6 @@ class MyEntrustController extends Controller {
         }
 
         return redirect()->route(config('quickadmin.route').'.myentrust.index');
-    }
-
-    //計算天數
-    function countDays($strSD, $strED) {
-		$sd = date_create($strSD);
-		$ed = date_create($strED);
-		$dayCount = 1;
-		if($sd && $ed)
-			$dayCount = date_diff($sd, $ed)->days + 1;
-		return $dayCount;
-    }
-    //計算天數_OLD
-    function countDays_OLD($strSD, $strED) {
-		$sd = date_create($strSD);
-		$ed = date_create($strED);
-		$interval = date_diff($sd, $ed);
-		return $interval->days + 1;
     }
     //委刊類別 array
     // function arrayPublishKind() {

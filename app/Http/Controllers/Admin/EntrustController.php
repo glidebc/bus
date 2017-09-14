@@ -8,10 +8,10 @@ use Schema;
 use App\Contact;
 use App\Customer;
 use App\DataQuery;
+use App\DataFunc;
 use App\Entrust;
 use App\EntrustFlow;
 use App\EntrustItem;
-use App\Glide;
 use App\Http\Requests\CreateEntrustRequest;
 use App\Http\Requests\UpdateEntrustRequest;
 use Illuminate\Http\Request;
@@ -54,17 +54,16 @@ class EntrustController extends Controller {
 		if(isset($contact))
 			$entrust->contact_name = $contact->name;
 
-		$sd = ''; $ed = ''; $dayCount = 1;
+		$sd = ''; $ed = '';
 		if(!empty($e->start_date))
 			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
 		if(!empty($e->end_date))
 			$ed = substr($e->end_date, 0, 4).'-'.substr($e->end_date, -4, 2).'-'.substr($e->end_date, -2);
-		if($sd && $ed)
-			$dayCount = $this->countDays($sd, $ed);
+		$days = (new DataFunc)->countDays($e->start_date, $e->end_date);//天數
 
 		$entrust->txt_start_date = $sd;
 		$entrust->txt_end_date = $ed;
-		$entrust->day_count = $dayCount;
+		$entrust->day_count = $days;
 		
 		$publishKindSelected = explode(',', $e->publish_kind);
 		$aryPublishKind = [];
@@ -94,16 +93,6 @@ class EntrustController extends Controller {
 		return $entrust;
 	}
 
-	//計算天數
-    function countDays($strSD, $strED) {
-		$sd = date_create($strSD);
-		$ed = date_create($strED);
-		$dayCount = 1;
-		if($sd && $ed)
-			$dayCount = date_diff($sd, $ed)->days + 1;
-		return $dayCount;
-    }
-
 	// private $customer;
 
 	// public function __construct()
@@ -121,7 +110,7 @@ class EntrustController extends Controller {
 	public function index(Request $request)
     {
         $userId = Auth::user()->id;
-        $entrust = Glide::collectionOfEntrustByUser($userId)->get();
+        $entrust = DataQuery::collectionOfEntrustByUser($userId)->get();
         // $entrust = Entrust::where('owner_user', $userid)->orderBy('created_at')->get();
 
 		return view('admin.entrust.index', compact('entrust'));
@@ -134,7 +123,7 @@ class EntrustController extends Controller {
 	 */
 	public function create()
 	{
-	    $customer = Glide::arraySelectCustomer();
+	    $customer = DataQuery::arraySelectCustomer();
 	    return view('admin.entrust.create', compact('customer'));
 	}
 
@@ -159,7 +148,7 @@ class EntrustController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$customer = Glide::arraySelectCustomer();
+		$customer = DataQuery::arraySelectCustomer();
 		$entrust = Entrust::find($id);
 		$customerid = $entrust->customer_id;
 		return view('admin.entrust.edit', compact(array('customer','entrust','customerid')));

@@ -7,7 +7,7 @@ use Redirect;
 use Schema;
 use App\Agent;
 use App\Customer;
-use App\Glide;
+use App\DataQuery;
 use App\Http\Requests\CreateCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Http\Request;
@@ -37,7 +37,7 @@ class CustomerController extends Controller {
 	public function index(Request $request)
     {
         // $customer = Customer::all();
-        $customer = Glide::arrayCustomer();
+        $customer = DataQuery::arrayCustomer();
 		return view('admin.customer.index', compact('customer'));
 	}
 
@@ -48,7 +48,7 @@ class CustomerController extends Controller {
 	 */
 	public function create()
 	{
-	    $agent = Glide::arraySelectAgent();
+	    $agent = DataQuery::arraySelectAgent();
 	    return view('admin.customer.create', compact('agent'));
 	}
 
@@ -71,7 +71,7 @@ class CustomerController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$agent = Glide::arraySelectAgent();
+		$agent = DataQuery::arraySelectAgent();
 		$customer = Customer::withTrashed()->find($id);
 		$agentid = $customer->agent_id;
 		return view('admin.customer.edit', compact(array('agent','customer','agentid')));

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Contact;
 use App\DataQuery;
 use App\Entrust;
-use App\Glide;
 use App\Publish;
 use App\Publishposition;
 use App\Publishuser;
@@ -281,7 +280,7 @@ class ServiceController extends Controller {
 									['publish_position_id', $datePosition->publish_position_id]
 								])->first()->status;
 				if($status != 2) {
-					$entrust = Glide::collectionOfEntrustByID($entrustId)
+					$entrust = DataQuery::collectionOfEntrustByID($entrustId)
 									->addSelect(DB::raw('"'.$datePosition->date.'" AS date, '.$datePosition->publish_position_id.' AS position, '.$status.' AS status'))
 									// ->put('position', $publish->publish_position_id)
 									->first();

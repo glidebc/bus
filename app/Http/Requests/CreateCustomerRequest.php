@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Glide;
+use App\DataFunc;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -74,7 +74,7 @@ class CreateCustomerRequest extends FormRequest {
         });
 
         $factory->extend('check_valid_tax_num', function($attribute, $value, $parameters, $validator) {
-        	return Glide::taxNumberValid($value);
+        	return (new DataFunc)->taxNumberValid($value);
         });
 
         $factory->extend('check_contact', function($attribute, $value, $parameters, $validator) {

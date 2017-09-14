@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
-use App\Glide;
+use App\DataQuery;
 use App\Publishposition;
 use App\Http\Requests\CreatePublishpositionRequest;
 use App\Http\Requests\UpdatePublishpositionRequest;
@@ -24,7 +24,7 @@ class PublishpositionController extends Controller {
 	 */
 	public function index(Request $request)
     {
-        $publishposition = Glide::arrayPublishpositionWithSite();
+        $publishposition = DataQuery::arrayPublishpositionWithSite();
 		return view('admin.publishposition.index', compact('publishposition'));
 	}
 
@@ -35,8 +35,8 @@ class PublishpositionController extends Controller {
 	 */
 	public function create()
 	{
-		$site = Glide::arraySelectSite();
-	    $count = Glide::arraySelectTurnsCount();
+		$site = DataQuery::arraySelectSite();
+	    $count = DataQuery::arraySelectTurnsCount();
 	    return view('admin.publishposition.create', compact(array('site','count')));
 	}
 
@@ -61,12 +61,12 @@ class PublishpositionController extends Controller {
 	 */
 	public function edit($id)
 	{
-		$site = Glide::arraySelectSite();
+		$site = DataQuery::arraySelectSite();
 
 		$publishposition = Publishposition::find($id);
 		$siteid = $publishposition->site_id;
 
-		$count = Glide::arraySelectTurnsCount();
+		$count = DataQuery::arraySelectTurnsCount();
 		// $publishposition = Publishposition::find($id);
 	    $turnscount = $publishposition->turns_count;
 		return view('admin.publishposition.edit', compact(array('site','siteid','count','publishposition','turnscount')));

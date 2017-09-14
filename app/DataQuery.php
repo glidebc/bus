@@ -193,9 +193,9 @@ class DataQuery {
                     $customer->contact_name = $contact->name;
             }
             //owner user name
-            $ownerUser = User::find($customer->owner_user);
-            if(isset($ownerUser))
-                $customer->owner_user_name = $ownerUser->name;
+            $cUser = Publishuser::where('user_id', $customer->owner_user)->get();
+            if($cUser->count() > 0)
+                $customer->owner_user_name = $cUser->first()->user_name;
             //共用user的數量
             $arrayUserId = CustomerUser::where('customer_id', $customer->id)->pluck('user_id');
             $arrayUserName = User::whereIn('id', $arrayUserId)->pluck('name');
@@ -206,6 +206,7 @@ class DataQuery {
                 $stringUserName .= $name;
             }
             $customer->user_names = $stringUserName;
+            $customer->user_count = count($arrayUserName);
             //(myAgent)自己建立的才可以修改
             // $customer->owner = false;
             // if($userId == $customer->owner_user)

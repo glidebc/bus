@@ -184,11 +184,12 @@
         changeMonth: true,
         numberOfMonths: 3,
         beforeShow: durationDatePick,
-        dateFormat: "yy-m-d",
+        dateFormat: "yy-mm-dd",
         onSelect: function(dateText, inst) {
-            var d = new Date(dateText);
+            // var d = new Date(dateText);
+            var dateValue = dateText.replace(/-/g, "");
             var hidID = inst.id.replace('txt', 'hid');
-            $('#' + hidID).val(dateString(d, 'date'));
+            $('#' + hidID).val(dateValue);
             //
             countDays();
         }

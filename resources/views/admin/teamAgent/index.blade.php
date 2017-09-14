@@ -19,7 +19,7 @@
                         <th>郵遞區號</th>
                         <th>公司地址</th>
                         <th>聯絡窗口</th>
-                        <th>擁有者</th>
+                        <th>建立者</th>
                         <th>共用</th>
                         <th>狀態</th>
                         <th>&nbsp;</th>
@@ -38,7 +38,12 @@
                             <td>{{ $row->owner_user_name }}</td>
                             <td>
                             @if(!empty($row->user_names))
-                                <span class="fa fa-child user-name" data-original-title='{{ $row->user_names }}' data-container="body" data-toggle="tooltip" data-placement="bottom"></span>
+                                <label class="label-user-share" data-original-title='{{ $row->user_names }}' data-container="body" data-toggle="tooltip" data-placement="bottom">
+                                    <span class="fa fa-child user-name"></span>
+                                    @if($row->user_count > 1)
+                                        x{{ $row->user_count }}
+                                    @endif
+                                </label>
                             @endif
                             </td>
                             <td>
@@ -83,7 +88,7 @@
 
 @section('javascript')
     <script>
-        $('.fa.fa-child.user-name').tooltip();
+        $('.label-user-share').tooltip();
 
         $(document).ready(function () {
             $('#delete').click(function () {
@@ -109,6 +114,8 @@
     <style>
         .user-name {
             color: #26a69a;
+        }
+        .label-user-share {
             cursor: pointer;
         }
 

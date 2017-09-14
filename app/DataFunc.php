@@ -41,7 +41,7 @@ class DataFunc {
         }
     }
 
-    static private function tenDigitsPlusDigits($n) {
+    private function tenDigitsPlusDigits($n) {
         if($n > 9) {
             $aryN = str_split(strval($n)); // [十位數, 個位數]
             $n = intval($aryN[0]) + intval($aryN[1]); //十位數 + 個位數

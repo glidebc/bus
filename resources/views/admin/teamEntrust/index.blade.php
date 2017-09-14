@@ -20,6 +20,8 @@
                         <th>公司簡稱</th>
                         <th>承辦窗口</th>
                         <th>總走期</th>
+                        <th>發票號碼</th>
+                        <th>發票日期</th>
                         <th>部門</th>
                         <th>使用者</th>
                         <th>審核狀態</th>
@@ -55,6 +57,8 @@
                             @endif
                             </td>
                             <td>{{ $row->duration }}</td>
+                            <td>{{ $row->invoice_num }}</td>
+                            <td>{{ $row->invoice_date_text }}</td>
                             <td>{{ $row->user_dept }}</td>
                             <td>{{ $row->user_name }}</td>
                             <td>{{ $row->status_name }}</td>

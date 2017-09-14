@@ -37,10 +37,9 @@ class TeamEntrustController extends Controller {
                     $dateEnd = '～'.substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
                 }
                 $entrust->duration = $dateStart.$dateEnd;
-
-                // $dateEnd = substr($entrust->end_date, 0, 4).'-'.substr($entrust->end_date, -4, 2).'-'.substr($entrust->end_date, -2);
-                // $entrust->duration = $dateStart.'～'.$dateEnd;
             }
+            //發票日期
+            $entrust->invoice_date_text = date_create($entrust->invoice_date)->format('Y-m-d');
             //
     		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
             $dept = Dept::find($publishuser->dept_id);

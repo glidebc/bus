@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Contact;
 use App\Customer;
 use App\CustomerAgent;
 use App\DataQuery;
@@ -64,6 +65,9 @@ class MyCustomerController extends Controller {
 		//更新客戶與代理商關聯
 		$agentid = $request->input('agent_id');
 		$this->checkCustomerAgent($id, $agentid);
+		//將聯絡人指定所屬公司
+		$this->setCustomerOfContact($request->input('contact_id'), $id);
+
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 
@@ -104,6 +108,9 @@ class MyCustomerController extends Controller {
 		//更新客戶與代理商關聯
 		$agentid = $request->input('agent_id');
 		$this->checkCustomerAgent($id, $agentid);
+		//將聯絡人指定所屬公司
+		$this->setCustomerOfContact($request->input('contact_id'), $id);
+		
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 
@@ -154,10 +161,7 @@ class MyCustomerController extends Controller {
 			$agentId = $ca->first()->agent_id;
 			$status = 0;
 		}
-		// $customerAgent = CustomerAgent::where([
-		// 		['customer_id', $customerId],
-		// 		['agent_id', $agentId]
-		// 	]);
+
 		
 		if($ca->count() == 0) {
 			$ca = new CustomerAgent();
@@ -168,31 +172,13 @@ class MyCustomerController extends Controller {
 		$ca->agent_id = $agentId;
 		$ca->status = $status;
 		$ca->save();
-		
-
-		
-
-
-		// if($agentId == 0) {
-		// 	$agentId = CustomerAgent::where('customer_id', $customerId)->first()->agent_id;
-		// 	$customerAgent = CustomerAgent::where([
-		// 			['customer_id', $customerId],
-		// 			['agent_id', $agentId]
-		// 		])->first();
-		// 	$customerAgent->status = 0;
-		// 	$customerAgent->save();
-		// } else {
-		// 	$customerAgent = CustomerAgent::where([
-		// 			['customer_id', $customerId],
-		// 			['agent_id', $agentId]
-		// 		]);
-		// 	if($customerAgent->count() > 0) {
-
-		// 	}
-		// 	$customerAgent = new CustomerAgent();
-		// 	$customerAgent->customer_id = $customerId;
-		// 	$customerAgent->agent_id = $agentId;
-		// 	$customerAgent->save();
-		// }
+	}
+	//將聯絡人指定所屬公司
+	function setCustomerOfContact($contactId, $id) {
+		$contact = Contact::find($contactId);
+	    if(isset($contact)) {
+	    	$contact->customer_id = $id;
+	    	$contact->save();
+	    }
 	}
 }

@@ -19,9 +19,10 @@
 {!! Form::model($contact, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.contact.update', $contact->id))) !!}
 
 <div class="form-group">
-    {!! Form::label('customer_id', '代理商｜客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    {!! Form::label('customer_name', '代理商｜客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::select('customer_id', $agent_and_customer, old('customer_id',$contact->customer_id), array('class'=>'form-control')) !!}
+        {!! Form::text('customer_name', $contact->customer_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        <!-- {!! Form::select('customer_id', $agent_and_customer, old('customer_id',$contact->customer_id), array('class'=>'form-control')) !!} -->
         
     </div>
 </div><div class="form-group">
@@ -78,3 +79,19 @@
 {!! Form::close() !!}
 
 @endsection
+
+@section('javascript')
+<script type="text/javascript">
+
+</script>
+<style>
+    .form-group input[type="text"], .form-group textarea:-moz-read-only { /* For Firefox */
+        display: inline-block;
+        background-color: white;
+    }
+    .form-group input[type="text"], .form-group textarea:read-only { 
+        display: inline-block;
+        background-color: white;
+    }
+</style>
+@stop

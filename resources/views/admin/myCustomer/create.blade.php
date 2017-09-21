@@ -55,7 +55,7 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('contact_id', '聯絡窗口', array('class'=>'col-sm-2 control-label text-primary')) !!}
+    {!! Form::label('contact_id', '聯絡窗口', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
         {!! Form::select('contact_id', $contact, null, array('class'=>'form-control')) !!}
         

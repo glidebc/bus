@@ -71,7 +71,7 @@ class DataQuery {
                 $customer->agent_name = Customer::withTrashed()->find($customerAgent->first()->agent_id)->name;
             //聯絡人
             if($customer->contact_id > 0) {
-                $customer->contact_name = Contact::find($customer->contact_id)->name;
+                $customer->contact_name = Contact::withTrashed()->find($customer->contact_id)->name;
             }
             //自己建立的才可以修改
             $customer->owner = false;

@@ -50,12 +50,7 @@ class MyAgentController extends Controller {
 	{
 	    $id = Customer::create($request->all())->id;
 	    //將聯絡人指定所屬公司
-	    $contactId = $request->input('contact_id');
-	    $contact = Contact::find($contactId);
-	    if($contact->customer_id == 0) {
-	    	$contact->customer_id = $id;
-	    	$contact->save();
-	    }
+	    $this->setCustomerOfContact($request->input('contact_id'), $id);
 
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
 	}
@@ -93,12 +88,7 @@ class MyAgentController extends Controller {
 		// 	$customerContact->save();
 		// }
 		//將聯絡人指定所屬公司
-		$contactId = $request->input('contact_id');
-	 //    if($contactId > 0) {
-	    $contact = Contact::find($contactId);
-	    $contact->customer_id = $id;
-	    $contact->save();
-		// }
+	    $this->setCustomerOfContact($request->input('contact_id'), $id);
 
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
 
@@ -142,5 +132,13 @@ class MyAgentController extends Controller {
 	{
 		Customer::withTrashed()->find($id)->restore();
 		return redirect()->route(config('quickadmin.route').'.myagent.index');
+	}
+	//將聯絡人指定所屬公司
+	function setCustomerOfContact($contactId, $id) {
+		$contact = Contact::find($contactId);
+	    if(isset($contact)) {
+	    	$contact->customer_id = $id;
+	    	$contact->save();
+	    }
 	}
 }

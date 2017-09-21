@@ -43,7 +43,7 @@ class MyEntrustController extends Controller {
 
         foreach ($entrust as $entrustOne) {
         	//聯絡窗口button
-        	$contact = Contact::find($entrustOne->contact_id);
+        	$contact = Contact::withTrashed()->find($entrustOne->contact_id);
 			if(isset($contact))
 				$entrustOne->contact_name = $contact->name;
 			//總走期
@@ -222,7 +222,9 @@ class MyEntrustController extends Controller {
 					$aryPayStatus = config('admin.entrust.pay_status');
 					if($entrust->pay_status != 1) //不使用Excel上的預設付款條件
 						$sheet->setCellValue('F19', $aryPayStatus[$entrust->pay_status]);//付款條件
-					$invoiceDate = date_create($entrust->invoice_date)->format('Y年m月d日');
+					$invoiceDate = '';
+					if(strlen($entrust->invoice_date) > 0)
+						$invoiceDate = date_create($entrust->invoice_date)->format('Y年m月d日');
 					$sheet->setCellValue('G17', $invoiceDate);//發票日期
 					// if($entrust->pay == 2) {
 					// 	$sheet->setCellValue('F15', '');$sheet->setCellValue('F16', '');$sheet->setCellValue('F17', '');

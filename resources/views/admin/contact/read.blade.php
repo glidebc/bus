@@ -33,7 +33,7 @@
 </div><div class="form-group">
     {!! Form::label('zip_code', '郵遞區號', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('zip_code', old('zip_code',$contact->zip_code), array('class'=>'form-control', 'placeholder' => '3碼', 'maxlength' => 3)) !!}
+        {!! Form::text('zip_code', old('zip_code',$contact->zip_code), array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">

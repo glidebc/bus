@@ -16,8 +16,8 @@
                         <th>
                             <!-- {!! Form::checkbox('delete_all',1,false,['class' => 'mass']) !!} -->
                         </th>
-                        <th>公司簡稱</th>
                         <th>姓名</th>
+                        <th>公司簡稱</th>
                         <th>地址</th>
                         <th>電話</th>
                         <th>傳真</th>
@@ -34,8 +34,8 @@
                             <td>
                                 <!-- {!! Form::checkbox('del-'.$row->id,1,false,['class' => 'single','data-id'=> $row->id]) !!} -->
                             </td>
-                            <td>{{ $row->customer_name }}</td>
                             <td>{{ $row->name }}</td>
+                            <td>{{ $row->customer_name }}</td>
                             <td>{{ $row->address }}</td>
                             <td>{{ $row->tel }}</td>
                             <td>{{ $row->fax }}</td>

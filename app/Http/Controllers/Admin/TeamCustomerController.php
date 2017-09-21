@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Redirect;
 use Schema;
+use App\Contact;
 use App\Customer;
 use App\CustomerAgent;
 use App\CustomerUser;
@@ -133,6 +134,9 @@ class TeamCustomerController extends Controller {
 					CustomerUser::find($customerUser->id)->delete();
 			}
 		}
+		//將聯絡人指定所屬公司
+		$this->setCustomerOfContact($request->input('contact_id'), $id);
+
 		return redirect()->route(config('quickadmin.route').'.teamcustomer.index');
 	}
 
@@ -197,5 +201,13 @@ class TeamCustomerController extends Controller {
 		$ca->agent_id = $agentId;
 		$ca->status = $status;
 		$ca->save();
+	}
+	//將聯絡人指定所屬公司
+	function setCustomerOfContact($contactId, $id) {
+		$contact = Contact::find($contactId);
+	    if(isset($contact)) {
+	    	$contact->customer_id = $id;
+	    	$contact->save();
+	    }
 	}
 }

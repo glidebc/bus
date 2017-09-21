@@ -49,7 +49,10 @@ class ContactController extends Controller {
 	 */
 	public function store(CreateContactRequest $request)
 	{
-		Contact::create($request->all());
+		$id = Contact::create($request->all())->id;
+		//將公司的聯絡窗口指定聯絡人
+		$this->setContactOfCustomer($request->input('customer_id'), $id);
+
 		return redirect()->route(config('quickadmin.route').'.contact.index');
 	}
 
@@ -62,7 +65,11 @@ class ContactController extends Controller {
 	public function edit($id)
 	{
 		$contact = Contact::find($id);
-
+		//
+		$contact->customer_name = '無';
+		if($contact->customer_id > 0)
+			$contact->customer_name = Customer::withTrashed()->find($contact->customer_id)->name;
+		//
 		$userId = Auth::user()->id;
 	    $agent_and_customer = DataQuery::arraySelectAgentAndCustomer($userId);
 	    
@@ -78,10 +85,9 @@ class ContactController extends Controller {
 	public function update($id, UpdateContactRequest $request)
 	{
 		$contact = Contact::findOrFail($id);
-
-        
-
 		$contact->update($request->all());
+		//將公司的聯絡窗口指定聯絡人
+		$this->setContactOfCustomer($request->input('customer_id'), $id);
 
 		return redirect()->route(config('quickadmin.route').'.contact.index');
 	}
@@ -116,10 +122,19 @@ class ContactController extends Controller {
         return redirect()->route(config('quickadmin.route').'.contact.index');
     }
 
+    //將公司的聯絡窗口指定聯絡人
+    function setContactOfCustomer($customerId, $id) {
+		if($customerId > 0) {
+			$customer = Customer::find($customerId);
+			if($customer->contact_id == 0) {
+				$customer->contact_id = $id;
+				$customer->save();
+			}
+		}
+    }
     //列表的承辦窗口
-    public function contactRead($id)
-	{
-		$contact = Contact::find($id);
+    public function contactRead($id) {
+		$contact = Contact::withTrashed()->find($id);
 		$contact->customer_name = Customer::find($contact->customer_id)->name;
 		return view(config('quickadmin.route').'.contact.read', compact('contact'));
 	}

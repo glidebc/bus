@@ -21,8 +21,11 @@
 <div class="form-group">
     {!! Form::label('customer_name', '代理商｜客戶', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
+    @if($contact->customer_id > 0)
         {!! Form::text('customer_name', $contact->customer_name, array('class'=>'form-control', 'readonly'=>'true')) !!}
-        <!-- {!! Form::select('customer_id', $agent_and_customer, old('customer_id',$contact->customer_id), array('class'=>'form-control')) !!} -->
+    @else
+        {!! Form::select('customer_id', $agent_and_customer, old('customer_id',$contact->customer_id), array('class'=>'form-control')) !!}
+    @endif
         
     </div>
 </div><div class="form-group">

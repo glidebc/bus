@@ -34,7 +34,13 @@
                             <td>{{ $row->tax_num }}</td>
                             <td>{{ $row->zip_code }}</td>
                             <td>{{ $row->address }}</td>
-                            <td>{{ $row->contact_name }}</td>
+                            <td>
+                            @if(!empty($row->contact_id))
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.contact.read', $row->contact_id))) !!}
+                                {!! Form::submit($row->contact_name, array('class' => 'btn btn-xs btn-default')) !!}
+                                {!! Form::close() !!}
+                            @endif
+                            </td>
                             <td>{{ $row->owner_user_name }}</td>
                             <td>
                             @if(!empty($row->user_names))

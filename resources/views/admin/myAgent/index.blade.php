@@ -40,11 +40,16 @@
                             </td> -->
                             <th></th>
                             <td>{{ $row->name }}</td>
-<!-- <td>{{ $row->tax_title }}</td> -->
-<td>{{ $row->tax_num }}</td>
-<td>{{ $row->zip_code }}</td>
-<td>{{ $row->address }}</td>
-<td>{{ $row->contact_name }}</td>
+                            <td>{{ $row->tax_num }}</td>
+                            <td>{{ $row->zip_code }}</td>
+                            <td>{{ $row->address }}</td>
+                            <td>
+                            @if(!empty($row->contact_id))
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.contact.read', $row->contact_id))) !!}
+                                {!! Form::submit($row->contact_name, array('class' => 'btn btn-xs btn-default')) !!}
+                                {!! Form::close() !!}
+                            @endif
+                            </td>
 <!-- <td>{{ $row->com_tel }}</td> -->
 <!-- <td>{{ $row->com_fax }}</td> -->
 <!-- <td>{{ $row->mobile }}</td> -->

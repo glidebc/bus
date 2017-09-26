@@ -31,7 +31,7 @@
 </div><div class="form-group">
     {!! Form::label('note', '其他說明', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('note', $entrust->note, array('class'=>'form-control', 'placeholder' => '40字以內', 'maxlength' => 40, 'readonly'=>'true')) !!}
+        {!! Form::text('note', $entrust->note, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">

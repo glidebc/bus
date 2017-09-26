@@ -9,7 +9,7 @@ use App\Team;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePublishuserRequest;
 use Illuminate\Support\Facades\Auth;
-use Form;
+// use Form;
 
 class MyUserController extends Controller {
 

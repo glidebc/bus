@@ -14,6 +14,7 @@ use App\EntrustFlow;
 use App\EntrustItem;
 use App\Http\Requests\CreateEntrustRequest;
 use App\Http\Requests\UpdateEntrustRequest;
+use App\Http\Requests\UpdateEntrustPassRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use stdClass;
@@ -91,6 +92,26 @@ class EntrustController extends Controller {
 		$entrust->note = $e->note;
 
 		return $entrust;
+	}
+
+	/**
+	 * 審核通過後再編輯的項目
+	 */
+	public function editAfterPass($id)
+	{
+		$entrust = $this->getEntrust($id);
+		//
+		$invDate = $entrust->invoice_date;
+		if(!empty($invDate))
+			$entrust->txt_invoice_date = substr($invDate, 0, 4).'-'.substr($invDate, -4, 2).'-'.substr($invDate, -2);
+
+		return view(config('quickadmin.route').'.entrust.edit_after_pass', compact('entrust'));
+	}
+	public function updateAfterPass($id, UpdateEntrustPassRequest $request)
+	{
+		$entrust = Entrust::findOrFail($id);
+		$entrust->update($request->all());
+		return redirect()->route(config('quickadmin.route').'.myentrust.index');
 	}
 
 	// private $customer;

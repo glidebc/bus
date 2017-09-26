@@ -28,8 +28,8 @@ class CreateEntrustRequest extends FormRequest {
             'customer_id' => 'required|check_customer',
             'contact_id' => 'required|check_contact',
             'name' => 'required|unique:entrust,name,'.$this->myentrust,
-            'start_date' => 'required', 
-            // 'end_date' => 'required', 
+            'start_date' => 'required|check_date', 
+            'end_date' => 'check_date', 
             'publish_kind' => 'required|array|min:1', 
             'item_count' => 'check_item_count', 
 
@@ -64,8 +64,10 @@ class CreateEntrustRequest extends FormRequest {
 	        'name.required' => '請輸入委刊專案名稱',
 	        'name.unique' => '輸入的委刊單名稱已存在',
 
-	        'start_date.required' => '請選擇 總走期的開始日期',  
-	        'end_date.required' => '請選擇 總走期的結束日期', 
+	        'start_date.required' => '請選擇 總走期的開始日期',
+	        'start_date.check_date' => '總走期的開始日期 格式錯誤',
+	        // 'end_date.required' => '請選擇 總走期的結束日期',
+	        'end_date.check_date' => '總走期的結束日期 格式錯誤', 
 	        'publish_kind.required' => '請選擇委刊類別', 
 
 	        'item_count.check_item_count' => '至少要有一個委刊項',
@@ -96,6 +98,12 @@ class CreateEntrustRequest extends FormRequest {
         });
         $factory->extend('check_contact', function($attribute, $value, $parameters, $validator) {
     		return $value > 0;
+        });
+        $factory->extend('check_date', function($attribute, $value, $parameters, $validator) {
+        	if(strlen($value) > 0)
+        		return strlen($value) == 8;
+        	else
+    			return true;
         });
         $factory->extend('check_item_count', function($attribute, $value, $parameters, $validator) {
     		return $value > 0;

@@ -102,6 +102,10 @@
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.myentrust.destroy', $row->id))) !!} -->
                                 {!! Form::submit('取消', array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!}
+                            @elseif($row->status == 3)
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrust.editAfterPass', $row->id))) !!}
+                                {!! Form::submit('編輯發票', array('class' => 'btn btn-xs btn-info')) !!}
+                                {!! Form::close() !!}
                             @endif
                             </td>
                         </tr>

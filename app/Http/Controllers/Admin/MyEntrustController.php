@@ -426,7 +426,7 @@ class MyEntrustController extends Controller {
     //委刊項的input逐一檢查，insert or update
     function checkEntrustItem($id, $request) {
     	$aryItemDeleteNo = explode(',', $request->input('item_delete_list'));
-    	//
+    	//委刊項固定5個
 	    for ($no = 1; $no <= 10; $no++) {
 	    	$itemName = $request->input('item_name_'.$no);
 	    	if($itemName != null) {

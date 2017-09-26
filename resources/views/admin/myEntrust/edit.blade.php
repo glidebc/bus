@@ -40,22 +40,22 @@
 </div><div class="form-group">
     {!! Form::label('note', '其他說明', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('note', old('note',$entrust->note), array('class'=>'form-control', 'placeholder' => '40字以內', 'maxlength' => 40)) !!}
+        {!! Form::text('note', old('note',$entrust->note), array('class'=>'form-control', 'placeholder' => '40字以內', 'maxlength' => 40, 'autocomplete' => 'off')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('name', '委刊單名稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::text('name', old('name',$entrust->name), array('class'=>'form-control')) !!}
+        {!! Form::text('name', old('name',$entrust->name), array('class'=>'form-control', 'autocomplete' => 'off')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('duration', '總走期', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
-        {!! Form::text('txt_start_date', old('txt_start_date'), array('class'=>'form-control duration', 'id'=>'txtStartDate', 'maxlength' => 10)) !!}
+        {!! Form::text('txt_start_date', old('txt_start_date'), array('class'=>'form-control duration', 'id'=>'txtStartDate', 'maxlength' => 10, 'autocomplete' => 'off')) !!}
         {{ Form::hidden('start_date', null, array('id' => 'hidStartDate')) }}
         <span class="fa fa-arrow-right"></span>
-        {!! Form::text('txt_end_date', old('txt_end_date'), array('class'=>'form-control duration', 'id'=>'txtEndDate', 'maxlength' => 10)) !!}
+        {!! Form::text('txt_end_date', old('txt_end_date'), array('class'=>'form-control duration', 'id'=>'txtEndDate', 'maxlength' => 10, 'autocomplete' => 'off')) !!}
         {{ Form::hidden('end_date', null, array('id' => 'hidEndDate')) }}&nbsp;
         共
         {!! Form::text('day_count', old('day_count'), array('class'=>'form-control day-count', 'id'=>'day-count', 'readonly'=>'true')) !!}
@@ -102,13 +102,13 @@
 </div><div class="form-group">
     {!! Form::label('invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('invoice_date', old('invoice_date',$entrust->invoice_date), array('class'=>'form-control')) !!}
+        {!! Form::text('invoice_date', old('invoice_date',$entrust->invoice_date), array('class'=>'form-control', 'autocomplete' => 'off')) !!}
         
     </div>
 </div><div class="form-group">
     {!! Form::label('invoice_num', '發票號碼', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('invoice_num', old('invoice_num',$entrust->invoice_num), array('class'=>'form-control', 'placeholder' => '10碼', 'maxlength' => 10)) !!}
+        {!! Form::text('invoice_num', old('invoice_num',$entrust->invoice_num), array('class'=>'form-control', 'placeholder' => '10碼', 'maxlength' => 10, 'autocomplete' => 'off')) !!}
         
     </div>
 </div>
@@ -196,6 +196,15 @@
             countDays();
         }
     });
+    $('#txtStartDate').change(function() {
+        var dateValue = $(this).val().replace(/-/g, "");
+        $('#hidStartDate').val(dateValue);
+    });
+    $('#txtEndDate').change(function() {
+        var dateValue = $(this).val().replace(/-/g, "");
+        $('#hidEndDate').val(dateValue);
+    });
+    
     function durationDatePick(input) {
         if (input.id == 'txtEndDate') {
             var minDate = new Date($('#txtStartDate').val());

@@ -24,7 +24,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('myentrust', 'Admin\MyEntrustController');
     Route::resource('mycustomer', 'Admin\MyCustomerController');
     Route::resource('myagent', 'Admin\MyAgentController');
-
+    //代理商｜客戶 啟用按鈕
     Route::post('/mycustomer/resetDelete/{id}',[
 	    'as' => 'admin.mycustomer.resetDelete',
 	    'uses' => 'Admin\MyCustomerController@resetDelete'
@@ -41,23 +41,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 	    'as' => 'admin.teamagent.resetDelete',
 	    'uses' => 'Admin\TeamAgentController@resetDelete'
 	]);
-
-	// Route::resource('myuser', 'Admin\MyUserController', ['only' => [
-	//     'index', 'update'
-	// ]]);
-
-	Route::patch('/myuser/update/{id}',[
-	    'as' => 'admin.myuser.update',
-	    'uses' => 'Admin\MyUserController@update'
-	]);
-});
-
-Route::get('/admin/api/ad/book/list', 'Admin\ServiceController@adBookedList');
-Route::post('/admin/api/ad/book', 'Admin\ServiceController@adBook');
-Route::post('/admin/api/contact', 'Admin\ServiceController@customerContact');
-
-Route::group(['prefix' => 'admin'], function () {
-    //
+	//我的委刊單 送審、產生Excel按鈕
     Route::post('myentrust/go/{id}', [
 	    'as'   => 'admin.myentrust.go',
 	    'uses' => 'Admin\MyEntrustController@entrustGo'
@@ -74,8 +58,7 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as'   => 'admin.myentrust.excel',
 	    'uses' => 'Admin\MyEntrustController@entrustExcel'
 	]);
-
-	//
+	//委刊單審核
 	Route::post('entrustverify/yes/{id}', [
 	    'as'   => 'admin.entrustverify.yes',
 	    'uses' => 'Admin\PublishverifyController@publishOk'
@@ -88,7 +71,7 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as'   => 'admin.entrustverify.back',
 	    'uses' => 'Admin\PublishverifyController@publishBack'
 	]);
-	//單一委刊單內容
+	//查看委刊單內容
 	Route::post('entrust/verify/{id}', [
 	    'as'   => 'admin.entrust.verify',
 	    'uses' => 'Admin\EntrustController@entrustVerify'
@@ -97,27 +80,30 @@ Route::group(['prefix' => 'admin'], function () {
 	    'as'   => 'admin.entrust.read',
 	    'uses' => 'Admin\EntrustController@entrustRead'
 	]);
+	//我的資訊
+	Route::patch('/myuser/update/{id}',[
+	    'as' => 'admin.myuser.update',
+	    'uses' => 'Admin\MyUserController@update'
+	]);
 	//委刊單的承辦窗口
 	Route::post('contact/read/{id}', [
 	    'as'   => 'admin.contact.read',
 	    'uses' => 'Admin\ContactController@contactRead'
 	]);
+	//編輯發票 (審核通過後再編輯)
+	Route::post('entrust/editAfterPass/{id}', [
+	    'as'   => 'admin.entrust.editAfterPass',
+	    'uses' => 'Admin\EntrustController@editAfterPass'
+	]);
+	Route::patch('/entrust/updateAfterPass/{id}',[
+	    'as' => 'admin.entrust.updateAfterPass',
+	    'uses' => 'Admin\EntrustController@updateAfterPass'
+	]);
 });
 
-// Route::group(['prefix' => 'publish'], function () {
-//     Route::get('yes/{id}', [
-// 	    'as'   => 'publish.yes',
-// 	    'uses' => 'Admin\PublishverifyController@publishOk'
-// 	]);
-//     Route::get('no/{id}', [
-// 	    'as'   => 'publish.no',
-// 	    'uses' => 'Admin\PublishverifyController@publishReject'
-// 	]);
-// 	Route::get('init/{id}', [
-// 	    'as'   => 'publish.init',
-// 	    'uses' => 'Admin\PublishverifyController@publishInit'
-// 	]);
-// });
+Route::get('/admin/api/ad/book/list', 'Admin\ServiceController@adBookedList');
+Route::post('/admin/api/ad/book', 'Admin\ServiceController@adBook');
+Route::post('/admin/api/contact', 'Admin\ServiceController@customerContact');
 
 //index.blade.php list row btn 使用於代理商，客戶
 Route::post('/admin/agent/resetDelete/{id}',[

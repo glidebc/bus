@@ -85,9 +85,9 @@
         
     </div>
 </div><div class="form-group">
-    {!! Form::label('invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
+    {!! Form::label('txt_invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('invoice_date', $entrust->invoice_date, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        {!! Form::text('txt_invoice_date', $entrust->txt_invoice_date, array('class'=>'form-control', 'readonly'=>'true')) !!}
         
     </div>
 </div><div class="form-group">

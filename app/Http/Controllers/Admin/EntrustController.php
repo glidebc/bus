@@ -87,7 +87,11 @@ class EntrustController extends Controller {
 
 		$entrust->pay = config('admin.entrust.pay')[$e->pay];
 		$entrust->pay_status = config('admin.entrust.pay_status')[$e->pay_status];
-		$entrust->invoice_date = $e->invoice_date;
+		//
+		$entrust->txt_invoice_date = '';
+		if(!empty($e->invoice_date))
+			$entrust->txt_invoice_date = substr($e->invoice_date, 0, 4).'-'.substr($e->invoice_date, -4, 2).'-'.substr($e->invoice_date, -2);
+		
 		$entrust->invoice_num = $e->invoice_num;
 		$entrust->note = $e->note;
 

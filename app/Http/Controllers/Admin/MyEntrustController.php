@@ -352,9 +352,11 @@ class MyEntrustController extends Controller {
 						$entrust->{'item_cost_'.$no} = $entrustItem->cost;
 					}
 			}
-			// $entrustItem = $entrustItems->first();
-			
 		}
+		//發票日期
+		$invDate = $entrust->invoice_date;
+		if(!empty($invDate))
+			$entrust->txt_invoice_date = substr($invDate, 0, 4).'-'.substr($invDate, -4, 2).'-'.substr($invDate, -2);
 		
 		return view(config('quickadmin.route').'.myEntrust.edit', compact(array('userId', 'customer', 'entrust', 'publishKind', 'publishKindSelected', 'pay', 'payStatus')));
 	}

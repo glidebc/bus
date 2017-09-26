@@ -10,6 +10,7 @@ use App\Publish;
 use App\Publishuser;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use DateTime;
 
 class TeamEntrustController extends Controller {
 
@@ -39,7 +40,9 @@ class TeamEntrustController extends Controller {
                 $entrust->duration = $dateStart.$dateEnd;
             }
             //發票日期
-            $entrust->invoice_date_text = date_create($entrust->invoice_date)->format('Y-m-d');
+            $entrust->invoice_date_text = '';
+            if(strlen($entrust->invoice_date) == 8)
+                $entrust->invoice_date_text = date_create($entrust->invoice_date)->format('Y-m-d');
             //
     		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
             $dept = Dept::find($publishuser->dept_id);

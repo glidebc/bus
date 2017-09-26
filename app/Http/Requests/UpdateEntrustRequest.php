@@ -44,7 +44,9 @@ class UpdateEntrustRequest extends FormRequest {
             'item_cost_9' => 'check_item_cost',
             'item_cost_10' => 'check_item_cost',
 
-			'pay' => 'check_pay', 
+			'pay' => 'check_pay',
+
+			'invoice_date' => 'check_date',
 
             'owner_user' => 'required', 
             
@@ -82,7 +84,9 @@ class UpdateEntrustRequest extends FormRequest {
 	        'item_cost_9.check_item_cost' => '預算請輸入數字',
 	        'item_cost_10.check_item_cost' => '預算請輸入數字',
 
-	        'pay.check_pay' => '請選擇付款方式', 
+	        'pay.check_pay' => '請選擇付款方式',
+
+	        'invoice_date.check_date' => '發票日期 格式錯誤',
 
 	    ];
 	}

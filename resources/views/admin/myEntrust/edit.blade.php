@@ -102,7 +102,8 @@
 </div><div class="form-group">
     {!! Form::label('invoice_date', '發票日期', array('class'=>'col-sm-2 control-label')) !!}
     <div class="col-sm-10">
-        {!! Form::text('invoice_date', old('invoice_date',$entrust->invoice_date), array('class'=>'form-control', 'autocomplete' => 'off')) !!}
+        {!! Form::text('txt_invoice_date', old('txt_invoice_date',$entrust->txt_invoice_date), array('class'=>'form-control', 'id'=>'txtInvoiceDate', 'maxlength' => 10, 'autocomplete' => 'off')) !!}
+        {{ Form::hidden('invoice_date', old('invoice_date',$entrust->invoice_date), array('id' => 'hidInvoiceDate')) }}
         
     </div>
 </div><div class="form-group">
@@ -183,7 +184,7 @@
         });
     }
 
-    $('#txtStartDate, #txtEndDate').datepicker({
+    $('#txtStartDate, #txtEndDate, #txtInvoiceDate').datepicker({
         changeMonth: true,
         numberOfMonths: 3,
         beforeShow: durationDatePick,
@@ -203,6 +204,10 @@
     $('#txtEndDate').change(function() {
         var dateValue = $(this).val().replace(/-/g, "");
         $('#hidEndDate').val(dateValue);
+    });
+    $('#txtInvoiceDate').change(function() {
+        var dateValue = $(this).val().replace(/-/g, "");
+        $('#hidInvoiceDate').val(dateValue);
     });
     
     function durationDatePick(input) {

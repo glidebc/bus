@@ -160,10 +160,15 @@ class MyEntrustController extends Controller {
 		$entrust = Entrust::find($id);
 		$customer = Customer::find($entrust->customer_id);
 		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
+		$item6 = false; $excelFileName = '委刊單';
+		if($entrustItems->count() == 1 && $entrustItems->first()->no == 6) {
+			$item6 = true;
+			$excelFileName = '委刊單6';
+		}
 
-		Excel::selectSheetsByIndex(0)->load('inc/委刊單.xlsx', function($reader) use ($customer,$entrust,$entrustItems) {
+		Excel::selectSheetsByIndex(0)->load('inc/'.$excelFileName.'.xlsx', function($reader) use ($customer,$entrust,$entrustItems,$item6) {
 				// $sheet = $reader->getExcel()->getSheet();
-				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems) {
+				$reader->sheet('廣告委刊單', function($sheet) use ($customer,$entrust,$entrustItems,$item6) {
 					//日期
 					$sheet->setCellValue('H1', date('Y/m/d', strtotime('today')));
 					//委刊單編號
@@ -192,7 +197,7 @@ class MyEntrustController extends Controller {
 					$sheet->setCellValue('C9', $duration);
 					$days = (new DataFunc)->countDays($entrust->start_date, $entrust->end_date);//天數
 					$sheet->setCellValue('F9', '(共 '.$days.' 天) / 實際走期依排期表');
-
+					//委刊類別
 					$strPublishKind = '';
 					$aryPublishKind = config('admin.entrust.items');//委刊類別 array
 					$publishKindSelected = explode(',', $entrust->publish_kind);
@@ -203,20 +208,26 @@ class MyEntrustController extends Controller {
 					}
 					$sheet->setCellValue('C10', $strPublishKind);
 
-					//付款方式與金額
+					//委刊項，委刊專案內容，預算
 					$numRow = 13; $numItem = 1; $count = 0;
-					foreach ($entrustItems as $entrustItem) {
-						$sheet->setCellValue('B'.$numRow, $numItem++);
-						$sheet->setCellValue('C'.$numRow, $entrustItem->name);
-						$sheet->setCellValue('E'.$numRow, $entrustItem->cost);
-						$count += $entrustItem->cost;
-						$numRow++;
+					if($item6) {
+						//特殊委刊項
+						$entrustItem = $entrustItems->first();
+						$sheet->setCellValue('E'.$numRow, $entrustItem->cost_text);
+					} else {
+						foreach ($entrustItems as $entrustItem) {
+							$sheet->setCellValue('B'.$numRow, $numItem++);
+							$sheet->setCellValue('C'.$numRow, $entrustItem->name);
+							$sheet->setCellValue('E'.$numRow, $entrustItem->cost);
+							$count += $entrustItem->cost;
+							$numRow++;
+						}
+						$sheet->setCellValue('E18', $count);//小計
+						$tax = round($count * .05);
+						$sheet->setCellValue('E19', $tax);//營業稅
+						$sheet->setCellValue('E20', $count + $tax);//總金額
 					}
-					$sheet->setCellValue('E18', $count);
-					$tax = round($count * .05);
-					$sheet->setCellValue('E19', $tax);
-					$sheet->setCellValue('E20', $count + $tax);
-
+					//付款方式
 					$aryPay = config('admin.entrust.pay');
 					$sheet->setCellValue('F13', $aryPay[$entrust->pay]);//付款方式
 					$aryPayStatus = config('admin.entrust.pay_status');
@@ -341,18 +352,27 @@ class MyEntrustController extends Controller {
 	    $pay = config('admin.entrust.pay');//付款方式 array
 	    $payStatus = config('admin.entrust.pay_status');//付款狀況 array
 		//
-		$entrustItems = EntrustItem::where('entrust_id', $id);
-		$entrust->item_count = $entrustItems->count();//顯示目前有幾個委刊項
-		if($entrustItems->count() > 0) {
-			foreach ($entrustItems->get() as $entrustItem) {
-				for ($no=1; $no <=10; $no++)
-					if($no == $entrustItem->no) {
-						$entrust->{'item_name_'.$no} = $entrustItem->name;
-						$entrust->{'item_currency_'.$no} = number_format($entrustItem->cost);
-						$entrust->{'item_cost_'.$no} = $entrustItem->cost;
-					}
+		$entrustItems = EntrustItem::where('entrust_id', $id)->get();
+		// $entrust->item_count = $entrustItems->count();//顯示目前有幾個委刊項
+		// if($entrustItems->count() > 0) {
+			foreach ($entrustItems as $entrustItem) {
+				$entrust->{'item_name_'.$entrustItem->no} = $entrustItem->name;
+				// $entrust->{'item_currency_'.$entrustItem->no} = number_format($entrustItem->cost);
+				if($entrustItem->no <= 5) {
+					$entrust->{'item_currency_'.$entrustItem->no} = number_format($entrustItem->cost);
+					$entrust->{'item_cost_'.$entrustItem->no} = $entrustItem->cost;//委刊項-預算金額
+				} else {
+					$entrust->{'item_currency_'.$entrustItem->no} = $entrustItem->cost_text;//委刊項-預算文字敘述
+				}
+
+				// for ($no=1; $no <=5; $no++)
+				// 	if($no == $entrustItem->no) {
+				// 		$entrust->{'item_name_'.$no} = $entrustItem->name;
+				// 		$entrust->{'item_currency_'.$no} = number_format($entrustItem->cost);
+				// 		$entrust->{'item_cost_'.$no} = $entrustItem->cost;
+				// 	}
 			}
-		}
+		// }
 		//發票日期
 		$invDate = $entrust->invoice_date;
 		if(!empty($invDate))
@@ -428,8 +448,8 @@ class MyEntrustController extends Controller {
     //委刊項的input逐一檢查，insert or update
     function checkEntrustItem($id, $request) {
     	$aryItemDeleteNo = explode(',', $request->input('item_delete_list'));
-    	//委刊項固定5個
-	    for ($no = 1; $no <= 10; $no++) {
+    	//委刊項
+	    for ($no = 1; $no <= 6; $no++) {
 	    	$itemName = $request->input('item_name_'.$no);
 	    	if($itemName != null) {
 	    		$entrustItems = EntrustItem::where([
@@ -445,9 +465,17 @@ class MyEntrustController extends Controller {
 		    		$entrustItem->no = $no;
 		    	}
 		    	$entrustItem->name = $itemName;
-	    		$itemCost = $request->input('item_cost_'.$no);
-	    		if($itemCost != null)
-		    		$entrustItem->cost = $itemCost;
+		    	if($no <= 5) {
+		    		//委刊項-預算金額
+		    		$itemCost = $request->input('item_cost_'.$no);
+		    		if($itemCost != null)
+			    		$entrustItem->cost = $itemCost;
+		    	} else {
+		    		//委刊項-預算文字敘述
+		    		$itemCostText = $request->input('item_currency_'.$no);
+		    		if($itemCostText != null)
+			    		$entrustItem->cost_text = $itemCostText;
+		    	}
 		    	//
 		    	$entrustItem->save();
 	    	}
@@ -465,6 +493,9 @@ class MyEntrustController extends Controller {
     		$sheet->cells('I'.$row, function($cells) {$cells->setBorder('none ', 'none', 'none', 'medium');});
     	}
     	$sheet->cells('A31:H31', function($cells) {$cells->setBorder('medium', 'none', 'none', 'none');});
+
+		// $sheet->cells('C13', function($cells) {$cells->setBorder('thin ', 'thin', 'none', 'thin');});
+    	// $sheet->cells('E13', function($cells) {$cells->setBorder('none ', 'none', 'none', 'thin');});
     }
     //flow verifying
     function countEntrustFlowStatus($id, $status) {

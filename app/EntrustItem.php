@@ -20,7 +20,8 @@ class EntrustItem extends Model {
           'entrust_id',
           'no',
           'name',
-          'cost'
+          'cost',
+          'cost_text'
     ];
     
 

@@ -433,7 +433,7 @@ class DataQuery {
         return $teamUser;
     }
 
-    //團隊管理-團隊委刊單
+    //團隊管理-委刊單總覽
     static function collectionOfTeamEntrust($userId)
     {
         $teamUser = self::collectionOfTeamUser($userId, false);
@@ -472,10 +472,10 @@ class DataQuery {
         return $entrusts;
     }
 
-    //團隊管理-團隊代理商
+    //團隊管理-管理客戶，管理代理商
     static function arrayTeamUser($userId)
     {
-        $teamUser = self::collectionOfTeamUser($userId, true);
+        $teamUser = self::collectionOfTeamUser($userId, false);
         // if($aryTeamId->isEmpty())
         //     $teamUser = Publishuser::whereNotIn('user_id', [$userId])->whereIn('dept_id', $aryDeptId);
         // else

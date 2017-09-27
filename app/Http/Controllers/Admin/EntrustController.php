@@ -72,19 +72,35 @@ class EntrustController extends Controller {
 			$aryPublishKind[] = config('admin.entrust.items')[$kindId];
 		}
 		$entrust->publish_kind = $aryPublishKind;
-
-		$entrustItems = EntrustItem::where('entrust_id', $id)->orderBy('no')->get();
-		$entrust->item_count = $entrustItems->count();//委刊項數量
-		$aryItem = []; $aryItemCost = []; $count = 0;
-		foreach ($entrustItems as $item) {
+		//委刊項
+		$aryItem = [];
+		$aryItemCost = []; $count = 0;
+		$aryItemCostText = [];
+		//委刊項-預算金額
+		$entrustItemCosts = EntrustItem::where([
+				['entrust_id', $id],
+				['no', '<=', 5]
+			])->orderBy('no')->get();
+		foreach ($entrustItemCosts as $item) {
 			$aryItem[] = $item->name;
 			$aryItemCost[] = number_format($item->cost);
-			$count += $item->cost;
+			$count += $item->cost;//小計加總
 		}
-		$entrust->item = $aryItem;
-		$entrust->itemCost = $aryItemCost;
-		$entrust->count = number_format($count);
-
+		//委刊項-預算文字敘述
+		$entrustItemCostTexts = EntrustItem::where([
+				['entrust_id', $id],
+				['no', '>', 5]
+			])->orderBy('no')->get();
+		foreach ($entrustItemCostTexts as $item) {
+			$aryItem[] = $item->name;
+			$aryItemCostText[] = $item->cost_text;
+		}
+		$entrust->item_count = count($aryItem);//委刊項數量
+		$entrust->count = number_format($count);//小計
+		$entrust->item = $aryItem;//委刊專案內容 array
+		$entrust->itemCost = $aryItemCost;//預算金額 array
+		$entrust->itemCostText = $aryItemCostText;//預算文字敘述 array
+		//
 		$entrust->pay = config('admin.entrust.pay')[$e->pay];
 		$entrust->pay_status = config('admin.entrust.pay_status')[$e->pay_status];
 		//
@@ -92,6 +108,7 @@ class EntrustController extends Controller {
 		if(!empty($e->invoice_date))
 			$entrust->txt_invoice_date = substr($e->invoice_date, 0, 4).'-'.substr($e->invoice_date, -4, 2).'-'.substr($e->invoice_date, -2);
 		
+		$entrust->invoice_date = $e->invoice_date;
 		$entrust->invoice_num = $e->invoice_num;
 		$entrust->note = $e->note;
 

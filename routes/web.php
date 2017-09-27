@@ -25,58 +25,58 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
     Route::resource('mycustomer', 'Admin\MyCustomerController');
     Route::resource('myagent', 'Admin\MyAgentController');
     //代理商｜客戶 啟用按鈕
-    Route::post('/mycustomer/resetDelete/{id}',[
+    Route::match(['get', 'post'], '/mycustomer/resetDelete/{id}',[
 	    'as' => 'admin.mycustomer.resetDelete',
 	    'uses' => 'Admin\MyCustomerController@resetDelete'
 	]);
-	Route::post('/myagent/resetDelete/{id}',[
+	Route::match(['get', 'post'], '/myagent/resetDelete/{id}',[
 	    'as' => 'admin.myagent.resetDelete',
 	    'uses' => 'Admin\MyAgentController@resetDelete'
 	]);
-	Route::post('/teamcustomer/resetDelete/{id}',[
+	Route::match(['get', 'post'], '/teamcustomer/resetDelete/{id}',[
 	    'as' => 'admin.teamcustomer.resetDelete',
 	    'uses' => 'Admin\TeamCustomerController@resetDelete'
 	]);
-	Route::post('/teamagent/resetDelete/{id}',[
+	Route::match(['get', 'post'], '/teamagent/resetDelete/{id}',[
 	    'as' => 'admin.teamagent.resetDelete',
 	    'uses' => 'Admin\TeamAgentController@resetDelete'
 	]);
 	//我的委刊單 送審、產生Excel按鈕
-    Route::post('myentrust/go/{id}', [
+    Route::match(['get', 'post'], 'myentrust/go/{id}', [
 	    'as'   => 'admin.myentrust.go',
 	    'uses' => 'Admin\MyEntrustController@entrustGo'
 	]);
-    Route::post('myentrust/back/{id}', [
+    Route::match(['get', 'post'], 'myentrust/back/{id}', [
 	    'as'   => 'admin.myentrust.back',
 	    'uses' => 'Admin\MyEntrustController@entrustBack'
 	]);
-	Route::post('myentrust/cancel/{id}',[
+	Route::match(['get', 'post'], 'myentrust/cancel/{id}',[
 	    'as' => 'admin.myentrust.cancel',
 	    'uses' => 'Admin\MyEntrustController@entrustCancel'
 	]);
-	Route::post('myentrust/excel/{id}', [
+	Route::match(['get', 'post'], 'myentrust/excel/{id}', [
 	    'as'   => 'admin.myentrust.excel',
 	    'uses' => 'Admin\MyEntrustController@entrustExcel'
 	]);
 	//委刊單審核
-	Route::post('entrustverify/yes/{id}', [
+	Route::match(['get', 'post'], 'entrustverify/yes/{id}', [
 	    'as'   => 'admin.entrustverify.yes',
 	    'uses' => 'Admin\PublishverifyController@publishOk'
 	]);
-    Route::post('entrustverify/reject/{id}', [
+    Route::match(['get', 'post'], 'entrustverify/reject/{id}', [
 	    'as'   => 'admin.entrustverify.reject',
 	    'uses' => 'Admin\PublishverifyController@publishReject'
 	]);
-	Route::post('entrustverify/back/{id}', [
+	Route::match(['get', 'post'], 'entrustverify/back/{id}', [
 	    'as'   => 'admin.entrustverify.back',
 	    'uses' => 'Admin\PublishverifyController@publishBack'
 	]);
 	//查看委刊單內容
-	Route::post('entrust/verify/{id}', [
+	Route::match(['get', 'post'], 'entrust/verify/{id}', [
 	    'as'   => 'admin.entrust.verify',
 	    'uses' => 'Admin\EntrustController@entrustVerify'
 	]);
-	Route::post('entrust/read/{id}', [
+	Route::match(['get', 'post'], 'entrust/read/{id}', [
 	    'as'   => 'admin.entrust.read',
 	    'uses' => 'Admin\EntrustController@entrustRead'
 	]);
@@ -86,12 +86,13 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 	    'uses' => 'Admin\MyUserController@update'
 	]);
 	//委刊單的承辦窗口
-	Route::post('contact/read/{id}', [
+	Route::match(['get', 'post'], 'contact/read/{id}', [
+	// Route::post('contact/read/{id}', [
 	    'as'   => 'admin.contact.read',
 	    'uses' => 'Admin\ContactController@contactRead'
 	]);
 	//編輯發票 (審核通過後再編輯)
-	Route::post('entrust/editAfterPass/{id}', [
+	Route::match(['get', 'post'], 'entrust/editAfterPass/{id}', [
 	    'as'   => 'admin.entrust.editAfterPass',
 	    'uses' => 'Admin\EntrustController@editAfterPass'
 	]);

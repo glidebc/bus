@@ -67,7 +67,11 @@
             @foreach ($entrust->item as $item)
             <div>
                 {!! Form::text(null, $item, array('class'=>'form-control item-name', 'readonly'=>'true')) !!}
+                @if(count($entrust->itemCost) > 0)
                 {!! Form::text(null, array_shift($entrust->itemCost), array('class'=>'form-control item-currency text-right', 'readonly'=>'true')) !!}
+                @else
+                {!! Form::text(null, array_shift($entrust->itemCostText), array('class'=>'form-control item-currency text-right', 'readonly'=>'true')) !!}
+                @endif
             </div>
             @endforeach
         </div>
@@ -97,6 +101,7 @@
         
     </div>
 </div>
+
 </form>
 
 <div class="form-group">
@@ -142,6 +147,9 @@
     }
     .item-currency {
         width: 15%;
+    }
+    .item-cost-text {
+        width: 27%;
     }
     .txt {
         width: auto;

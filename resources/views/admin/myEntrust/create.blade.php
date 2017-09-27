@@ -75,15 +75,24 @@
         <!-- 目前有 -->
         {!! Form::text('item_info', old('item_info',''), array('class'=>'form-control item-info', 'id'=>'item-info', 'readonly'=>'true')) !!}
         <!-- 個委刊項 , 小計 $<span id="count">{{ old('count',0) }}</span> 元整 -->&nbsp;&nbsp;
-        <input class="btn btn-item" type="button" value="編輯委刊項" onclick="showOrHideItemList(this);">
+        <input class="btn btn-item" type="button" value="編輯委刊項" onclick="showOrHideItemList(this);">&nbsp;
+        @if($userId==1 || $userId==7 || $userId==10)
+        <input class="btn btn-item" type="button" value="編輯特殊委刊項" onclick="showOrHideItemListSpecial(this);">
+        @endif
         <div id="item-list" style="display: none;">
-            @for ($no=1; $no <= 10 ; $no++)
+            @for ($no=1; $no <= 5 ; $no++)
             <div>
-                {!! Form::text('item_name_'.$no, old('item_name_'.$no), array('class'=>'form-control item-name', 'id'=>'item_name_'.$no, 'placeholder'=>'項次'.$no.'：委刊專案內容')) !!}
-                {!! Form::text('item_currency_'.$no, old('item_currency_'.$no), array('class'=>'form-control item-currency text-right', 'placeholder'=>'項次'.$no.'：預算', 'no'=>$no)) !!}
+                {!! Form::text('item_name_'.$no, old('item_name_'.$no), array('class'=>'form-control item-name', 'id'=>'item_name_'.$no, 'placeholder'=>'項次'.$no.'：委刊專案內容', 'autocomplete' => 'off')) !!}
+                {!! Form::text('item_currency_'.$no, old('item_currency_'.$no), array('class'=>'form-control item-currency text-right', 'placeholder'=>'項次'.$no.'：預算金額', 'no'=>$no, 'autocomplete' => 'off')) !!}
                 {{ Form::hidden('item_cost_'.$no, old('item_cost_'.$no), array('id' => 'item_cost_'.$no)) }}
             </div>
             @endfor
+        </div>
+        <div id="item-list-special" style="display: none;">
+            <div>
+                {!! Form::text('item_name_6', old('item_name_6', '其他專案執行，CPM$計價'), array('class'=>'form-control item-name', 'readonly'=>'true')) !!}
+                {!! Form::text('item_currency_6', old('item_currency_6'), array('class'=>'form-control item-currency text-right', 'placeholder'=>'CPM $', 'no'=>6, 'autocomplete' => 'off')) !!}
+            </div>
         </div>
     </div>
 </div><div class="form-group">
@@ -187,7 +196,6 @@
         beforeShow: durationDatePick,
         dateFormat: "yy-mm-dd",
         onSelect: function(dateText, inst) {
-            // var d = new Date(dateText);
             var dateValue = dateText.replace(/-/g, "");
             var hidID = inst.id.replace('txt', 'hid');
             $('#' + hidID).val(dateValue);
@@ -255,21 +263,28 @@
         $('#item-list').slideToggle();
     }
 
+    function showOrHideItemListSpecial(e){
+        var t = '';
+        e.value.indexOf('編輯') >= 0 ? t = '隱藏' : t = '編輯';
+        e.value = t + '特殊委刊項';
+        $('#item-list-special').slideToggle();
+    }
+
     var itemCount=0, count=0;//委刊項數量, 小計金額
     var strItemCountInfo = '目前有 item 個委刊項 , 小計 $count 元整';
     setItemInfo();
 
-    $('#item_name_1, #item_name_2, #item_name_3, #item_name_4, #item_name_5, #item_name_6, #item_name_7, #item_name_8, #item_name_9, #item_name_10').change(function() {
-        //
-        // var itemCount = 0, count = 0;
-        setItemInfo();
-    });
+    $('#item_name_1, #item_name_2, #item_name_3, #item_name_4, #item_name_5, input[name=item_currency_6]').change(function() {setItemInfo();});
 
     function setItemInfo() {
         itemCount = 0;
-        for(var itemNo = 1; itemNo <= 10; itemNo++)
+        //計算委刊項數量
+        for(var itemNo = 1; itemNo <= 5; itemNo++)
             if($('#item_name_' + itemNo).val().length > 0)
-                itemCount++;
+                    itemCount++;
+
+        if($('input[name=item_currency_6]').val().length > 0)
+            itemCount++;
         // alert(strItemCountInfo.replace(/item/i, itemCount.toString()).replace(/count/i, count.toString()));
         setCount();//小計
     }
@@ -317,7 +332,8 @@
     function setCount() {
         $('#item_count').val(itemCount);
         count = 0;
-        for(var itemNo = 1; itemNo <= 10; itemNo++){
+        //計算預算總和
+        for(var itemNo = 1; itemNo <= 5; itemNo++){
             var cost = parseInt($('#item_cost_' + itemNo).val(), 10);
             if($('#item_name_' + itemNo).val().length > 0 && !isNaN(cost))
                 count += cost;
@@ -346,10 +362,10 @@
         /*text-align: center;*/
         border-width: 0px;
     }
-    .item-info:-moz-read-only, .day-count:-moz-read-only, .entrust-number:-moz-read-only { /* For Firefox */
+    .form-group input[type="text"]:-moz-read-only { /* For Firefox */
         background-color: white;
     }
-    .item-info:read-only, .day-count:read-only, .entrust-number:read-only { 
+    .form-group input[type="text"]:read-only { 
         background-color: white;
     }
     .item-name {
@@ -359,6 +375,10 @@
     .item-currency {
         display: inline-block;
         width: 15%;
+    }
+    .item-cost-text {
+        display: inline-block;
+        width: 27%;
     }
     .btn-item {
         display: inline-block;

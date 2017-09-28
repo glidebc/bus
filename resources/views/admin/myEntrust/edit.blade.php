@@ -91,7 +91,7 @@
         </div>
         <div id="item-list-special" style="display: none;">
             <div>
-                {!! Form::text('item_name_6', old('item_name_6'), array('class'=>'form-control item-name', 'id'=>'item_name_6', 'readonly'=>'true')) !!}
+                {!! Form::text('item_name_6', old('item_name_6', '其他專案執行，CPM$計價'), array('class'=>'form-control item-name', 'id'=>'item_name_6', 'readonly'=>'true')) !!}
                 {!! Form::text('item_currency_6', old('item_currency_6'), array('class'=>'form-control item-currency text-right', 'placeholder'=>'CPM $', 'no'=>6, 'autocomplete' => 'off')) !!}
                 @if($entrust->item_name_6 != null)
                 <span class="fa fa-times item-del" onclick="deleteItem(this, 6);"></span>

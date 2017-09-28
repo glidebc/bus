@@ -470,14 +470,17 @@ class MyEntrustController extends Controller {
 		    		$itemCost = $request->input('item_cost_'.$no);
 		    		if($itemCost != null)
 			    		$entrustItem->cost = $itemCost;
+			    	$entrustItem->save();//save
 		    	} else {
-		    		//委刊項-預算文字敘述
+		    		//委刊項-CPM$計價
 		    		$itemCostText = $request->input('item_currency_'.$no);
-		    		if($itemCostText != null)
+		    		if($itemCostText != null) {
 			    		$entrustItem->cost_text = $itemCostText;
+			    		$entrustItem->save();//save
+		    		}
 		    	}
 		    	//
-		    	$entrustItem->save();
+		    	// $entrustItem->save();
 	    	}
 	    	//檢查item id array whhich wanna delete
 	    	if(in_array($no, $aryItemDeleteNo))

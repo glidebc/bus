@@ -125,6 +125,15 @@
         
     </div>
 </div>
+@if($entrust->status == 4)
+<div class="form-group">
+    {!! Form::label('reject_text', '退件原因', array('class'=>'col-sm-2 control-label text-danger')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('reject_text', $entrust->reject_text, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        
+    </div>
+</div>
+@endif
 
 {{ Form::hidden('item_count', old('item_count'), array('id' => 'item_count')) }}
 {{ Form::hidden('item_delete_list', null, array('id' => 'item_delete_list')) }}

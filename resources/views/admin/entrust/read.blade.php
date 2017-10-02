@@ -101,6 +101,15 @@
         
     </div>
 </div>
+@if($entrust->status == 4)
+<div class="form-group">
+    {!! Form::label('reject_text', '退件原因', array('class'=>'col-sm-2 control-label text-danger')) !!}
+    <div class="col-sm-10">
+        {!! Form::text('reject_text', $entrust->reject_text, array('class'=>'form-control', 'readonly'=>'true')) !!}
+        
+    </div>
+</div>
+@endif
 
 </form>
 
@@ -110,8 +119,9 @@
         {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrustverify.yes', $entrust->id))) !!}
         {!! Form::submit('核可', array('class' => 'btn btn-info')) !!}
         {!! Form::close() !!}&nbsp;
-        {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退件？');", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $entrust->id))) !!}
+        {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt();", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $entrust->id))) !!}
         {!! Form::submit('退件', array('class' => 'btn btn-danger')) !!}
+        {{ Form::hidden('reject_text', null, array('id' => 'reject_text')) }}
         {!! Form::close() !!}&nbsp;&nbsp;&nbsp;&nbsp;
     @endif
         <a href="javascript:history.back();" class="btn btn-default">返回</a>
@@ -122,7 +132,15 @@
 
 @section('javascript')
 <script type="text/javascript">
-
+    function rejectPrompt() {
+        var rejectText = prompt("請輸入退件原因");
+        if (rejectText == null || rejectText == "") {
+            return false;
+        } else {
+            $('#reject_text').val(rejectText);
+            return true;
+        }
+    }
 </script>
 <style>
     .form-group input[type="text"], .form-group textarea:-moz-read-only { /* For Firefox */

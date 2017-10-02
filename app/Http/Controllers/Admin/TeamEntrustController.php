@@ -27,7 +27,7 @@ class TeamEntrustController extends Controller {
     	$entrusts = DataQuery::collectionOfTeamEntrust($userId);
     	foreach ($entrusts as $entrust) {
             //聯絡窗口button
-            $contact = Contact::find($entrust->contact_id);
+            $contact = Contact::withTrashed()->find($entrust->contact_id);
             if(isset($contact))
                 $entrust->contact_name = $contact->name;
             //總走期
@@ -67,25 +67,32 @@ class TeamEntrustController extends Controller {
                 $typePublish = 0;
                 foreach ($listPublish as $publish) {
                     
-                    $strDate = substr($publish->date, 0, 4).'-'.substr($publish->date, -4, 2).'-'.substr($publish->date, -2);
-                    $pd = date_create($strDate);
-                    $ed = date_create($strDate)->modify('+'.($publish->days - 1).' day');
+                    // $strDate = substr($publish->date, 0, 4).'-'.substr($publish->date, -4, 2).'-'.substr($publish->date, -2);
+                    $pd = date_create($publish->date);
+                    $ed = date_create($publish->date)->modify('+'.($publish->days - 1).' day');
                     // $status_publish = $publish->id.', '.$pd->format('Y-m-d H:i:s');
+
+                    //只要有一個委刊還在執行就顯示 執行中
                     if($pd <= $now && $now <= $ed) {
-                        $typePublish = 1;//委刊中
-                        break;//只要有一個委刊還在執行就顯示 執行中
-                    } else if($ed < $now) {
-                        $typePublish = 2;//委刊結束 (結束時間 < now)
+                        $status_publish = config('admin.publish.status')[1];//委刊執行中
+                        // $typePublish = 1;
+                        break;
                     }
+                    if(array_key_exists($entrust->status, config('admin.publish.status')))
+                        $status_publish = config('admin.publish.status')[$entrust->status];//已預約 | 待執行
+                    //else if($ed < $now) {
+                        // $typePublish = 2;//委刊結束 (結束時間 < now)
+                    // }
+                    // if($entrust->status == 2)
+                    //     $status_publish = '已預約';
+                    // else if($entrust->status == 3)
+                    //     $status_publish = '待執行';
                 }
-                if($typePublish) {
-                    $status_publish = $typePublish == 1 ? '執行中' : '結束';
-                } else {
-                    if($entrust->status == 2)
-                        $status_publish = '已預約';
-                    else if($entrust->status == 3)
-                        $status_publish = '待執行';
-                }
+                // if($typePublish) {
+                //     $status_publish = $typePublish == 1 ? '執行中' : '';//手動結案
+                // } else {
+                    
+                // }
                 // $status_publish = $isPublishing ? '執行中' : '待執行';
             } else {
                 $status_publish = '尚未預約';

@@ -9,7 +9,6 @@ use App\Entrust;
 use App\EntrustFlow;
 use App\Publish;
 use App\Publishuser;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,14 +23,14 @@ class PublishverifyController extends Controller {
 	 */
 	public function index()
     {
-    	$entrustVerify = EntrustFlow::where('status', 'verify');
+    	// $entrustVerify = EntrustFlow::where('status', 'verify');
 
-    	$entrusts = DataQuery::collectionOfEntrustVerify();
+    	$entrusts = DataQuery::collectionOfEntrustByStatus(2);
     	foreach ($entrusts as $entrust) {
-    		$publishuser = Publishuser::where('user_id', $entrust->owner_user)->first();
+    		$publishuser = Publishuser::withTrashed()->where('user_id', $entrust->owner_user)->first();
     		$dept = Dept::find($publishuser->dept_id);
             $entrust->user_dept = empty($dept) ? '' : $dept->name;
-            $entrust->user_name = User::find($publishuser->user_id)->name;
+            $entrust->user_name = $publishuser->user_name;
             $entrust->status_name = config('admin.entrust.status')[$entrust->status];
             
             $entrust->verify = EntrustFlow::where('status', 'verify')->where('entrust_id', $entrust->id)->count();
@@ -55,10 +54,14 @@ class PublishverifyController extends Controller {
 
 		return redirect()->route('admin.publishverify.index');
 	}
-	public function publishReject($id)
+	public function publishReject($id, Request $request)
 	{
 		//退件時把委刊單預約的資料刪除
 		Publish::where('entrust_id', $id)->delete();
+		//退件原因
+		$entrust = Entrust::find($id);
+		$entrust->reject_text = $request->get('reject_text');
+		$entrust->save();
 		//flow reject
 		EntrustFlow::where('entrust_id', $id)->update(['status' => 'reject']);
 		//

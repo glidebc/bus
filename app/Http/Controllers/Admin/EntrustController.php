@@ -49,12 +49,15 @@ class EntrustController extends Controller {
 
 		$entrust->enum = $e->enum;
 		$entrust->name = $e->name;
-		$entrust->customer_name = Customer::find($e->customer_id)->name;
+		$entrust->customer_name = Customer::withTrashed()->find($e->customer_id)->name;
+		//承辦窗口
 		$entrust->contact_name = '';
 		$contact = Contact::find($e->contact_id);
 		if(isset($contact))
 			$entrust->contact_name = $contact->name;
 
+		$entrust->note = $e->note;
+		//總走期
 		$sd = ''; $ed = '';
 		if(!empty($e->start_date))
 			$sd = substr($e->start_date, 0, 4).'-'.substr($e->start_date, -4, 2).'-'.substr($e->start_date, -2);
@@ -110,7 +113,8 @@ class EntrustController extends Controller {
 		
 		$entrust->invoice_date = $e->invoice_date;
 		$entrust->invoice_num = $e->invoice_num;
-		$entrust->note = $e->note;
+		$entrust->status = $e->status;
+		$entrust->reject_text = $e->reject_text;
 
 		return $entrust;
 	}

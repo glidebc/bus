@@ -35,6 +35,7 @@ class Entrust extends Model {
           'note',
           'owner_user',
           'status',
+          'reject_text',
           'enum'
     ];
     

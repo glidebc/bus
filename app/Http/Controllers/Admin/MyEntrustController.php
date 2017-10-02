@@ -123,6 +123,10 @@ class MyEntrustController extends Controller {
 	public function entrustGo($id)
 	{
 		$this->entrustPending($id, 2);
+		//送審時 reset 退件原因
+		$entrust = Entrust::find($id);
+		$entrust->reject_text = null;
+		$entrust->save();
 		//flow
 		$entrustFlow = new EntrustFlow();
 		$entrustFlow->entrust_id = $id;

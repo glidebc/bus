@@ -563,43 +563,24 @@ class DataQuery {
         return $publish;
     }
 
-    static function collectionOfEntrustVerify()
+    static function collectionOfEntrustByStatus($status)
     {
-        // $entrustVerify = Entrust::where('status', 2);
-        $entrusts = Entrust::where('status', 2)
+        $col_orderby;
+        if($status == 2)
+            $col_orderby = 'updated_at';
+        else
+            $col_orderby = 'created_at';
+        $entrusts = Entrust::where('status', $status)
                             ->join('customer', function ($join) {
                                 $join->on('customer.id', 'entrust.customer_id');
                             })
-                            ->join('publish_user', function ($join) {
-                                $join->on('publish_user.user_id', 'entrust.owner_user')
-                                     ->whereRaw('publish_user.deleted_at IS NULL');
-                            })
+                            // ->join('publish_user', function ($join) {
+                            //     $join->on('publish_user.user_id', 'entrust.owner_user')
+                            //          ->whereRaw('publish_user.deleted_at IS NULL');
+                            // })
                             ->selectRaw('customer.name AS customer_name, entrust.*')
-                            ->orderBy('entrust.updated_at', 'desc')
+                            ->orderBy('entrust.'.$col_orderby, 'desc')
                             ->get();
         return $entrusts;
-        // 
-        //     // $positionName = Publishposition::find($publish->publish_position_id)->first()->name;
-        //     // $publish->update(['position_name' => $positionName]);
-        //     $publish->position_name = 'glide';//$positionName;
-        //     $publish->save();
-        // }
-        // $publishCollection->each(function ($publish) {
-        //     $positionName = Publishposition::find($publish->publish_position_id)->first()->name;
-        //     $publish->update(['position_name' => $positionName]);
-        // });
-
-
-        // $arrayPositionID = $publish->pluck('publish_position_id');
-        // foreach ($arrayPositionID as $positionID) {
-        //     $positionName = Publishposition::leftJoin('publish_site', function ($join) {
-        //                     $join->on('publish_site.id', '=', 'publish_position.site_id');
-        //                 })->selectRaw('publish_site.name AS site_name,publish_position.*')
-        //                 ->find($positionID)->name;
-        //     $publish->find($positionID)->position_name = $positionName;
-        // }
-
-        // $publish = $query->addSelect(DB::raw(''))
-        
     }
 }

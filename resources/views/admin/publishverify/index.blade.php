@@ -45,14 +45,16 @@
 <!-- <td>{{ $row->status_name }}</td> -->
 
                             <td>
-                            @if($row->status == 2)
+                            <!-- @if($row->status == 2) -->
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'route' => array(config('quickadmin.route').'.entrustverify.yes', $row->id))) !!}
                                 {!! Form::submit('核可', array('class' => 'btn btn-xs btn-info')) !!}
                                 {!! Form::close() !!}
-                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要退件？');", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
+
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt();", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
                                 {!! Form::submit('退件', array('class' => 'btn btn-xs btn-danger')) !!}
+                                {{ Form::hidden('reject_text', null, array('id' => 'reject_text')) }}
                                 {!! Form::close() !!}
-                            @endif
+                            <!-- @endif -->
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.publish.destroy', $row->id))) !!}
                                 {!! Form::submit(trans('quickadmin::templates.templates-view_index-delete'), array('class' => 'btn btn-xs btn-danger')) !!}
                                 {!! Form::close() !!} -->
@@ -108,6 +110,19 @@
                 }
             });
         });
+
+        function rejectPrompt() {
+            var rejectText = prompt("請輸入退件原因");
+            if (rejectText == null || rejectText == "") {
+                return false;
+            } else {
+                $('#reject_text').val(rejectText);
+                // if(rejectText != ""){
+                //     alert('已輸入退件原因');
+                // }
+                return true;
+            }
+        }
     </script>
     <style>
         .btn-verify {

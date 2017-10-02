@@ -71,6 +71,15 @@ Route::group(['middleware' => 'auth', 'prefix' => 'admin'], function () {
 	    'as'   => 'admin.entrustverify.back',
 	    'uses' => 'Admin\PublishverifyController@publishBack'
 	]);
+	//委刊單執行
+	Route::match(['get', 'post'], 'publish/close/{id}', [
+	    'as'   => 'admin.publish.close',
+	    'uses' => 'Admin\PublishDoController@publishClose'
+	]);
+	Route::match(['get', 'post'], 'publish/reject/{id}', [
+	    'as'   => 'admin.publish.reject',
+	    'uses' => 'Admin\PublishDoController@publishReject'
+	]);
 	//查看委刊單內容
 	Route::match(['get', 'post'], 'entrust/verify/{id}', [
 	    'as'   => 'admin.entrust.verify',

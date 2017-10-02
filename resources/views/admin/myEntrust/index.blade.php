@@ -65,16 +65,14 @@
                             <td>{{ $row->txt_pay_status }}</td>
 
                             <td>
-                            @if($row->status == 1)
-                                提案
-                            @elseif($row->status == 2)
-                                審核中
-                            @elseif($row->status == 3)
-                                <span class="text-success">審核通過</span>
+                            @if($row->status == 3)
+                                <span class="text-success">{{ config('admin.entrust.status')[$row->status] }}</span>
                             @elseif($row->status == 4)
-                                <span class="text-danger">退件</span>
-                            @elseif($row->status == 0)
-                                取消委刊
+                                <span class="text-danger">{{ config('admin.entrust.status')[$row->status] }}</span>
+                            @elseif($row->status == 9)
+                                <span class="text-default">{{ config('admin.entrust.status')[$row->status] }}</span>
+                            @else
+                                {{ config('admin.entrust.status')[$row->status] }}
                             @endif
                             </td>
                             <td>

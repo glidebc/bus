@@ -37,8 +37,9 @@ class MyAgentController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
+		$type = DataQuery::arraySelectCustomerType();
 		$contact = DataQuery::arraySelectContactByCustomer($userId, 0);
-	    return view(config('quickadmin.route').'.myAgent.create', compact('userId', 'contact'));
+	    return view(config('quickadmin.route').'.myAgent.create', compact('userId', 'type', 'contact'));
 	}
 
 	/**

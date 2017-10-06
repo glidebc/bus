@@ -19,6 +19,12 @@
 {!! Form::model($customer, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.teamcustomer.update', $customer->id))) !!}
 
 <div class="form-group">
+    {!! Form::label('type_id', '類型', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::select('type_id', $type, $customer->type_id, array('class'=>'form-control')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('name', '公司簡稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::text('name', old('name',$customer->name), array('class'=>'form-control')) !!}

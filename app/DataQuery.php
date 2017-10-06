@@ -5,6 +5,7 @@ namespace App;
 use App\Contact;
 use App\Customer;
 use App\CustomerAgent;
+use App\CustomerType;
 use App\CustomerUser;
 use App\Dept;
 use App\Entrust;
@@ -249,6 +250,12 @@ class DataQuery {
         // }
         
         
+    }
+
+    //業務管理-我的客戶, 團隊管理-管理客戶
+    static function arraySelectCustomerType()
+    {
+        return CustomerType::withTrashed()->pluck('name','id')->prepend('預設', 0);
     }
 
     //業務管理-我的客戶, 團隊管理-管理客戶

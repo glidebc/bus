@@ -19,6 +19,12 @@
 {!! Form::model($agent, array('class' => 'form-horizontal', 'id' => 'form-with-validation', 'method' => 'PATCH', 'route' => array(config('quickadmin.route').'.teamagent.update', $agent->id))) !!}
 
 <div class="form-group">
+    {!! Form::label('type_id', '類型', array('class'=>'col-sm-2 control-label')) !!}
+    <div class="col-sm-10">
+        {!! Form::select('type_id', $type, $agent->type_id, array('class'=>'form-control')) !!}
+        
+    </div>
+</div><div class="form-group">
     {!! Form::label('name', '公司簡稱', array('class'=>'col-sm-2 control-label text-primary')) !!}
     <div class="col-sm-10">
         {!! Form::text('name', old('name',$agent->name), array('class'=>'form-control', 'placeholder' => '10字以內','maxlength' => 10)) !!}

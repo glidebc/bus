@@ -26,6 +26,7 @@ class CreateCustomerRequest extends FormRequest {
 	public function rules()
 	{
 		return [
+			// 'type_id' => 'check_customer_type',
             'name' => 'required|unique:customer,name,'.$this->customer,
             'tax_title' => 'required',
             // 'agent_id' => 'required',
@@ -45,6 +46,7 @@ class CreateCustomerRequest extends FormRequest {
 	public function messages()
 	{
 	    return [
+	    	// 'type_id.check_customer_type' => '請選擇類型',
 	        'name.required' => '請輸入公司簡稱',
 	        'name.unique' => '輸入的公司簡稱已存在',
 
@@ -69,6 +71,10 @@ class CreateCustomerRequest extends FormRequest {
      */
     public function validator(Factory $factory)
     {
+    	// $factory->extend('check_customer_type', function($attribute, $value, $parameters, $validator) {
+    	// 	return $value > 0;
+     //    });
+        
     	$factory->extend('check_min_length', function($attribute, $value, $parameters, $validator) {
     		return strlen($value) == 8;
         });

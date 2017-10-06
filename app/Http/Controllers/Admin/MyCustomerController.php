@@ -49,9 +49,10 @@ class MyCustomerController extends Controller {
 	public function create()
 	{
 		$userId = Auth::user()->id;
+		$type = DataQuery::arraySelectCustomerType();
 		$agent = DataQuery::arraySelectAgent($userId, false);
 		$contact = DataQuery::arraySelectContactByCustomer($userId, 0);
-	    return view(config('quickadmin.route').'.myCustomer.create', compact(array('userId', 'agent', 'contact')));
+	    return view(config('quickadmin.route').'.myCustomer.create', compact(array('userId', 'type', 'agent', 'contact')));
 	}
 
 	/**
@@ -110,7 +111,7 @@ class MyCustomerController extends Controller {
 		$this->checkCustomerAgent($id, $agentid);
 		//將聯絡人指定所屬公司
 		$this->setCustomerOfContact($request->input('contact_id'), $id);
-		
+
 		return redirect()->route(config('quickadmin.route').'.mycustomer.index');
 	}
 

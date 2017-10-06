@@ -34,6 +34,7 @@ class Customer extends Model {
           // 'com_fax',
           // 'mobile',
           'note',
+          'type_id',
           'is_agent',
           'owner_user'
     ];

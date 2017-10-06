@@ -74,6 +74,8 @@ class TeamAgentController extends Controller {
 	public function edit($id)
 	{
 		$agent = Customer::withTrashed()->find($id);
+		//類型
+		$type = DataQuery::arraySelectCustomerType();
 		//同個部門與組別的user
 		$userId = Auth::user()->id;
 	    $arrayUser = DataQuery::arrayTeamUser($userId);
@@ -84,7 +86,7 @@ class TeamAgentController extends Controller {
 		// foreach ($customerUsers as $customerUser) {
 		// 	if($listUser[$customerUser->user_id])
 		// }
-		return view(config('quickadmin.route').'.teamAgent.edit', compact(array('agent','arrayUser','arrayCustomerUser','contact')));
+		return view(config('quickadmin.route').'.teamAgent.edit', compact(array('agent','type','arrayUser','arrayCustomerUser','contact')));
 	}
 
 	/**

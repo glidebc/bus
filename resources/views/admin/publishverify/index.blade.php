@@ -50,9 +50,9 @@
                                 {!! Form::submit('核可', array('class' => 'btn btn-xs btn-info')) !!}
                                 {!! Form::close() !!}
 
-                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt();", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt($row->id);", 'route' => array(config('quickadmin.route').'.entrustverify.reject', $row->id))) !!}
                                 {!! Form::submit('退件', array('class' => 'btn btn-xs btn-danger')) !!}
-                                {{ Form::hidden('reject_text', null, array('id' => 'reject_text')) }}
+                                {{ Form::hidden('reject_text', null, array('id' => 'reject_text_'.$row->id)) }}
                                 {!! Form::close() !!}
                             <!-- @endif -->
                                 <!-- {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'DELETE', 'onsubmit' => "return confirm('".trans("quickadmin::templates.templates-view_index-are_you_sure")."');",  'route' => array(config('quickadmin.route').'.publish.destroy', $row->id))) !!}
@@ -111,12 +111,12 @@
             });
         });
 
-        function rejectPrompt() {
+        function rejectPrompt(id) {
             var rejectText = prompt("請輸入退件原因");
             if (rejectText == null || rejectText == "") {
                 return false;
             } else {
-                $('#reject_text').val(rejectText);
+                $('#reject_text_'+id).val(rejectText);
                 // if(rejectText != ""){
                 //     alert('已輸入退件原因');
                 // }

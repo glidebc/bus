@@ -40,9 +40,9 @@
                                 {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return confirm('確定要結案？');", 'route' => array(config('quickadmin.route').'.publish.close', $row->id))) !!}
                                 {!! Form::submit('結案', array('class' => 'btn btn-xs btn-warning')) !!}
                                 {!! Form::close() !!}
-                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt();", 'route' => array(config('quickadmin.route').'.publish.reject', $row->id))) !!}
+                                {!! Form::open(array('style' => 'display: inline-block;', 'method' => 'POST', 'onsubmit' => "return rejectPrompt($row->id);", 'route' => array(config('quickadmin.route').'.publish.reject', $row->id))) !!}
                                 {!! Form::submit('退件', array('class' => 'btn btn-xs btn-danger')) !!}
-                                {{ Form::hidden('reject_text', null, array('id' => 'reject_text')) }}
+                                {{ Form::hidden('reject_text', null, array('id' => 'reject_text_'.$row->id)) }}
                                 {!! Form::close() !!}
                             </td>
                         </tr>
@@ -59,12 +59,12 @@
 
 @section('javascript')
 <script>
-    function rejectPrompt() {
+    function rejectPrompt(id) {
         var rejectText = prompt("請輸入退件原因");
         if (rejectText == null || rejectText == "") {
             return false;
         } else {
-            $('#reject_text').val(rejectText);
+            $('#reject_text_'+id).val(rejectText);
             return true;
         }
     }

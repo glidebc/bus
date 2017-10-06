@@ -30,7 +30,6 @@ class PublishDoController extends Controller {
             $entrust->user_name = $publishuser->user_name;
             $entrust->status_name = config('admin.entrust.status')[$entrust->status];
         }
-
 		return view('admin.publishdo.index', compact('entrusts'));
 	}
 

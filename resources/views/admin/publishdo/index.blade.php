@@ -64,7 +64,7 @@
         if (rejectText == null || rejectText == "") {
             return false;
         } else {
-            $('#reject_text_'+id).val(rejectText);
+            $('#reject_text_'+id).val(rejectText);//
             return true;
         }
     }
